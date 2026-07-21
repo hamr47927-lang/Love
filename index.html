@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>إليكِ أنتِ... ❤️</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --main-bg: #0c0814; --card-bg: rgba(25, 18, 38, 0.85); --accent: #ff4d6d; --gold: #ffd700; --text: #f0f0f5; }
+        * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--main-bg); color: var(--text); overflow: hidden; }
+        
+        .container { width: 92%; max-width: 400px; height: 88vh; text-align: center; background: var(--card-bg); backdrop-filter: blur(20px); padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; z-index: 10; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;}
+        
+        .section { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; animation: fadeIn 0.8s ease; }
+        .section.active { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2, h3 { color: var(--accent); margin-bottom: 12px; }
+        p { line-height: 1.6; font-size: 0.92rem; color: #d0d0d8; margin-bottom: 15px; }
+
+        button { background: linear-gradient(145deg, #ff4d6d, #c9184a); color: white; border: none; padding: 13px 20px; border-radius: 20px; width: 100%; font-weight: bold; cursor: pointer; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); transition: 0.3s; margin-top: 10px; }
+        button:active { transform: scale(0.97); }
+
+        /* المحطة الثانية: الذكريات */
+        .timeline-card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 15px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 12px; }
+        
+        /* المحطة الرابعة: النجوم */
+        #star-canvas { width: 100%; height: 180px; background: rgba(0,0,0,0.3); border-radius: 15px; cursor: crosshair; margin-bottom: 10px; display: block; }
+
+        /* المحطة الخاصة: نبتة الوقت */
+        .seed-box { font-size: 55px; color: var(--gold); margin: 15px 0; transition: 0.5s; }
+
+        /* المحطة الخاصة: راديو الترددات */
+        .radio-container { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); width: 100%; margin: 10px 0; }
+        input[type=range] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: 15px 0; }
+
+        /* أزرار القرار الأخير */
+        .choice-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- المحطة الأولى: الباب -->
+    <div id="s1" class="section active">
+        <div>
+            <h2>مرحباً بكِ... ✨</h2>
+            <p>هناك رحلة صغيرة، وكلمات خارجة من القلب بالكامل، أتمنى أن تأخذي دقيقة واحدة لقراءتها بهدوء.</p>
+        </div>
+        <button onclick="nextSection(2)">مستعدة تشوفي حاجة طالعة من قلبي؟ ❤️</button>
+    </div>
+
+    <!-- المحطة الثانية: شريط الذكريات -->
+    <div id="s2" class="section">
+        <h3>رحلتنا معاً 🕰️</h3>
+        <div class="timeline-card" id="timeline-text">
+            بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.
+        </div>
+        <p id="timeline-sub" style="font-size: 0.85rem; color: var(--gold);">وجودك كان دائماً يترك أثراً جميلاً ومختلفاً.</p>
+        <button onclick="nextTimelineStep()">التالي ➡️</button>
+    </div>
+
+    <!-- المحطة الثالثة: نبتة الوقت (الفكرة الإضافية الأولى) -->
+    <div id="s3" class="section">
+        <h3>قصة صبر ووقت 🌱</h3>
+        <div class="seed-box" id="seed-icon"><i class="fas fa-seedling"></i></div>
+        <p id="seed-msg" style="min-height: 50px; font-weight: bold; color: var(--gold);">في حاجات حلوة مبتجيش فجأة..</p>
+        <button id="seedBtn" onclick="waterSeed()">اسقي النبتة 💧</button>
+    </div>
+
+    <!-- المحطة الرابعة: راديو الترددات السري (الفكرة الإضافية الثانية) -->
+    <div id="s4" class="section">
+        <h3>راديو الترددات 📻</h3>
+        <p style="font-size: 0.85rem;">حركي المؤشر للبحث عن التردد الصحيح الذي يصف إحساسي:</p>
+        <div class="radio-container">
+            <div id="radio-status" style="font-family: monospace; font-size: 0.9rem; color: var(--accent);">📶 جاري البحث (وشوشة راديو)...</div>
+            <input type="range" id="radioDial" min="88" max="108" value="88" oninput="checkRadioDial(this.value)">
+        </div>
+        <p id="radio-msg" style="min-height: 40px; font-size: 0.85rem;"></p>
+        <button id="radioNextBtn" style="display:none;" onclick="nextSection(5)">متابعة الرحلة ✨</button>
+    </div>
+
+    <!-- المحطة الخامسة: نقطة التحول والموسيقى -->
+    <div id="s5" class="section">
+        <h3>نقطة التحول 🎵</h3>
+        <div style="font-size: 35px; color: var(--accent); margin-bottom: 5px;"><i class="fas fa-headphones-alt"></i></div>
+        <p id="typewriter-box" style="min-height: 70px; font-weight: bold; color: white; font-size: 0.9rem;"></p>
+        <button onclick="nextSection(6)">تابعي القراءة ✨</button>
+    </div>
+
+    <!-- المحطة السادسة: خريطة النجوم -->
+    <div id="s6" class="section">
+        <h3>ارسمي الطريق بالضغط على النجوم ⭐</h3>
+        <canvas id="star-canvas"></canvas>
+        <p id="star-hint" style="font-size: 0.8rem;">اضغطي أو تمرري داخل المربع لتظهر الحقيقة...</p>
+        <button id="starNextBtn" style="display:none;" onclick="nextSection(7)">الخطوة الأخيرة ❤️</button>
+    </div>
+
+    <!-- المحطة السابعة: الوعد والضمان -->
+    <div id="s7" class="section">
+        <h3>اطمني... 💌</h3>
+        <p style="text-align: right; font-size: 0.85rem;">
+            أنا عارف إن الكلمة دي بتغير حاجات كتير، وعارف إنك ممكن تقلقي من فكرة "إحنا لسه قدامنا وقت". بس أنا مكنتش هقدر أسكت أكتر من كده وأنا شايفك بتبقي أهم حاجة في حياتي.<br><br>
+            أنا مش بطلب منك تستنيني في المجهول، أنا بطلب منك تكوني الوجهة اللي أنا ببني مستقبلي عشان أكون جاهز أقف قدام العالم كله وأطلبك ليهم. أنا مش هضغط عليكي في أي حاجة، ولا هغير معاملتي ليكي، أنا بس حبيت أحجز مكاني في قلبك لحد ما أثبتلك ده بالأفعال.
+        </p>
+        <button onclick="nextSection(8)">قراري النهائي...</button>
+    </div>
+
+    <!-- المحطة الثامنة: مساحة القرار بدون ضغط -->
+    <div id="s8" class="section">
+        <h3>خدي كل وقتك 🌸</h3>
+        <p>مهما كان قرارك، قيمتك عندي لن تتغير أبداً.</p>
+        <div class="choice-btns">
+            <button onclick="positiveChoice()">وأنا كمان حابة نكمل الطريق ده سوا ❤️</button>
+            <button class="btn-secondary" onclick="neutralChoice()">محتاجة أستوعب اللي قريته الأول 🥺</button>
+        </div>
+        <p id="final-reply" style="margin-top: 10px; font-weight: bold; color: var(--gold); font-size: 0.85rem;"></p>
+    </div>
+
+</div>
+
+<script>
+let currentSec = 1;
+
+// بيانات الذكريات
+const timelineSteps = [
+    { text: "بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.", sub: "وجودك كان دائماً يترك أثراً جميلاً ومختلفاً." },
+    { text: "مواقف الجدعنة والدعم المتبادل وسط ضغوط المحاضرات والمشاريع.", sub: "كنت أجد معك دائماً الراحة وسط أي تعب." },
+    { text: "أوقات الضحك والهزار البريء التي لا تُعوض.", sub: "هنا أدركت أنكِ لستِ مجرد صديقة عادية بالنسبة لي." }
+];
+let timelineIdx = 0;
+
+// مراحل نبتة الوقت
+let seedStep = 0;
+const seedData = [
+    { msg: "بتحتاج صبر، ووقت، ومجهود عشان تطرح..", icon: "fa-spa" },
+    { msg: "وانتي أجمل حاجة أنا مستعد أسقيها وأصبر عليها لحد ما أكون جاهز أقطفها ❤️", icon: "fa-seedling" }
+];
+
+function nextSection(n) {
+    document.getElementById('s' + currentSec).classList.remove('active');
+    currentSec = n;
+    document.getElementById('s' + currentSec).classList.add('active');
+    
+    if(n === 5) {
+        startTypewriter();
+    }
+    if(n === 6) {
+        initStarCanvas();
+    }
+}
+
+function nextTimelineStep() {
+    timelineIdx++;
+    if(timelineIdx < timelineSteps.length) {
+        document.getElementById('timeline-text').innerText = timelineSteps[timelineIdx].text;
+        document.getElementById('timeline-sub').innerText = timelineSteps[timelineIdx].sub;
+    } else {
+        nextSection(3); // الانتقال لمحطة البذرة
+    }
+}
+
+function waterSeed() {
+    if(seedStep === 0) {
+        document.getElementById('seed-msg').innerText = seedData[0].msg;
+        document.getElementById('seed-icon').innerHTML = `<i class="fas ${seedData[0].icon}"></i>`;
+        seedStep++;
+    } else if(seedStep === 1) {
+        document.getElementById('seed-msg').innerText = seedData[1].msg;
+        document.getElementById('seed-icon').innerHTML = `<i class="fas fa-tree" style="color: var(--accent);"></i>`;
+        document.getElementById('seedBtn').innerText = "الانتقال للتردد التالي 📻";
+        seedStep++;
+    } else {
+        nextSection(4); // الانتقال لمحطة الراديو
+    }
+}
+
+function checkRadioDial(val) {
+    const status = document.getElementById('radio-status');
+    const msg = document.getElementById('radio-msg');
+    const targetVal = 104; // التردد السري
+    
+    if(Math.abs(val - targetVal) <= 2) {
+        status.innerHTML = "📻 تم التقاط التردد الصافي بنجاح!";
+        status.style.color = "var(--gold)";
+        msg.innerHTML = "<b>"أنتِ التردد الوحيد الذي يصفّي دماغي ويعطيني سلاماً وسط كل هذا الصخب. أنا بحبك."</b>";
+        document.getElementById('radioNextBtn').style.display = 'block';
+    } else {
+        status.innerHTML = "📶 جاري البحث (وشوشة راديو)... التردد الحالي: " + val + " MHz";
+        status.style.color = "var(--accent)";
+        msg.innerHTML = "حركي المؤشر لليمين أو اليسار للوصول إلى التردد المميز (حوالي 104)...";
+        document.getElementById('radioNextBtn').style.display = 'none';
+    }
+}
+
+function startTypewriter() {
+    const text = "دایماً كنت بسمع أغاني الحب عادي، لحد ما في يوم لقيتني بركز في الكلمات دي وبتخيلك إنتي.. هنا عرفت إنك مبقتيش مجرد صاحبة، وإن قلبي اختار وجهته.";
+    const el = document.getElementById('typewriter-box');
+    el.innerHTML = "";
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            el.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 40);
+        }
+    }
+    type();
+}
+
+function initStarCanvas() {
+    const canvas = document.getElementById('star-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
+    let starsDrawn = 0;
+    ctx.fillStyle = '#ffffff';
+    
+    for(let i=0; i<25; i++) {
+        let x = Math.random() * canvas.width;
+        let y = Math.random() * canvas.height;
+        ctx.fillRect(x, y, 2, 2);
+    }
+
+    const drawLine = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - rect.left;
+        const y = (e.clientY || e.touches[0].clientY) - rect.top;
+        
+        ctx.fillStyle = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        starsDrawn++;
+        if(starsDrawn > 12) {
+            document.getElementById('star-hint').innerText = "تم اكتشاف الرسالة بنجاح! ✨";
+            document.getElementById('starNextBtn').style.display = 'block';
+        }
+    };
+
+    canvas.addEventListener('mousemove', drawLine);
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); drawLine(e); }, {passive: false});
+}
+
+function positiveChoice() {
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    document.getElementById('final-reply').innerText = "سأكون عند حسن ظنك دائماً، ولن أخذل هذا الاختيار أبداً ❤️";
+}
+
+function neutralChoice() {
+    document.getElementById('final-reply').innerText = "خدي كل وقتك تماماً، أنا هنا دائماً ولا يوجد أي استعجال 🌸";
+}
+</script>
+
+</body>
+</html>
