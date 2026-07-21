@@ -11,30 +11,31 @@
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--main-bg); color: var(--text); overflow: hidden; }
         
-        .container { width: 92%; max-width: 400px; height: 88vh; text-align: center; background: var(--card-bg); backdrop-filter: blur(20px); padding: 25px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; z-index: 10; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;}
+        .container { width: 92%; max-width: 400px; height: 90vh; text-align: center; background: var(--card-bg); backdrop-filter: blur(20px); padding: 20px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); position: relative; z-index: 10; border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column; justify-content: space-between; overflow-y: auto;}
         
         .section { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; animation: fadeIn 0.8s ease; }
         .section.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2, h3 { color: var(--accent); margin-bottom: 12px; }
-        p { line-height: 1.6; font-size: 0.92rem; color: #d0d0d8; margin-bottom: 15px; }
+        h2, h3 { color: var(--accent); margin-bottom: 8px; }
+        p { line-height: 1.5; font-size: 0.9rem; color: #d0d0d8; margin-bottom: 12px; }
 
-        button { background: linear-gradient(145deg, #ff4d6d, #c9184a); color: white; border: none; padding: 13px 20px; border-radius: 20px; width: 100%; font-weight: bold; cursor: pointer; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); transition: 0.3s; margin-top: 10px; }
+        button { background: linear-gradient(145deg, #ff4d6d, #d9163b); color: white; border: none; padding: 12px 20px; border-radius: 20px; width: 100%; font-weight: bold; cursor: pointer; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); transition: 0.3s; margin-top: 8px; }
         button:active { transform: scale(0.97); }
 
-        /* المحطة الثانية: الذكريات */
-        .timeline-card { background: rgba(255,255,255,0.05); padding: 18px; border-radius: 15px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 12px; }
+        /* المحطة الثانية: شريط الذكريات بالصور */
+        .timeline-card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 10px; width: 100%; }
+        .timeline-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 8px; }
         
-        /* المحطة الرابعة: النجوم */
-        #star-canvas { width: 100%; height: 180px; background: rgba(0,0,0,0.3); border-radius: 15px; cursor: crosshair; margin-bottom: 10px; display: block; }
+        /* المحطة الثالثة: نبتة الوقت */
+        .seed-box { font-size: 50px; color: var(--gold); margin: 10px 0; transition: 0.5s; }
 
-        /* المحطة الخاصة: نبتة الوقت */
-        .seed-box { font-size: 55px; color: var(--gold); margin: 15px 0; transition: 0.5s; }
+        /* المحطة الرابعة: راديو الترددات (الباسورد) */
+        .radio-container { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); width: 100%; margin: 8px 0; }
+        input[type=range] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: 12px 0; }
 
-        /* المحطة الخاصة: راديو الترددات */
-        .radio-container { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); width: 100%; margin: 10px 0; }
-        input[type=range] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: 15px 0; }
+        /* المحطة الخامسة: النجوم */
+        #star-canvas { width: 100%; height: 150px; background: rgba(0,0,0,0.3); border-radius: 15px; cursor: crosshair; margin-bottom: 8px; display: block; }
 
         /* أزرار القرار الأخير */
         .choice-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
@@ -42,6 +43,9 @@
     </style>
 </head>
 <body>
+
+<!-- عنصر الصوت (حط اسم الأغنية بتاعتك مكان src) -->
+<audio id="bgSong" src="your-song.mp3" loop></audio>
 
 <div class="container">
     
@@ -51,74 +55,67 @@
             <h2>مرحباً بكِ... ✨</h2>
             <p>هناك رحلة صغيرة، وكلمات خارجة من القلب بالكامل، أتمنى أن تأخذي دقيقة واحدة لقراءتها بهدوء.</p>
         </div>
-        <button onclick="nextSection(2)">مستعدة تشوفي حاجة طالعة من قلبي؟ ❤️</button>
+        <button onclick="startExperience()">مستعدة تشوفي حاجة طالعة من قلبي؟ ❤️</button>
     </div>
 
-    <!-- المحطة الثانية: شريط الذكريات -->
+    <!-- المحطة الثانية: شريط الذكريات (صور حقيقية) -->
     <div id="s2" class="section">
         <h3>رحلتنا معاً 🕰️</h3>
-        <div class="timeline-card" id="timeline-text">
-            بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.
+        <div class="timeline-card">
+            <img id="timeline-img" class="timeline-img" src="" alt="ذكرياتنا">
+            <div id="timeline-text" style="font-weight: bold; color: white; font-size: 0.9rem;"></div>
         </div>
-        <p id="timeline-sub" style="font-size: 0.85rem; color: var(--gold);">وجودك كان دائماً يترك أثراً جميلاً ومختلفاً.</p>
+        <p id="timeline-sub" style="font-size: 0.8rem; color: var(--gold);"></p>
         <button onclick="nextTimelineStep()">التالي ➡️</button>
     </div>
 
-    <!-- المحطة الثالثة: نبتة الوقت (الفكرة الإضافية الأولى) -->
+    <!-- المحطة الثالثة: نبتة الوقت -->
     <div id="s3" class="section">
         <h3>قصة صبر ووقت 🌱</h3>
         <div class="seed-box" id="seed-icon"><i class="fas fa-seedling"></i></div>
-        <p id="seed-msg" style="min-height: 50px; font-weight: bold; color: var(--gold);">في حاجات حلوة مبتجيش فجأة..</p>
+        <p id="seed-msg" style="min-height: 40px; font-weight: bold; color: var(--gold);">في حاجات حلوة مبتجيش فجأة..</p>
         <button id="seedBtn" onclick="waterSeed()">اسقي النبتة 💧</button>
     </div>
 
-    <!-- المحطة الرابعة: راديو الترددات السري (الفكرة الإضافية الثانية) -->
+    <!-- المحطة الرابعة: راديو الترددات (كلمة السر 104) -->
     <div id="s4" class="section">
-        <h3>راديو الترددات 📻</h3>
-        <p style="font-size: 0.85rem;">حركي المؤشر للبحث عن التردد الصحيح الذي يصف إحساسي:</p>
+        <h3>راديو الترددات (كلمة السر) 📻</h3>
+        <p style="font-size: 0.8rem;">لفتح الخطوة التالية، حركي المؤشر للبحث عن التردد الصحيح (104):</p>
         <div class="radio-container">
-            <div id="radio-status" style="font-family: monospace; font-size: 0.9rem; color: var(--accent);">📶 جاري البحث (وشوشة راديو)...</div>
+            <div id="radio-status" style="font-family: monospace; font-size: 0.85rem; color: var(--accent);">📶 جاري البحث (وشوشة راديو)...</div>
             <input type="range" id="radioDial" min="88" max="108" value="88" oninput="checkRadioDial(this.value)">
         </div>
-        <p id="radio-msg" style="min-height: 40px; font-size: 0.85rem;"></p>
-        <button id="radioNextBtn" style="display:none;" onclick="nextSection(5)">متابعة الرحلة ✨</button>
+        <p id="radio-msg" style="min-height: 35px; font-size: 0.8rem;"></p>
+        <button id="radioNextBtn" style="display:none;" onclick="nextSection(5)">فتح الباب التالي ✨</button>
     </div>
 
-    <!-- المحطة الخامسة: نقطة التحول والموسيقى -->
+    <!-- المحطة الخامسة: خريطة النجوم -->
     <div id="s5" class="section">
-        <h3>نقطة التحول 🎵</h3>
-        <div style="font-size: 35px; color: var(--accent); margin-bottom: 5px;"><i class="fas fa-headphones-alt"></i></div>
-        <p id="typewriter-box" style="min-height: 70px; font-weight: bold; color: white; font-size: 0.9rem;"></p>
-        <button onclick="nextSection(6)">تابعي القراءة ✨</button>
-    </div>
-
-    <!-- المحطة السادسة: خريطة النجوم -->
-    <div id="s6" class="section">
         <h3>ارسمي الطريق بالضغط على النجوم ⭐</h3>
         <canvas id="star-canvas"></canvas>
         <p id="star-hint" style="font-size: 0.8rem;">اضغطي أو تمرري داخل المربع لتظهر الحقيقة...</p>
-        <button id="starNextBtn" style="display:none;" onclick="nextSection(7)">الخطوة الأخيرة ❤️</button>
+        <button id="starNextBtn" style="display:none;" onclick="nextSection(6)">الخطوة الأخيرة ❤️</button>
     </div>
 
-    <!-- المحطة السابعة: الوعد والضمان -->
-    <div id="s7" class="section">
+    <!-- المحطة السادسة: الوعد والضمان -->
+    <div id="s6" class="section">
         <h3>اطمني... 💌</h3>
-        <p style="text-align: right; font-size: 0.85rem;">
+        <p style="text-align: right; font-size: 0.82rem;">
             أنا عارف إن الكلمة دي بتغير حاجات كتير، وعارف إنك ممكن تقلقي من فكرة "إحنا لسه قدامنا وقت". بس أنا مكنتش هقدر أسكت أكتر من كده وأنا شايفك بتبقي أهم حاجة في حياتي.<br><br>
             أنا مش بطلب منك تستنيني في المجهول، أنا بطلب منك تكوني الوجهة اللي أنا ببني مستقبلي عشان أكون جاهز أقف قدام العالم كله وأطلبك ليهم. أنا مش هضغط عليكي في أي حاجة، ولا هغير معاملتي ليكي، أنا بس حبيت أحجز مكاني في قلبك لحد ما أثبتلك ده بالأفعال.
         </p>
-        <button onclick="nextSection(8)">قراري النهائي...</button>
+        <button onclick="nextSection(7)">قراري النهائي...</button>
     </div>
 
-    <!-- المحطة الثامنة: مساحة القرار بدون ضغط -->
-    <div id="s8" class="section">
+    <!-- المحطة السابعة: مساحة القرار بدون ضغط -->
+    <div id="s7" class="section">
         <h3>خدي كل وقتك 🌸</h3>
         <p>مهما كان قرارك، قيمتك عندي لن تتغير أبداً.</p>
         <div class="choice-btns">
             <button onclick="positiveChoice()">وأنا كمان حابة نكمل الطريق ده سوا ❤️</button>
             <button class="btn-secondary" onclick="neutralChoice()">محتاجة أستوعب اللي قريته الأول 🥺</button>
         </div>
-        <p id="final-reply" style="margin-top: 10px; font-weight: bold; color: var(--gold); font-size: 0.85rem;"></p>
+        <p id="final-reply" style="margin-top: 8px; font-weight: bold; color: var(--gold); font-size: 0.8rem;"></p>
     </div>
 
 </div>
@@ -126,11 +123,11 @@
 <script>
 let currentSec = 1;
 
-// بيانات الذكريات
+// مصفوفة الذكريات (تقدر تغير أسماء الصور دي وتحط صورك الحقيقية زي img1.jpg و img2.jpg)
 const timelineSteps = [
-    { text: "بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.", sub: "وجودك كان دائماً يترك أثراً جميلاً ومختلفاً." },
-    { text: "مواقف الجدعنة والدعم المتبادل وسط ضغوط المحاضرات والمشاريع.", sub: "كنت أجد معك دائماً الراحة وسط أي تعب." },
-    { text: "أوقات الضحك والهزار البريء التي لا تُعوض.", sub: "هنا أدركت أنكِ لستِ مجرد صديقة عادية بالنسبة لي." }
+    { img: "IMG-20251030-WA0022.jpg", text: "بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.", sub: "وجودك كان دائماً يترك أثراً جميلاً ومختلفاً." },
+    { img: "IMG-20251030-WA0023.jpg", text: "مواقف الجدعنة والدعم المتبادل وسط ضغوط المحاضرات والمشاريع.", sub: "كنت أجد معك دائماً الراحة وسط أي تعب." },
+    { img: "IMG-20251012-WA0053.jpg", text: "أوقات الضحك والهزار البريء التي لا تُعوض.", sub: "هنا أدركت أنكِ لستِ مجرد صديقة عادية بالنسبة لي." }
 ];
 let timelineIdx = 0;
 
@@ -141,15 +138,28 @@ const seedData = [
     { msg: "وانتي أجمل حاجة أنا مستعد أسقيها وأصبر عليها لحد ما أكون جاهز أقطفها ❤️", icon: "fa-seedling" }
 ];
 
+function startExperience() {
+    // تشغيل الأغنية أول ما تدوس على البداية
+    const song = document.getElementById('bgSong');
+    song.play().catch(e => console.log("Audio play blocked by browser policy until user interaction"));
+    
+    // تحميل أول صورة في شريط الذكريات
+    updateTimelineUI();
+    nextSection(2);
+}
+
+function updateTimelineUI() {
+    document.getElementById('timeline-img').src = timelineSteps[timelineIdx].img;
+    document.getElementById('timeline-text').innerText = timelineSteps[timelineIdx].text;
+    document.getElementById('timeline-sub').innerText = timelineSteps[timelineIdx].sub;
+}
+
 function nextSection(n) {
     document.getElementById('s' + currentSec).classList.remove('active');
     currentSec = n;
     document.getElementById('s' + currentSec).classList.add('active');
     
     if(n === 5) {
-        startTypewriter();
-    }
-    if(n === 6) {
         initStarCanvas();
     }
 }
@@ -157,8 +167,7 @@ function nextSection(n) {
 function nextTimelineStep() {
     timelineIdx++;
     if(timelineIdx < timelineSteps.length) {
-        document.getElementById('timeline-text').innerText = timelineSteps[timelineIdx].text;
-        document.getElementById('timeline-sub').innerText = timelineSteps[timelineIdx].sub;
+        updateTimelineUI();
     } else {
         nextSection(3); // الانتقال لمحطة البذرة
     }
@@ -172,44 +181,29 @@ function waterSeed() {
     } else if(seedStep === 1) {
         document.getElementById('seed-msg').innerText = seedData[1].msg;
         document.getElementById('seed-icon').innerHTML = `<i class="fas fa-tree" style="color: var(--accent);"></i>`;
-        document.getElementById('seedBtn').innerText = "الانتقال للتردد التالي 📻";
+        document.getElementById('seedBtn').innerText = "الانتقال لكلمة السر (الراديو) 📻";
         seedStep++;
     } else {
-        nextSection(4); // الانتقال لمحطة الراديو
+        nextSection(4); // الانتقال لمحطة الراديو (الباسورد 104)
     }
 }
 
 function checkRadioDial(val) {
     const status = document.getElementById('radio-status');
     const msg = document.getElementById('radio-msg');
-    const targetVal = 104; // التردد السري
+    const targetVal = 104; // كلمة السر
     
     if(Math.abs(val - targetVal) <= 2) {
-        status.innerHTML = "📻 تم التقاط التردد الصافي بنجاح!";
+        status.innerHTML = "📻 تم التقاط التردد الصافي (كلمة السر صحيحة)!";
         status.style.color = "var(--gold)";
-        msg.innerHTML = "<b>"أنتِ التردد الوحيد الذي يصفّي دماغي ويعطيني سلاماً وسط كل هذا الصخب. أنا بحبك."</b>";
+        msg.innerHTML = "<b>أنتِ التردد الوحيد الذي يصفّي دماغي ويعطيني سلاماً وسط كل هذا الصخب. أنا بحبك.</b>";
         document.getElementById('radioNextBtn').style.display = 'block';
     } else {
         status.innerHTML = "📶 جاري البحث (وشوشة راديو)... التردد الحالي: " + val + " MHz";
         status.style.color = "var(--accent)";
-        msg.innerHTML = "حركي المؤشر لليمين أو اليسار للوصول إلى التردد المميز (حوالي 104)...";
+        msg.innerHTML = "حركي المؤشر للوصول إلى الرقم 104 لفك القفل...";
         document.getElementById('radioNextBtn').style.display = 'none';
     }
-}
-
-function startTypewriter() {
-    const text = "دایماً كنت بسمع أغاني الحب عادي، لحد ما في يوم لقيتني بركز في الكلمات دي وبتخيلك إنتي.. هنا عرفت إنك مبقتيش مجرد صاحبة، وإن قلبي اختار وجهته.";
-    const el = document.getElementById('typewriter-box');
-    el.innerHTML = "";
-    let i = 0;
-    function type() {
-        if (i < text.length) {
-            el.innerHTML += text.charAt(i);
-            i++;
-            setTimeout(type, 40);
-        }
-    }
-    type();
 }
 
 function initStarCanvas() {
