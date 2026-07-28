@@ -26,7 +26,6 @@
             position: relative;
         }
 
-        /* خلفية ديناميكية 3D مبهجة في البداية */
         .ambient-bg {
             position: fixed;
             top: 0;
@@ -39,11 +38,7 @@
                 radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
                 #1a0515;
             z-index: -1;
-            animation: vibrantGlow 6s ease-in-out infinite alternate;
-        }
-        @keyframes vibrantGlow {
-            0% { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.04); }
+            transition: background 1.5s ease;
         }
 
         .screen {
@@ -63,7 +58,6 @@
             display: flex;
         }
 
-        /* كارت زجاجي بلمسة 3D */
         .glass-card {
             background: rgba(40, 10, 30, 0.85);
             backdrop-filter: blur(20px);
@@ -74,7 +68,7 @@
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.1);
             max-width: 95%;
             width: 360px;
-            transition: transform 0.3s ease;
+            transition: all 0.8s ease;
         }
 
         @keyframes shake {
@@ -107,7 +101,6 @@
             transform: scale(0.98);
         }
 
-        /* قفل الأرقام LTR */
         .pin-container {
             display: flex;
             justify-content: center;
@@ -140,7 +133,6 @@
             text-shadow: 0 0 10px rgba(255, 20, 147, 0.6);
         }
 
-        /* صفحة الأسئلة */
         .quiz-btn {
             width: 100%;
             background: rgba(255, 20, 147, 0.1);
@@ -161,38 +153,16 @@
             transform: translateY(-2px);
         }
 
-        /* الشكل الجديد كلياً لألبوم الصور (معرض الذكريات المضيء) */
-        .gallery-frame {
-            background: rgba(10, 2, 8, 0.9);
-            border: 2px solid rgba(255, 20, 147, 0.5);
-            border-radius: 20px;
-            width: 310px;
-            height: 250px;
-            margin: 0 auto 12px auto;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 25px rgba(255, 20, 147, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .gallery-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-        .gallery-caption {
-            font-size: 13px;
-            color: #fce4ec;
-            min-height: 45px;
-            padding: 0 5px;
-            margin-bottom: 12px;
-            line-height: 1.5;
-            font-family: 'Georgia', serif;
-        }
+        .album-container { width:260px; height:320px; margin:15px auto; perspective:2000px; position:relative;}
+        .book { width:100%; height:100%; position:relative; transform-style:preserve-3d;}
+        .page { width:100%; height:100%; position:absolute; top:0; left:0; transform-origin: right center; transform-style:preserve-3d; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); cursor:pointer;}
+        .page img { width:100%; height:100%; object-fit:cover; border-radius:15px; border:5px solid white; backface-visibility:hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .page.flipped { transform:rotateY(160deg);} 
+        .page-back { position:absolute; top:0; left:0; width:100%; height:100%; background:#fff; transform:rotateY(180deg); backface-visibility:hidden; border-radius:15px; border:5px solid white; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#ff4d6d;}
 
-        /* مرحلة رسم القلب على أرقام ونقاط (Dot-to-Dot) */
+        #photo-caption { font-size:1.1rem; font-weight:bold; color:#ff69b4; margin-top:15px; min-height:45px; line-height: 1.5; }
+
+        /* شاشة رسم القلب التفاعلية بالأرقام والنقاط */
         .heart-stage-box {
             position: relative;
             width: 240px;
@@ -201,54 +171,79 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 1s ease;
         }
         .dot-svg {
-            width: 160px;
-            height: 160px;
+            width: 170px;
+            height: 170px;
             overflow: visible;
         }
-        /* النقاط وأرقام التتبع */
-        .dot-point {
-            fill: #ff69b4;
-            animation: pulseDot 1.5s infinite alternate;
+        .interactive-dot {
+            cursor: pointer;
+            transition: 0.3s;
         }
-        .dot-number {
+        .interactive-dot circle {
+            fill: #ff69b4;
+            transition: 0.3s;
+        }
+        .interactive-dot:hover circle {
+            r: 7px;
+            fill: #ff1493;
+            filter: drop-shadow(0 0 8px #ff1493);
+        }
+        .dot-number-label {
             fill: #ff80ab;
-            font-size: 8px;
+            font-size: 10px;
             font-family: monospace;
             font-weight: bold;
-        }
-        @keyframes pulseDot {
-            0% { r: 3px; opacity: 0.5; }
-            100% { r: 5px; opacity: 1; }
+            pointer-events: none;
         }
 
-        /* خط رسم القلب اللي بيمشي على الأرقام */
-        .heart-trace-path {
+        .user-drawn-line {
             fill: none;
             stroke: #ff1493;
-            stroke-width: 3;
-            stroke-dasharray: 400;
-            stroke-dashoffset: 400;
-            animation: drawTraceHeart 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-        }
-        @keyframes drawTraceHeart {
-            to { stroke-dashoffset: 0; fill: rgba(255, 20, 147, 0.5); }
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 6px #ff1493);
         }
 
-        .heart-name-glow {
+        /* القلب النبيل اللي جواه الاسم */
+        .center-heart-container {
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 26px;
+            transform: translate(-50%, -50%) scale(0);
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .center-heart-container.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .center-heart-container:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .glowing-heart-shape {
+            font-size: 65px;
+            color: #ff1493;
+            text-shadow: 0 0 25px #ff1493, 0 0 50px #ff69b4;
+            animation: gentlePulse 1.5s infinite alternate;
+        }
+        @keyframes gentlePulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+        .inner-name-text {
+            position: absolute;
+            font-size: 16px;
             font-weight: bold;
-            color: #ffffff;
-            text-shadow: 0 0 15px #ff1493, 0 0 35px #ff1493;
-            opacity: 0;
-            transition: opacity 1.2s ease;
-            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px #000, 0 0 5px #ff1493;
+            letter-spacing: 1px;
+            top: 42%;
         }
 
         #confession-area {
@@ -311,45 +306,62 @@
         </div>
     </div>
 
-    <!-- 3. شاشة الألبوم الجديد كلياً (معرض الذكريات المضيء) -->
+    <!-- 3. شاشة ألبوم الصور (Book Flip) بالـ 37 صورة والأغنية -->
     <div id="screen-3" class="screen">
         <div class="glass-card" style="width: 340px;">
-            <div style="font-size: 12px; color: #ff69b4; margin-bottom: 6px; font-weight: bold;" id="photo-counter">1 / 37</div>
-            <div class="gallery-frame">
-                <img id="album-img" src="1.png" alt="Memory">
+            <div style="font-size: 12px; color: #ff69b4; margin-bottom: 6px; font-weight: bold;" id="photo-counter">افتحي الغلاف..</div>
+            <div class="album-container">
+                <div class="book" id="albumBook"></div>
             </div>
-            <p class="gallery-caption" id="photo-desc">أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="neon-btn" onclick="prevPhoto()" style="flex: 1; padding: 10px; font-size: 13px;">◀ السابق</button>
-                <button class="neon-btn" onclick="nextPhoto()" style="flex: 1; padding: 10px; font-size: 13px;" id="next-album-btn">التالي ▶</button>
+            <div id="photo-caption">اضحي واقلبي الصفحات.. ❤️</div>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="neon-btn" onclick="goBack()" style="flex: 1; padding: 10px; font-size: 13px;">◀ رجوع</button>
+                <button class="neon-btn" id="toHeartBtn" onclick="goToScreen(4)" style="flex: 1; padding: 10px; font-size: 13px; display: none;">للقلب ✨</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. شاشة رسم القلب ع الأرقام، الظلام، والهدوء الرومانسي -->
+    <!-- 4. شاشة رسم القلب بالتفاعل اليدوي والتحول الرومانسي -->
     <div id="screen-4" class="screen">
         <div class="glass-card" style="width: 350px;" id="cardContainer">
             
             <div id="heartStage">
-                <h3 style="color: #ff69b4; font-size: 15px; margin-bottom: 5px;">تتبع الأرقام وارسمي نبضنا.. ❤️</h3>
+                <h3 id="dot-instruction" style="color: #ff69b4; font-size: 15px; margin-bottom: 5px;">اضعي على النقطة (1) للبدء ❤️</h3>
                 <div class="heart-stage-box">
-                    <svg class="dot-svg" viewBox="0 0 100 100">
-                        <!-- مسار رسم القلب عبر النقاط -->
-                        <path class="heart-trace-path" d="M 50,30 Q 30,10 15,30 Q 0,55 50,85 Q 100,55 85,30 Q 70,10 50,30 Z"/>
-                        <!-- النقاط والأرقام اللي بيمشي عليها -->
-                        <circle class="dot-point" cx="50" cy="30" r="3"></circle>
-                        <text class="dot-number" x="52" y="26">1</text>
+                    <svg class="dot-svg" viewBox="0 0 100 100" id="heartSvg">
+                        <!-- مسارات التوصيل اللي هتترسم بالتدريج -->
+                        <path id="line-1-2" class="user-drawn-line" d="" />
+                        <path id="line-2-3" class="user-drawn-line" d="" />
+                        <path id="line-3-4" class="user-drawn-line" d="" />
+                        <path id="line-4-1" class="user-drawn-line" d="" />
 
-                        <circle class="dot-point" cx="15" cy="30" r="3"></circle>
-                        <text class="dot-number" x="2" y="28">2</text>
-
-                        <circle class="dot-point" cx="50" cy="85" r="3"></circle>
-                        <text class="dot-number" x="53" y="94">3</text>
-
-                        <circle class="dot-point" cx="85" cy="30" r="3"></circle>
-                        <text class="dot-number" x="88" y="28">4</text>
+                        <!-- نقطة 1 -->
+                        <g class="interactive-dot" onclick="handleDotClick(1)">
+                            <circle cx="50" cy="30" r="5" id=" dot-circle-1"></circle>
+                            <text class="dot-number-label" x="53" y="25">1</text>
+                        </g>
+                        <!-- نقطة 2 -->
+                        <g class="interactive-dot" onclick="handleDotClick(2)">
+                            <circle cx="20" cy="35" r="5" id="dot-circle-2"></circle>
+                            <text class="dot-number-label" x="8" y="32">2</text>
+                        </g>
+                        <!-- نقطة 3 -->
+                        <g class="interactive-dot" onclick="handleDotClick(3)">
+                            <circle cx="50" cy="80" r="5" id="dot-circle-3"></circle>
+                            <text class="dot-number-label" x="53" y="92">3</text>
+                        </g>
+                        <!-- نقطة 4 -->
+                        <g class="interactive-dot" onclick="handleDotClick(4)">
+                            <circle cx="80" cy="35" r="5" id="dot-circle-4"></circle>
+                            <text class="dot-number-label" x="84" y="32">4</text>
+                        </g>
                     </svg>
-                    <div class="heart-name-glow" id="heartName">أمل</div>
+
+                    <!-- قلب الشاشة المنتصفية اللي جواه الاسم -->
+                    <div class="center-heart-container" id="centerHeart" onclick="revealConfession()">
+                        <div class="glowing-heart-shape">❤️</div>
+                        <div class="inner-name-text">أمل</div>
+                    </div>
                 </div>
             </div>
 
@@ -454,119 +466,175 @@
             }
         }
 
-        const albumData = [
-            { img: "1.png", text: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
-            { img: "2.png", text: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من زمان." },
-            { img: "3.png", text: "نظرات العيون اللي بتقول كل الكلام من غير مالمح تكمل." },
-            { img: "4.png", text: "أجمل صدفة جمعتني بكي في الكلية." },
-            { img: "5.png", text: "ضحكتك اللي بتنور أي يوم ضلمة وعدا علي." },
-            { img: "6.png", text: "لما بتتعصبي وتتغيري عليا.. بكون باين قدامك هادي بس من جوه بايب! 🥰" },
-            { img: "7.png", text: "قعدات الكلية وضجتها اللي بتبقى حلوة بوجودك." },
-            { img: "8.png", text: "كل تفصيلة صغيرة فيكي بتبهمني وتلفت انتباهي." },
-            { img: "9.png", text: "لما بنمشي سوا ونتكلم في كل حاجة وما نزهقش أبداً." },
-            { img: "10.png", text: "الغيرة اللطيفة اللي بتثبت لي غلاوتك عندي وعندك." },
-            { img: "11.png", text: "أيام التعب والضغط لما كلمتك وكانت هي الدواء." },
-            { img: "12.png", text: "نظرة الاستغراب الشقية اللي بتموتني ضحك." },
-            { img: "13.png", text: "لما بتسرحي في كلامي وأنا بحكي لك." },
-            { img: "14.png", text: "أحلى وقت لما اليوم بيخلص واحنا لسه مع بعض." },
-            { img: "15.png", text: "الصوت الهادي اللي بيهدي الدنيا كلها في ودني." },
-            { img: "16.png", text: "لما بنهزر ونقعد نكايد في بعض طول اليوم." },
-            { img: "17.png", text: "كل طريق مشيناه سوا وبقى عزيز على قلبي." },
-            { img: "18.png", text: "اللحظات العفوية اللي بتطلع أجمل مفينا." },
-            { img: "19.png", text: "لما بتتأكدي إن في حد بيخاف عليكي وبيهتم بكل تفاصيلك." },
-            { img: "20.png", text: "نص حكاياتنا المجنونة اللي محدش يفهمها غيرنا." },
-            { img: "21.png", text: "لما تبصي لي نظرة كده وأفهم أنك زعلانة فأحاول أصالحك." },
-            { img: "22.png", text: "أجمل صدفة وأطعم انسانة دخلت حياتي بجد." },
-            { img: "23.png", text: "لما تحكي لي عن مواقفك اليومية وأنا مركز في كل كلمة." },
-            { img: "24.png", text: "الخوف المتبادل واللهفة لما حد غاب عن التاني." },
-            { img: "25.png", text: "أحلى ابتسامة بتطلع من قلبك الصافي." },
-            { img: "26.png", text: "كل كلمة حلوة قلتيها وفضلت محفورة جوه قلبي." },
-            { img: "27.png", text: "سوا في كل الخطوات والمغامرات الصغيرة." },
-            { img: "28.png", text: "لما بتحاولي تخبي غيرتك بس بتباني في عينيكي فوراً!" },
-            { img: "29.png", text: "أيام الكلية ومواقف رادار التأخير الكوميدية." },
-            { img: "30.png", text: "الذكريات اللي مهما عدى عليها وقت هتفضل منورة." },
-            { img: "300.png", text: "المفاجأة الخطيرة وصورة 300.png المحشورة في قلب الحدث لعيونك! ⭐" },
-            { img: "32.png", text: "لما بتبقي متألقة ومنورة في كل مكان بتبقي فيه." },
-            { img: "33.png", text: "وعد بينا إننا نكمل ونتخطى أي حاجة سوا." },
-            { img: "34.png", text: "الدعم والاهتمام المتبادل اللي مالي حياتنا دفء." },
-            { img: "35.png", text: "أحلى مستقبل وأجمل أحلام بتخيلها وأنتِ معايا فيها." },
-            { img: "36.png", text: "قربك هو الحاجة الوحيدة اللي بتعدي أي يوم صعب." },
-            { img: "37.png", text: "النهاية هنا مش نهاية الحكاية.. دي لسه البداية يا أمل قلبي! ❤️" }
+        const memories = [
+            { img: "1.png", t: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
+            { img: "2.png", t: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من zaman." },
+            { img: "3.png", t: "نظرات العيون اللي بتقول كل الكلام من غير مالمح تكمل." },
+            { img: "4.png", t: "أجمل صدفة جمعتني بكي في الكلية." },
+            { img: "5.png", t: "ضحكتك اللي بتنور أي يوم ضلمة وعدا علي." },
+            { img: "6.png", t: "لما بتتعصبي وتتغيري عليا.. بكون باين قدامك هادي بس من جوه بايب! 🥰" },
+            { img: "7.png", t: "قعدات الكلية وضجتها اللي بتبقى حلوة بوجودك." },
+            { img: "8.png", t: "كل تفصيلة صغيرة فيكي بتبهمني وتلفت انتباهي." },
+            { img: "9.png", t: "لما بنمشي سوا ونتكلم في كل حاجة وما نزهقش أبداً." },
+            { img: "10.png", t: "الغيرة اللطيفة اللي بتثبت لي غلاوتك عندي وعندك." },
+            { img: "11.png", t: "أيام التعب والضغط لما كلمتك وكانت هي الدواء." },
+            { img: "12.png", t: "نظرة الاستغراب الشقية اللي بتموتني ضحك." },
+            { img: "13.png", t: "لما بتسرحي في كلامي وأنا بحكي لك." },
+            { img: "14.png", t: "أحلى وقت لما اليوم بيخلص واحنا لسه مع بعض." },
+            { img: "15.png", t: "الصوت الهادي اللي بيهدي الدنيا كلها في ودني." },
+            { img: "16.png", t: "لما بنهزر ونقعد نكايد في بعض طول اليوم." },
+            { img: "17.png", t: "كل طريق مشيناه سوا وبقى عزيز على قلبي." },
+            { img: "18.png", t: "اللحظات العفوية اللي بتطلع أجمل مفينا." },
+            { img: "19.png", t: "لما بتتأكدي إن في حد بيخاف عليكي وبيهتم بكل تفاصيلك." },
+            { img: "20.png", t: "نص حكاياتنا المجنونة اللي محدش يفهمها غيرنا." },
+            { img: "21.png", t: "لما تبصي لي نظرة كده وأفهم أنك زعلانة فأحاول أصالحك." },
+            { img: "22.png", t: "أجمل صدفة وأطعم انسانة دخلت حياتي بجد." },
+            { img: "23.png", t: "لما تحكي لي عن مواقفك اليومية وأنا مركز في كل كلمة." },
+            { img: "24.png", t: "الخوف المتبادل واللهفة لما حد غاب عن التاني." },
+            { img: "25.png", t: "أحلى ابتسامة بتطلع من قلبك الصافي." },
+            { img: "26.png", t: "كل كلمة حلوة قلتيها وفضلت محفورة جوه قلبي." },
+            { img: "27.png", t: "سوا في كل الخطوات والمغامرات الصغيرة." },
+            { img: "28.png", t: "لما بتحاولي تخبي غيرتك بس بتباني في عينيكي فوراً!" },
+            { img: "29.png", t: "أيام الكلية ومواقف رادار التأخير الكوميدية." },
+            { img: "30.png", t: "الذكريات اللي مهما عدى عليها وقت هتفضل منورة." },
+            { img: "300.png", t: "المفاجأة الخطيرة وصورة 300.png المحشورة في قلب الحدث لعيونك! ⭐" },
+            { img: "32.png", t: "لما بتبقي متألقة ومنورة في كل مكان بتبقي فيه." },
+            { img: "33.png", t: "وعد بينا إننا نكمل ونتخطى أي حاجة سوا." },
+            { img: "34.png", t: "الدعم والاهتمام المتبادل اللي مالي حياتنا دفء." },
+            { img: "35.png", t: "أحلى مستقبل وأجمل أحلام بتخيلها وأنتِ معايا فيها." },
+            { img: "36.png", t: "قربك هو الحاجة الوحيدة اللي بتعدي أي يوم صعب." },
+            { img: "37.png", t: "النهاية هنا مش نهاية الحكاية.. دي لسه البداية يا أمل قلبي! ❤️" }
         ];
 
-        let pIdx = 0;
-        function updatePhoto() {
-            const imgEl = document.getElementById('album-img');
-            imgEl.style.opacity = '0';
-            imgEl.style.transform = 'scale(0.95)';
+        let flippedCount = 0;
+
+        function initAlbum() {
+            const book = document.getElementById('albumBook');
+            if (book.children.length > 0) return;
+            
+            const cover = document.createElement('div');
+            cover.className = 'page';
+            cover.style.zIndex = 50;
+            cover.innerHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg,#ff1493,#c9184a); color:white; display:flex; align-items:center; justify-content:center; border-radius:15px; border:5px solid gold; text-align:center; padding:10px;"><h2>ألبومها ❤️</h2></div><div class="page-back">يلا نبدأ الحكاية..</div>`;
+            cover.onclick = function() { flipPage.call(this); };
+            book.appendChild(cover);
+
+            memories.forEach((m, i) => {
+                const p = document.createElement('div');
+                p.className = 'page';
+                p.style.zIndex = memories.length - i;
+                p.innerHTML = `<img src="${m.img}"><div class="page-back">❤️</div>`;
+                p.onclick = flipPage;
+                book.appendChild(p);
+            });
+        }
+
+        function flipPage() {
+            if (!this.classList.contains('flipped')) {
+                playClickSound();
+                this.classList.add('flipped');
+                flippedCount++;
+                this.style.zIndex = 50 + flippedCount;
+
+                if (flippedCount <= memories.length) {
+                    document.getElementById('photo-counter').innerText = `${flippedCount} / ${memories.length}`;
+                    document.getElementById('photo-caption').innerText = memories[flippedCount - 1].t;
+                }
+                if (flippedCount >= memories.length) {
+                    document.getElementById('toHeartBtn').style.display = 'block';
+                }
+            }
+        }
+
+        function goBack() {
+            const flipped = document.querySelectorAll('.page.flipped');
+            if (flipped.length > 0) {
+                playClickSound();
+                const last = flipped[flipped.length - 1];
+                last.classList.remove('flipped');
+                flippedCount--;
+                last.style.zIndex = 50 - flippedCount;
+
+                if (flippedCount === 0) {
+                    document.getElementById('photo-counter').innerText = "افتحي الغلاف..";
+                    document.getElementById('photo-caption').innerText = "اضحي واقلبي الصفحات.. ❤️";
+                } else {
+                    document.getElementById('photo-counter').innerText = `${flippedCount} / ${memories.length}`;
+                    document.getElementById('photo-caption').innerText = memories[flippedCount - 1].t;
+                }
+                document.getElementById('toHeartBtn').style.display = 'none';
+            }
+        }
+
+        // تفاعل رسم القلب اليدوي خطوة بخطوة
+        let currentDotStep = 1;
+        function handleDotClick(dotNum) {
+            if (dotNum === currentDotStep) {
+                playClickSound();
+                if (dotNum === 1) {
+                    document.getElementById('line-1-2').setAttribute('d', 'M 50,30 Q 35,20 20,35');
+                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة (2) واستمري.. ❤️";
+                    currentDotStep = 2;
+                } else if (dotNum === 2) {
+                    document.getElementById('line-2-3').setAttribute('d', 'M 20,35 Q 25,65 50,80');
+                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة (3) يلا.. ❤️";
+                    currentDotStep = 3;
+                } else if (dotNum === 3) {
+                    document.getElementById('line-3-4').setAttribute('d', 'M 50,80 Q 75,65 80,35');
+                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة الأخيرة (4) لتقفلي القلب.. ❤️";
+                    currentDotStep = 4;
+                } else if (dotNum === 4) {
+                    document.getElementById('line-4-1').setAttribute('d', 'M 80,35 Q 65,20 50,30');
+                    document.getElementById('dot-instruction').innerText = "رسمتي قلبنا الجميل! اكتملت اللحظة ✨";
+                    currentDotStep = 5;
+                    confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
+
+                    // إخفاء النقاط مؤقتاً لمدة ثانيتين ثم إظهار قلب الاسم في المنتصف
+                    setTimeout(() => {
+                        document.getElementById('heartSvg').style.opacity = '0';
+                        document.getElementById('dot-instruction').style.opacity = '0';
+                        setTimeout(() => {
+                            document.getElementById('heartSvg').style.display = 'none';
+                            document.getElementById('dot-instruction').style.display = 'none';
+                            document.getElementById('centerHeart').classList.add('show');
+                        }, 500);
+                    }, 2000);
+                }
+            }
+        }
+
+        // عندما تضغط أمل على القلب الذي يضم اسمها (الانتقال للجو الرومانسي المظلم مع الشمع والورد)
+        function revealConfession() {
+            playClickSound();
+            song1.pause();
+            song1.currentTime = 0;
+            song2.play().catch(e => {});
+
+            const ambientBg = document.getElementById('ambientBg');
+            const cardContainer = document.getElementById('cardContainer');
+            const centerHeart = document.getElementById('centerHeart');
+            const confessionArea = document.getElementById('confession-area');
+
+            // إضاءة رومانسية هادئة جداً (ظلام خفيف مع الشمع والورد)
+            ambientBg.style.background = '#0a0208';
+            cardContainer.style.background = 'rgba(15, 3, 12, 0.95)';
+            centerHeart.style.transform = 'translate(-50%, -50%) scale(0)';
+
             setTimeout(() => {
-                imgEl.src = albumData[pIdx].img;
-                document.getElementById('photo-counter').innerText = `${pIdx + 1} / ${albumData.length}`;
-                document.getElementById('photo-desc').innerText = albumData[pIdx].text;
-                imgEl.style.opacity = '1';
-                imgEl.style.transform = 'scale(1)';
-            }, 150);
-
-            if (pIdx === albumData.length - 1) {
-                document.getElementById('next-album-btn').innerText = "التالي لقلب الحب ✨";
-            } else {
-                document.getElementById('next-album-btn').innerText = "التالي ▶";
-            }
-        }
-
-        function nextPhoto() {
-            playClickSound();
-            if (pIdx < albumData.length - 1) {
-                pIdx++;
-                updatePhoto();
-            } else {
-                goToScreen(4);
-            }
-        }
-
-        function prevPhoto() {
-            playClickSound();
-            if (pIdx > 0) {
-                pIdx--;
-                updatePhoto();
-            }
+                centerHeart.style.display = 'none';
+                confessionArea.classList.add('show');
+                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+            }, 600);
         }
 
         function goToScreen(n) {
+            playClickSound();
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`screen-${n}`).classList.add('active');
 
             if (n === 3) {
                 song1.play().catch(e => {});
-            } else if (n === 4) {
-                song1.pause();
-                song1.currentTime = 0;
-                song2.play().catch(e => {});
-
-                const heartName = document.getElementById('heartName');
-                const heartStage = document.getElementById('heartStage');
-                const confessionArea = document.getElementById('confession-area');
-                const ambientBg = document.getElementById('ambientBg');
-                const cardContainer = document.getElementById('cardContainer');
-
-                // ظهور الاسم بعد ما خطوط الأرقام تكتمل
-                setTimeout(() => {
-                    heartName.style.opacity = '1';
-                }, 3200);
-
-                // ظلام الشاشة بعد اكتمال الرسم وبعدين النور يرجع هادئ ورومانسي
-                setTimeout(() => {
-                    heartStage.style.opacity = '0';
-                    ambientBg.style.background = '#0a0208';
-                    cardContainer.style.background = 'rgba(15, 3, 12, 0.9)';
-
-                    setTimeout(() => {
-                        heartStage.style.display = 'none';
-                        confessionArea.classList.add('show');
-                        confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
-                    }, 1500);
-
-                }, 5000);
+                initAlbum();
             }
         }
 
@@ -586,19 +654,30 @@
             playClickSound();
             song2.pause(); song2.currentTime = 0;
             song1.pause(); song1.currentTime = 0;
-            pIdx = 0; qIdx = 0; currentPin = [0,0,0,0];
+            flippedCount = 0; qIdx = 0; currentPin = [0,0,0,0]; currentDotStep = 1;
             for(let i=0; i<4; i++) document.getElementById(`digit-${i}`).innerText = "0";
             document.getElementById('error-msg').innerText = "";
             
-            const heartStage = document.getElementById('heartStage');
-            heartStage.style.display = 'block';
-            heartStage.style.opacity = '1';
-            document.getElementById('heartName').style.opacity = '0';
+            // إعادة ضبط شاشة القلب
+            document.getElementById('heartSvg').style.display = 'block';
+            document.getElementById('heartSvg').style.opacity = '1';
+            document.getElementById('dot-instruction').style.display = 'block';
+            document.getElementById('dot-instruction').style.opacity = '1';
+            document.getElementById('dot-instruction').innerText = "اضعي على النقطة (1) للبدء ❤️";
+            document.getElementById('line-1-2').setAttribute('d', '');
+            document.getElementById('line-2-3').setAttribute('d', '');
+            document.getElementById('line-3-4').setAttribute('d', '');
+            document.getElementById('line-4-1').setAttribute('d', '');
+            
+            const centerHeart = document.getElementById('centerHeart');
+            centerHeart.style.display = 'flex';
+            centerHeart.classList.remove('show');
+
             document.getElementById('confession-area').classList.remove('show');
             document.getElementById('ambientBg').style.background = '';
             document.getElementById('cardContainer').style.background = '';
+            document.getElementById('toHeartBtn').style.display = 'none';
 
-            updatePhoto();
             goToScreen(1);
         }
     </script>
