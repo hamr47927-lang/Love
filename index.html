@@ -2,733 +2,785 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Amal - Our Special Journey ❤️</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secret Love Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary-dark: #16040d;
+            --primary: #220612;
+            --accent-1: #ff1493;
+            --accent-2: #ff69b4;
+            --accent-3: #ffd1e8;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-light: #fff;
+        }
+
         * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+
         body {
-            margin: 0;
-            padding: 0;
-            background: #1a0515;
-            color: #ffffff;
-            font-family: 'Tahoma', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: var(--text-light);
+            height: 100vh;
             overflow: hidden;
             position: relative;
         }
 
-        .ambient-bg {
-            position: fixed;
+        #bg-canvas, #confetti-canvas {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(255, 0, 128, 0.25) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
-                #1a0515;
             z-index: -1;
-            transition: background 1.5s ease;
+            pointer-events: none;
+        }
+        #confetti-canvas { z-index: 999; }
+
+        /* Global UI */
+        .global-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        .global-controls button {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .global-controls button:hover {
+            background: rgba(255, 20, 147, 0.3);
         }
 
+        /* Screens */
         .screen {
-            display: none;
-            text-align: center;
-            width: 100%;
-            height: 100vh;
             position: absolute;
             top: 0;
             left: 0;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-        .active {
-            display: flex;
-        }
-
-        .glass-card {
-            background: rgba(40, 10, 30, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 105, 180, 0.4);
-            border-radius: 26px;
-            padding: 22px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.1);
-            max-width: 95%;
-            width: 380px;
-            transition: all 0.8s ease;
-        }
-
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-8px); }
-            80% { transform: translateX(8px); }
-            100% { transform: translateX(0); }
-        }
-        .shake {
-            animation: shake 0.4s ease-in-out;
-        }
-
-        .neon-btn {
-            padding: 12px 24px;
-            font-size: 15px;
-            border-radius: 14px;
-            border: 1px solid #ff1493;
-            background: rgba(255, 20, 147, 0.2);
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(255, 20, 147, 0.4);
-            transition: 0.2s ease;
-        }
-        .neon-btn:hover {
-            background: #ff1493;
-            box-shadow: 0 0 25px #ff1493;
-            transform: scale(0.98);
-        }
-
-        .pin-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-            direction: ltr;
-        }
-        .pin-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: rgba(255, 20, 147, 0.08);
-            border: 1px solid rgba(255, 20, 147, 0.4);
-            border-radius: 12px;
-            width: 55px;
-            padding: 6px 0;
-        }
-        .pin-box button.arrow {
-            background: transparent;
-            border: none;
-            color: #ff69b4;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        .pin-digit {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
-            margin: 4px 0;
-            text-shadow: 0 0 10px rgba(255, 20, 147, 0.6);
-        }
-
-        .quiz-btn {
             width: 100%;
-            background: rgba(255, 20, 147, 0.1);
-            border: 1px solid rgba(255, 20, 147, 0.3);
-            color: #fff;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 12px;
-            transition: 0.2s;
-            box-shadow: 0 0 10px rgba(255, 20, 147, 0.1);
-        }
-        .quiz-btn:hover {
-            background: #ff1493;
-            border-color: #ff1493;
-            box-shadow: 0 0 20px #ff1493;
-            transform: translateY(-2px);
-        }
-
-        /* تحسين مقاسات وشكل ألبوم الصور (احترافي وبأبعاد متناسقة للصور) */
-        .album-container { 
-            width: 300px; 
-            height: 360px; 
-            margin: 12px auto; 
-            perspective: 2200px; 
-            position: relative;
-        }
-        .book { 
-            width: 100%; 
-            height: 100%; 
-            position: relative; 
-            transform-style: preserve-3d;
-        }
-        .page { 
-            width: 100%; 
-            height: 100%; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            transform-origin: right center; 
-            transform-style: preserve-3d; 
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); 
-            cursor: pointer;
-        }
-        .page img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            object-position: center; 
-            border-radius: 18px; 
-            border: 3px solid rgba(255, 105, 180, 0.5); 
-            backface-visibility: hidden; 
-            box-shadow: -8px 5px 25px rgba(0,0,0,0.5), inset 0 0 15px rgba(255, 105, 180, 0.2); 
-        }
-        .page.flipped { 
-            transform: rotateY(160deg);
-        } 
-        .page-back { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(35, 8, 26, 0.96); 
-            transform: rotateY(180deg); 
-            backface-visibility: hidden; 
-            border-radius: 18px; 
-            border: 3px solid rgba(255, 105, 180, 0.5); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            color: #ff69b4; 
-            font-size: 1.8rem; 
-            box-shadow: inset 0 0 25px rgba(255, 20, 147, 0.2);
-        }
-
-        #photo-caption { 
-            font-size: 13.5px; 
-            font-weight: bold; 
-            color: #fce4ec; 
-            margin-top: 12px; 
-            min-height: 48px; 
-            line-height: 1.6; 
-            padding: 0 8px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-
-        /* شاشة رسم القلب التفاعلية بالأرقام والنقاط */
-        .heart-stage-box {
-            position: relative;
-            width: 240px;
-            height: 200px;
-            margin: 0 auto 15px auto;
+            height: 100%;
             display: flex;
-            align-items: center;
             justify-content: center;
-        }
-        .dot-svg {
-            width: 170px;
-            height: 170px;
-            overflow: visible;
-        }
-        .interactive-dot {
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .interactive-dot circle {
-            fill: #ff69b4;
-            transition: 0.3s;
-        }
-        .interactive-dot:hover circle {
-            r: 7px;
-            fill: #ff1493;
-            filter: drop-shadow(0 0 8px #ff1493);
-        }
-        .dot-number-label {
-            fill: #ff80ab;
-            font-size: 10px;
-            font-family: monospace;
-            font-weight: bold;
-            pointer-events: none;
-        }
-
-        .user-drawn-line {
-            fill: none;
-            stroke: #ff1493;
-            stroke-width: 3.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            filter: drop-shadow(0 0 6px #ff1493);
-        }
-
-        .center-heart-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            cursor: pointer;
-            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-        }
-        .center-heart-container.show {
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .center-heart-container:hover {
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-        .glowing-heart-shape {
-            font-size: 65px;
-            color: #ff1493;
-            text-shadow: 0 0 25px #ff1493, 0 0 50px #ff69b4;
-            animation: gentlePulse 1.5s infinite alternate;
-        }
-        @keyframes gentlePulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.08); }
-        }
-        .inner-name-text {
-            position: absolute;
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 10px #000, 0 0 5px #ff1493;
-            letter-spacing: 1px;
-            top: 42%;
-        }
-
-        #confession-area {
-            display: none;
             opacity: 0;
-            transition: opacity 1.5s ease;
+            pointer-events: none;
+            transition: opacity 0.8s ease;
+            z-index: 10;
         }
-        #confession-area.show {
-            display: block;
+        .screen.active {
             opacity: 1;
+            pointer-events: all;
         }
+        .hidden { display: none !important; }
+
+        .content { text-align: center; width: 90%; max-width: 500px; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUpFade 0.8s forwards 0.2s;
+        }
+
+        /* Typography */
+        .glow-text {
+            font-size: 2.5rem;
+            color: var(--accent-3);
+            text-shadow: 0 0 10px var(--accent-1), 0 0 20px var(--accent-2);
+            margin-bottom: 15px;
+        }
+        p { font-size: 1.2rem; margin-bottom: 20px; line-height: 1.6; }
+
+        /* Buttons */
+        .btn-primary, .btn-secondary {
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, background 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-1), var(--accent-2));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
+        }
+        .btn-primary:active { transform: scale(0.95); }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid var(--accent-2);
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        /* Progress */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Password Safe */
+        .safe-wheels {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .wheel {
+            width: 50px;
+            height: 70px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--accent-1);
+            border-radius: 10px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .wheel::-webkit-scrollbar { display: none; }
+        .wheel-inner div {
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            scroll-snap-align: start;
+            color: var(--accent-3);
+        }
+        .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: red !important; }
+
+        /* Album Slider */
+        .album-container {
+            width: 95%; max-width: 600px;
+            height: 80vh;
+            display: flex; flex-direction: column;
+        }
+        .slider-wrapper {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            background: #000;
+        }
+        .slide {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateX(100%);
+        }
+        .slide.active { opacity: 1; transform: translateX(0); }
+        .slide.prev { transform: translateX(-100%); }
+        .slide img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .slide img.zoomed { transform: scale(1.5); }
+        .slider-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 15px;
+        }
+        .icon-btn {
+            background: var(--glass-bg); border: none; color: white;
+            font-size: 1.5rem; width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; transition: background 0.3s;
+        }
+        .icon-btn:hover { background: var(--accent-1); }
+
+        /* Heart Draw & Pulse */
+        .heart-svg { width: 150px; height: 150px; fill: none; stroke: var(--accent-1); stroke-width: 2; cursor: pointer; }
+        .heart-svg.draw path {
+            stroke-dasharray: 300; stroke-dashoffset: 300;
+            animation: drawHeart 2s forwards ease-in-out;
+        }
+        .heart-svg.pulse { fill: var(--accent-1); animation: pulse 1s infinite alternate; }
+
+        /* Envelope */
+        .envelope {
+            position: relative; width: 250px; height: 150px; margin: 0 auto;
+            background: var(--accent-2); border-radius: 10px; cursor: pointer;
+            perspective: 1000px;
+        }
+        .flap {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--accent-1); clip-path: polygon(0 0, 50% 50%, 100% 0);
+            transform-origin: top; transition: transform 0.8s ease; z-index: 3;
+        }
+        .envelope.open .flap { transform: rotateX(180deg); z-index: 1; }
+        .paper {
+            position: absolute; top: 10px; left: 10px; width: 230px; height: 130px;
+            background: white !important; color: #333; z-index: 2;
+            transition: transform 1s ease, height 1s ease; overflow: hidden;
+        }
+        .envelope.open .paper { transform: translateY(-100px); height: 300px; z-index: 4; }
+
+        /* Utilities & Animations */
+        .mt-2 { margin-top: 20px; }
+        .buttons-group { display: flex; gap: 15px; justify-content: center; position: relative; height: 50px;}
+
+        @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        @keyframes drawHeart { to { stroke-dashoffset: 0; } }
+        @keyframes pulse { to { transform: scale(1.1); filter: drop-shadow(0 0 15px var(--accent-1)); } }
     </style>
 </head>
 <body>
+    <!-- Background Canvas for Effects -->
+    <canvas id="bg-canvas"></canvas>
 
-    <div class="ambient-bg" id="ambientBg"></div>
+    <!-- Audio Elements (قم بإضافة ملفات الصوت في نفس مسار هذا الملف) -->
+    <audio id="bg-music" loop>
+        <source src="assets/romantic-music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="type-sound">
+        <source src="assets/typing.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="success-sound">
+        <source src="assets/unlock.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="error-sound">
+        <source src="assets/error.mp3" type="audio/mpeg">
+    </audio>
 
-    <!-- 1. شاشة الباسورد -->
-    <div id="screen-1" class="screen active">
-        <div class="glass-card" id="passCard">
-            <div style="font-size: 26px; margin-bottom: 5px;">💖✨</div>
-            <h3 style="color: #ff69b4; margin-bottom: 5px;">خزنة القلوب السرية</h3>
-            <p style="font-size: 12px; color: #ffb6c1; margin-bottom: 15px;">اكتبي الرقم السري (1107)</p>
-            
-            <div class="pin-container">
-                <div class="pin-box">
-                    <button class="arrow" onclick="changeDigit(0, 1)">▲</button>
-                    <div class="pin-digit" id="digit-0">0</div>
-                    <button class="arrow" onclick="changeDigit(0, -1)">▼</button>
+    <!-- UI Controls -->
+    <div class="global-controls glass">
+        <button id="toggle-music">🎵 تشغيل الموسيقى</button>
+        <button id="reset-journey">🔄 إعادة الرحلة</button>
+    </div>
+
+    <!-- 1. Loading Screen -->
+    <section id="screen-loading" class="screen active">
+        <div class="content">
+            <h1 class="glow-text">Amr ❤️ Amal</h1>
+            <p>Loading Memories...</p>
+            <div class="progress-bar-container">
+                <div id="loading-progress" class="progress-bar"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Start Screen -->
+    <section id="screen-start" class="screen hidden">
+        <div class="content glass-panel">
+            <h1 class="glow-text">❤️ Secret Love Journey ❤️</h1>
+            <p>اضغطي لبدء الرحلة</p>
+            <button class="btn-primary" data-next="screen-password">Start</button>
+        </div>
+    </section>
+
+    <!-- 3. Password Screen -->
+    <section id="screen-password" class="screen hidden">
+        <div class="content glass-panel" id="safe-box">
+            <h2>أدخلي كلمة السر ❤️</h2>
+            <div class="safe-wheels">
+                <div class="wheel" id="w1"><div class="wheel-inner"></div></div>
+                <div class="wheel" id="w2"><div class="wheel-inner"></div></div>
+                <div class="wheel" id="w3"><div class="wheel-inner"></div></div>
+                <div class="wheel" id="w4"><div class="wheel-inner"></div></div>
+            </div>
+            <button class="btn-primary" id="check-password">فتح الخزنة</button>
+        </div>
+    </section>
+
+    <!-- 4. Questions Screen -->
+    <section id="screen-questions" class="screen hidden">
+        <div class="content glass-panel">
+            <div class="progress-bar-container top-progress">
+                <div id="q-progress" class="progress-bar"></div>
+            </div>
+            <div id="question-container" class="card-container">
+                <h2 id="q-text">السؤال هنا؟</h2>
+                <div class="q-options" id="q-options"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Photo Album -->
+    <section id="screen-album" class="screen hidden">
+        <div class="album-container glass-panel">
+            <div class="slider-wrapper" id="slider">
+                <!-- Images will be injected via JS -->
+            </div>
+            <div class="slider-controls">
+                <button class="icon-btn" id="prev-slide">❮</button>
+                <span id="slide-counter">1 / X</span>
+                <button class="icon-btn" id="next-slide">❯</button>
+            </div>
+            <p id="slide-caption" class="caption"></p>
+            <button class="btn-primary mt-2 hidden" id="finish-album" data-next="screen-heart">Continue ❤️</button>
+        </div>
+    </section>
+
+    <!-- 6. Heart Animation -->
+    <section id="screen-heart" class="screen hidden">
+        <div class="content">
+            <svg class="heart-svg" viewBox="0 0 100 100">
+                <path d="M 50,30 C 50,30 40,10 25,10 C 10,10 5,25 5,40 C 5,60 25,75 50,90 C 75,75 95,60 95,40 C 95,25 90,10 75,10 C 60,10 50,30 50,30 Z"></path>
+            </svg>
+            <h2 id="heart-name" class="hidden">Amal ❤️</h2>
+        </div>
+    </section>
+
+    <!-- 7. Envelope & Letter -->
+    <section id="screen-letter" class="screen hidden">
+        <div class="content">
+            <div class="envelope" id="envelope">
+                <div class="flap"></div>
+                <div class="paper glass-panel">
+                    <p id="typewriter-text"></p>
                 </div>
-                <div class="pin-box">
-                    <button class="arrow" onclick="changeDigit(1, 1)">▲</button>
-                    <div class="pin-digit" id="digit-1">0</div>
-                    <button class="arrow" onclick="changeDigit(1, -1)">▼</button>
-                </div>
-                <div class="pin-box">
-                    <button class="arrow" onclick="changeDigit(2, 1)">▲</button>
-                    <div class="pin-digit" id="digit-2">0</div>
-                    <button class="arrow" onclick="changeDigit(2, -1)">▼</button>
-                </div>
-                <div class="pin-box">
-                    <button class="arrow" onclick="changeDigit(3, 1)">▲</button>
-                    <div class="pin-digit" id="digit-3">0</div>
-                    <button class="arrow" onclick="changeDigit(3, -1)">▼</button>
-                </div>
             </div>
-
-            <button class="neon-btn" onclick="checkPassword()" style="width: 100%;">فتح القفل 🔓</button>
-            <p id="error-msg" style="color: #ff80ab; font-size: 12px; margin-top: 10px;"></p>
+            <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q">Continue</button>
         </div>
-    </div>
+    </section>
 
-    <!-- 2. شاشة الأسئلة الحية -->
-    <div id="screen-2" class="screen">
-        <div class="glass-card">
-            <p id="quiz-step" style="font-size: 12px; color: #ff69b4; margin-bottom: 8px; font-weight: bold;">السؤال 1 من 3</p>
-            <h3 id="quiz-text" style="font-size: 16px; margin-bottom: 20px; line-height: 1.5;">مين اللي بيغير أكتر؟</h3>
-            <button class="quiz-btn" onclick="answerQuiz()">عمرو</button>
-            <button class="quiz-btn" onclick="answerQuiz()">أمل</button>
-        </div>
-    </div>
-
-    <!-- 3. شاشة ألبوم الصور (بمقاسات وشكل احترافي متناسق) -->
-    <div id="screen-3" class="screen">
-        <div class="glass-card" style="width: 360px;">
-            <div style="font-size: 12px; color: #ff69b4; margin-bottom: 6px; font-weight: bold;" id="photo-counter">افتحي الغلاف..</div>
-            <div class="album-container">
-                <div class="book" id="albumBook"></div>
-            </div>
-            <div id="photo-caption">اضحي واقلبي الصفحات.. ❤️</div>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button class="neon-btn" onclick="goBack()" style="flex: 1; padding: 10px; font-size: 13px;">◀ رجوع</button>
-                <button class="neon-btn" id="toHeartBtn" onclick="goToScreen(4)" style="flex: 1; padding: 10px; font-size: 13px; display: none;">للقلب ✨</button>
+    <!-- 8. Final Question -->
+    <section id="screen-final-q" class="screen hidden">
+        <div class="content glass-panel">
+            <h2>بتحبيني؟</h2>
+            <div class="buttons-group">
+                <button class="btn-primary" id="btn-yes">أكيد ❤️</button>
+                <button class="btn-secondary" id="btn-escape">محتاجة أفكر</button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- 4. شاشة رسم القلب بالتفاعل اليدوي والتحول الرومانسي -->
-    <div id="screen-4" class="screen">
-        <div class="glass-card" style="width: 350px;" id="cardContainer">
-            
-            <div id="heartStage">
-                <h3 id="dot-instruction" style="color: #ff69b4; font-size: 15px; margin-bottom: 5px;">اضعي على النقطة (1) للبدء ❤️</h3>
-                <div class="heart-stage-box">
-                    <svg class="dot-svg" viewBox="0 0 100 100" id="heartSvg">
-                        <path id="line-1-2" class="user-drawn-line" d="" />
-                        <path id="line-2-3" class="user-drawn-line" d="" />
-                        <path id="line-3-4" class="user-drawn-line" d="" />
-                        <path id="line-4-1" class="user-drawn-line" d="" />
-
-                        <g class="interactive-dot" onclick="handleDotClick(1)">
-                            <circle cx="50" cy="30" r="5" id="dot-circle-1"></circle>
-                            <text class="dot-number-label" x="53" y="25">1</text>
-                        </g>
-                        <g class="interactive-dot" onclick="handleDotClick(2)">
-                            <circle cx="20" cy="35" r="5" id="dot-circle-2"></circle>
-                            <text class="dot-number-label" x="8" y="32">2</text>
-                        </g>
-                        <g class="interactive-dot" onclick="handleDotClick(3)">
-                            <circle cx="50" cy="80" r="5" id="dot-circle-3"></circle>
-                            <text class="dot-number-label" x="53" y="92">3</text>
-                        </g>
-                        <g class="interactive-dot" onclick="handleDotClick(4)">
-                            <circle cx="80" cy="35" r="5" id="dot-circle-4"></circle>
-                            <text class="dot-number-label" x="84" y="32">4</text>
-                        </g>
-                    </svg>
-
-                    <div class="center-heart-container" id="centerHeart" onclick="revealConfession()">
-                        <div class="glowing-heart-shape">❤️</div>
-                        <div class="inner-name-text">أمل</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="confession-area">
-                <div style="font-size: 20px; margin-bottom: 8px; letter-spacing: 6px;">🕯️ 🌹 🕯️</div>
-                <h3 style="color: #ff69b4; margin-bottom: 10px; font-size: 18px;">من قلبي لقلبك 🌹</h3>
-                <p style="font-size: 13px; line-height: 1.8; color: #fce4ec; margin-bottom: 20px;">
-                    "مشاعري رايحه لامل ومعجب بيها وبنلها دا وهيا كمان في اهتمام ونا بهتم وبتغير عليا وبغير عليها".. وجودك بيفرق في كل تفصيلة وبيخلي الدنيا أطعم وأجمل بكتير. ❤️
-                </p>
-                <button class="neon-btn" onclick="goToScreen(5)" style="width: 100%;">كملي الرحلة 🥰</button>
-            </div>
-
+    <!-- 9. Ending Screen -->
+    <section id="screen-end" class="screen hidden">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="content glass-panel">
+            <h1 class="glow-text">Amr ❤️ Amal</h1>
+            <p>شكراً إنك كملتي الرحلة.</p>
         </div>
-    </div>
-
-    <!-- 5. شاشة سؤال الاستعداد -->
-    <div id="screen-5" class="screen">
-        <div class="glass-card">
-            <h3 style="color: #ff69b4; font-size: 16px; margin-bottom: 10px;">سؤال بخصوص قلبك؟ 😌</h3>
-            <p style="font-size: 14px; margin: 15px 0; color: #fce4ec;">بتحبيني ولا محتاجة وقت تفكري؟</p>
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button class="neon-btn" onclick="acceptLove()" style="width: 100%;">مغروسة وبحبك أكتر يا سيدي 🥰</button>
-                <button class="neon-btn" id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()" style="width: 100%; background: transparent; border-color: rgba(255,255,255,0.2); box-shadow: none;">محتاجة وقت أفكر يا عم الحج 😌</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 6. النهاية -->
-    <div id="screen-6" class="screen">
-        <div class="glass-card">
-            <h3 style="color: #ff69b4; font-size: 18px; margin-bottom: 10px;">النهاية السعيدة 🎉</h3>
-            <p style="font-size: 13px; line-height: 1.6; margin: 15px 0; color: #fce4ec;">
-                هاه.. الموقع ظبط وبقى في حتة تانية خالص يا غيبوبة؟ 😂❤️
-            </p>
-            <button class="neon-btn" onclick="resetJourney()" style="width: 100%;">عيد الرحلة من جديد 🔄</button>
-        </div>
-    </div>
-
-    <audio id="song1" src="1000451616.mp3" preload="auto" loop></audio>
-    <audio id="song2" src="1000451619h.mp3" preload="auto" loop></audio>
+    </section>
 
     <script>
-        const song1 = document.getElementById('song1');
-        const song2 = document.getElementById('song2');
+        class AppController {
+            constructor() {
+                this.currentScreen = 'screen-loading';
+                this.musicBtn = document.getElementById('toggle-music');
+                this.bgMusic = document.getElementById('bg-music');
+                this.isMusicPlaying = false;
+                
+                // يمكنك تعديل مسارات الصور والأسئلة من هنا
+                this.photos = [
+                    { src: 'assets/photo1.jpg', caption: 'أول مرة نتقابل ❤️' },
+                    { src: 'assets/photo2.jpg', caption: 'يوم ما يتنسيش' },
+                    { src: 'assets/photo3.jpg', caption: 'ضحكتك اللي بتنور حياتي' }
+                ];
+                this.questions = [
+                    { q: "أكتر مكان بنحب نروحه؟", options: ["البحر", "الكافيه", "السينما"] },
+                    { q: "لونك المفضل؟", options: ["الأسود", "البينك", "الأزرق"] },
+                    { q: "مين بيحب التاني أكتر؟", options: ["أنا طبعاً", "أنتي ❤️", "إحنا الاتنين"] }
+                ];
 
-        function playClickSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.05);
-            } catch (e) {}
-        }
-
-        let currentPin = [0, 0, 0, 0];
-        const targetPin = [1, 1, 0, 7];
-
-        function changeDigit(index, delta) {
-            playClickSound();
-            currentPin[index] += delta;
-            if (currentPin[index] > 9) currentPin[index] = 0;
-            if (currentPin[index] < 0) currentPin[index] = 9;
-            document.getElementById(`digit-${index}`).innerText = currentPin[index];
-        }
-
-        function checkPassword() {
-            playClickSound();
-            let ok = true;
-            for (let i = 0; i < 4; i++) {
-                if (currentPin[i] !== targetPin[i]) ok = false;
+                this.init();
             }
-            if (ok) {
-                confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-                goToScreen(2);
-            } else {
-                const card = document.getElementById('passCard');
-                card.classList.add('shake');
-                setTimeout(() => card.classList.remove('shake'), 400);
-                document.getElementById('error-msg').innerText = "كلمة السر غلط! (1107) ❌";
+
+            init() {
+                this.setupBackground();
+                this.setupEventListeners();
+                this.checkSavedState();
+                this.startLoading();
             }
-        }
 
-        const quizQ = ["مين اللي بيغير أكتر؟", "مين صاحب لقب 'رادار التأخير'؟", "مين بيحب التاني أكتر؟"];
-        let qIdx = 0;
-        function answerQuiz() {
-            playClickSound();
-            confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
-            qIdx++;
-            if (qIdx < quizQ.length) {
-                document.getElementById('quiz-step').innerText = `السؤال ${qIdx + 1} من 3`;
-                document.getElementById('quiz-text').innerText = quizQ[qIdx];
-            } else {
-                setTimeout(() => goToScreen(3), 500);
+            setupEventListeners() {
+                document.querySelectorAll('[data-next]').forEach(btn => {
+                    btn.addEventListener('click', (e) => this.navigateTo(e.target.dataset.next));
+                });
+
+                this.musicBtn.addEventListener('click', () => this.toggleMusic());
+                
+                document.getElementById('reset-journey').addEventListener('click', () => {
+                    localStorage.removeItem('loveJourneyState');
+                    location.reload();
+                });
+
+                this.initSafeBox();
+
+                const escapeBtn = document.getElementById('btn-escape');
+                escapeBtn.addEventListener('mouseover', (e) => this.dodgeButton(e.target));
+                escapeBtn.addEventListener('touchstart', (e) => this.dodgeButton(e.target));
+                document.getElementById('btn-yes').addEventListener('click', () => this.navigateTo('screen-end'));
             }
-        }
 
-        const memories = [
-            { img: "1.png", t: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
-            { img: "2.png", t: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من زمان." },
-            { img: "3.png", t: "نظرات العيون اللي بتقول كل الكلام من غير ملامح تكمل." },
-            { img: "4.png", t: "أجمل صدفة جمعتني بكي في الكلية." },
-            { img: "5.png", t: "ضحكتك اللي بتنور أي يوم ضلمة وعدا علي." },
-            { img: "6.png", t: "لما بتتعصبي وتتغيري عليا.. بكون باين قدامك هادي بس من جوه بايب! 🥰" },
-            { img: "7.png", t: "قعدات الكلية وضجتها اللي بتبقى حلوة بوجودك." },
-            { img: "8.png", t: "كل تفصيلة صغيرة فيكي بتبهمني وتلفت انتباهي." },
-            { img: "9.png", t: "لما بنمشي سوا ونتكلم في كل حاجة وما نزهقش أبداً." },
-            { img: "10.png", t: "الغيرة اللطيفة اللي بتثبت لي غلاوتك عندي وعندك." },
-            { img: "11.png", t: "أيام التعب والضغط لما كلمتك وكانت هي الدواء." },
-            { img: "12.png", t: "نظرة الاستغراب الشقية اللي بتموتني ضحك." },
-            { img: "13.png", t: "لما بتسرحي في كلامي وأنا بحكي لك." },
-            { img: "14.png", t: "أحلى وقت لما اليوم بيخلص واحنا لسه مع بعض." },
-            { img: "15.png", t: "الصوت الهادي اللي بيهدي الدنيا كلها في ودني." },
-            { img: "16.png", t: "لما بنهزر ونقعد نكايد في بعض طول اليوم." },
-            { img: "17.png", t: "كل طريق مشيناه سوا وبقى عزيز على قلبي." },
-            { img: "18.png", t: "اللحظات العفوية اللي بتطلع أجمل مفينا." },
-            { img: "19.png", t: "لما بتتأكدي إن في حد بيخاف عليكي وبيهتم بكل تفاصيلك." },
-            { img: "20.png", t: "نص حكاياتنا المجنونة اللي محدش يفهمها غيرنا." },
-            { img: "21.png", t: "لما تبصي لي نظرة كده وأفهم أنك زعلانة فأحاول أصالحك." },
-            { img: "22.png", t: "أجمل صدفة وأطعم انسانة دخلت حياتي بجد." },
-            { img: "23.png", t: "لما تحكي لي عن مواقفك اليومية وأنا مركز في كل كلمة." },
-            { img: "24.png", t: "الخوف المتبادل واللهفة لما حد غاب عن التاني." },
-            { img: "25.png", t: "أحلى ابتسامة بتطلع من قلبك الصافي." },
-            { img: "26.png", t: "كل كلمة حلوة قلتيها وفضلت محفورة جوه قلبي." },
-            { img: "27.png", t: "سوا في كل الخطوات والمغامرات الصغيرة." },
-            { img: "28.png", t: "لما بتحاولي تخبي غيرتك بس بتباني في عينيكي فوراً!" },
-            { img: "29.png", t: "أيام الكلية ومواقف رادار التأخير الكوميدية." },
-            { img: "30.png", t: "الذكريات اللي مهما عدى عليها وقت هتفضل منورة." },
-            { img: "300.png", t: "المفاجأة الخطيرة وصورة 300.png المحشورة في قلب الحدث لعيونك! ⭐" },
-            { img: "32.png", t: "لما بتبقي متألقة ومنورة في كل مكان بتبقي فيه." },
-            { img: "33.png", t: "وعد بينا إننا نكمل ونتخطى أي حاجة سوا." },
-            { img: "34.png", t: "الدعم والاهتمام المتبادل اللي مالي حياتنا دفء." },
-            { img: "35.png", t: "أحلى مستقبل وأجمل أحلام بتخيلها وأنتِ معايا فيها." },
-            { img: "36.png", t: "قربك هو الحاجة الوحيدة اللي بتعدي أي يوم صعب." },
-            { img: "37.png", t: "النهاية هنا مش نهاية الحكاية.. دي لسه البداية يا أمل قلبي! ❤️" }
-        ];
-
-        let flippedCount = 0;
-
-        function initAlbum() {
-            const book = document.getElementById('albumBook');
-            if (book.children.length > 0) return;
-            
-            const cover = document.createElement('div');
-            cover.className = 'page';
-            cover.style.zIndex = 50;
-            cover.innerHTML = `<div style="width:100%; height:100%; background:rgba(35, 8, 26, 0.96); color:#ff69b4; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:18px; border:3px solid rgba(255, 105, 180, 0.5); text-align:center; padding:15px; box-shadow: inset 0 0 25px rgba(255, 20, 147, 0.2);"><h2 style="color:#ff1493; margin-bottom:10px; font-size:24px;">ألبومها ❤️</h2><p style="font-size:13px; color:#fce4ec;">اضغطي لفتح الصفحات..</p></div><div class="page-back">يلا نبدأ الحكاية..</div>`;
-            cover.onclick = function() { flipPage.call(this); };
-            book.appendChild(cover);
-
-            memories.forEach((m, i) => {
-                const p = document.createElement('div');
-                p.className = 'page';
-                p.style.zIndex = memories.length - i;
-                p.innerHTML = `<img src="${m.img}"><div class="page-back">❤️</div>`;
-                p.onclick = flipPage;
-                book.appendChild(p);
-            });
-        }
-
-        function flipPage() {
-            if (!this.classList.contains('flipped')) {
-                playClickSound();
-                this.classList.add('flipped');
-                flippedCount++;
-                this.style.zIndex = 50 + flippedCount;
-
-                if (flippedCount <= memories.length) {
-                    document.getElementById('photo-counter').innerText = `${flippedCount} / ${memories.length}`;
-                    document.getElementById('photo-caption').innerText = memories[flippedCount - 1].t;
-                }
-                if (flippedCount >= memories.length) {
-                    document.getElementById('toHeartBtn').style.display = 'block';
+            checkSavedState() {
+                const saved = localStorage.getItem('loveJourneyState');
+                if (saved && saved !== 'screen-loading') {
+                    this.currentScreen = saved;
                 }
             }
-        }
 
-        function goBack() {
-            const flipped = document.querySelectorAll('.page.flipped');
-            if (flipped.length > 0) {
-                playClickSound();
-                const last = flipped[flipped.length - 1];
-                last.classList.remove('flipped');
-                flippedCount--;
-                last.style.zIndex = 50 - flippedCount;
-
-                if (flippedCount === 0) {
-                    document.getElementById('photo-counter').innerText = "افتحي الغلاف..";
-                    document.getElementById('photo-caption').innerText = "اضحي واقلبي الصفحات.. ❤️";
-                } else {
-                    document.getElementById('photo-counter').innerText = `${flippedCount} / ${memories.length}`;
-                    document.getElementById('photo-caption').innerText = memories[flippedCount - 1].t;
-                }
-                document.getElementById('toHeartBtn').style.display = 'none';
+            saveState(screenId) {
+                localStorage.setItem('loveJourneyState', screenId);
             }
-        }
 
-        let currentDotStep = 1;
-        function handleDotClick(dotNum) {
-            if (dotNum === currentDotStep) {
-                playClickSound();
-                if (dotNum === 1) {
-                    document.getElementById('line-1-2').setAttribute('d', 'M 50,30 Q 35,20 20,35');
-                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة (2) واستمري.. ❤️";
-                    currentDotStep = 2;
-                } else if (dotNum === 2) {
-                    document.getElementById('line-2-3').setAttribute('d', 'M 20,35 Q 25,65 50,80');
-                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة (3) يلا.. ❤️";
-                    currentDotStep = 3;
-                } else if (dotNum === 3) {
-                    document.getElementById('line-3-4').setAttribute('d', 'M 50,80 Q 75,65 80,35');
-                    document.getElementById('dot-instruction').innerText = "اضعي على النقطة الأخيرة (4) لتقفلي القلب.. ❤️";
-                    currentDotStep = 4;
-                } else if (dotNum === 4) {
-                    document.getElementById('line-4-1').setAttribute('d', 'M 80,35 Q 65,20 50,30');
-                    document.getElementById('dot-instruction').innerText = "رسمتي قلبنا الجميل! اكتملت اللحظة ✨";
-                    currentDotStep = 5;
-                    confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
-
+            navigateTo(targetScreenId) {
+                const current = document.getElementById(this.currentScreen);
+                const target = document.getElementById(targetScreenId);
+                
+                if(current) {
+                    current.style.opacity = 0;
                     setTimeout(() => {
-                        document.getElementById('heartSvg').style.opacity = '0';
-                        document.getElementById('dot-instruction').style.opacity = '0';
+                        current.classList.remove('active');
+                        current.classList.add('hidden');
+                        
+                        target.classList.remove('hidden');
                         setTimeout(() => {
-                            document.getElementById('heartSvg').style.display = 'none';
-                            document.getElementById('dot-instruction').style.display = 'none';
-                            document.getElementById('centerHeart').classList.add('show');
-                        }, 500);
-                    }, 2000);
+                            target.classList.add('active');
+                            target.style.opacity = 1;
+                            this.currentScreen = targetScreenId;
+                            this.saveState(targetScreenId);
+                            this.triggerScreenSpecificLogic(targetScreenId);
+                        }, 50);
+                    }, 800); 
                 }
             }
-        }
 
-        function revealConfession() {
-            playClickSound();
-            song1.pause();
-            song1.currentTime = 0;
-            song2.play().catch(e => {});
+            triggerScreenSpecificLogic(screenId) {
+                switch(screenId) {
+                    case 'screen-questions': this.startQuestions(); break;
+                    case 'screen-album': this.initAlbum(); break;
+                    case 'screen-heart': this.initHeart(); break;
+                    case 'screen-end': this.fireConfetti(); break;
+                }
+            }
 
-            const ambientBg = document.getElementById('ambientBg');
-            const cardContainer = document.getElementById('cardContainer');
-            const centerHeart = document.getElementById('centerHeart');
-            const confessionArea = document.getElementById('confession-area');
+            startLoading() {
+                const bar = document.getElementById('loading-progress');
+                let progress = 0;
+                
+                const loadInterval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(loadInterval);
+                        setTimeout(() => {
+                            if (this.currentScreen === 'screen-loading') {
+                                this.navigateTo('screen-start');
+                            } else {
+                                const savedScreen = this.currentScreen;
+                                this.currentScreen = 'screen-loading';
+                                this.navigateTo(savedScreen);
+                            }
+                        }, 500);
+                    }
+                    bar.style.width = `${progress}%`;
+                }, 300);
+            }
 
-            ambientBg.style.background = '#0a0208';
-            cardContainer.style.background = 'rgba(15, 3, 12, 0.95)';
-            centerHeart.style.transform = 'translate(-50%, -50%) scale(0)';
+            toggleMusic() {
+                if(this.isMusicPlaying) {
+                    this.bgMusic.pause();
+                    this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
+                } else {
+                    this.bgMusic.play().catch(()=>console.log("Audio play blocked"));
+                    this.musicBtn.textContent = '🔇 إيقاف الموسيقى';
+                }
+                this.isMusicPlaying = !this.isMusicPlaying;
+            }
 
-            setTimeout(() => {
-                centerHeart.style.display = 'none';
-                confessionArea.classList.add('show');
-                confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
-            }, 600);
-        }
+            playSound(id) {
+                const sound = document.getElementById(id);
+                if(sound) { sound.currentTime = 0; sound.play().catch(()=>{}); }
+            }
 
-        function goToScreen(n) {
-            playClickSound();
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(`screen-${n}`).classList.add('active');
+            initSafeBox() {
+                const wheels = document.querySelectorAll('.wheel-inner');
+                wheels.forEach(w => {
+                    let html = `<div></div>`; 
+                    for(let i=0; i<=9; i++) html += `<div>${i}</div>`;
+                    html += `<div></div>`;
+                    w.innerHTML = html;
+                });
 
-            if (n === 3) {
-                song1.play().catch(e => {});
-                initAlbum();
+                document.getElementById('check-password').addEventListener('click', () => {
+                    const wheelsDivs = document.querySelectorAll('.wheel');
+                    let password = "";
+                    wheelsDivs.forEach(w => {
+                        const index = Math.round(w.scrollTop / 70);
+                        password += index.toString();
+                    });
+
+                    if(password === "1107") {
+                        this.playSound('success-sound');
+                        this.navigateTo('screen-questions');
+                    } else {
+                        this.playSound('error-sound');
+                        const box = document.getElementById('safe-box');
+                        box.classList.add('error-shake');
+                        setTimeout(() => box.classList.remove('error-shake'), 400);
+                    }
+                });
+            }
+
+            startQuestions() {
+                let currentQ = 0;
+                const qText = document.getElementById('q-text');
+                const qOptions = document.getElementById('q-options');
+                const qProgress = document.getElementById('q-progress');
+
+                const loadQ = () => {
+                    if(currentQ >= this.questions.length) {
+                        this.navigateTo('screen-album');
+                        return;
+                    }
+                    qProgress.style.width = `${((currentQ) / this.questions.length) * 100}%`;
+                    
+                    const q = this.questions[currentQ];
+                    qText.textContent = q.q;
+                    qOptions.innerHTML = '';
+                    
+                    q.options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-secondary mt-2';
+                        btn.style.display = 'block';
+                        btn.style.width = '100%';
+                        btn.textContent = opt;
+                        btn.addEventListener('click', () => {
+                            currentQ++;
+                            qOptions.style.opacity = 0;
+                            setTimeout(() => {
+                                loadQ();
+                                qOptions.style.opacity = 1;
+                            }, 300);
+                        });
+                        qOptions.appendChild(btn);
+                    });
+                };
+                loadQ();
+            }
+
+            initAlbum() {
+                const wrapper = document.getElementById('slider');
+                const counter = document.getElementById('slide-counter');
+                const caption = document.getElementById('slide-caption');
+                let currentIdx = 0;
+                let startX = 0;
+
+                wrapper.innerHTML = '';
+                this.photos.forEach((photo, idx) => {
+                    const div = document.createElement('div');
+                    div.className = `slide ${idx === 0 ? 'active' : ''}`;
+                    div.innerHTML = `<img src="${photo.src}" alt="Memory" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23220612\\'/%3E%3Ctext x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'14\\' fill=\\'white\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3Eصورة ${idx+1}%3C/text%3E%3C/svg%3E'">`;
+                    
+                    const img = div.querySelector('img');
+                    img.addEventListener('click', () => img.classList.toggle('zoomed'));
+                    
+                    wrapper.appendChild(div);
+                });
+
+                const updateSlider = () => {
+                    const slides = wrapper.querySelectorAll('.slide');
+                    slides.forEach((s, i) => {
+                        s.className = 'slide';
+                        if(i === currentIdx) s.classList.add('active');
+                        else if(i < currentIdx) s.classList.add('prev');
+                    });
+                    counter.textContent = `${currentIdx + 1} / ${this.photos.length}`;
+                    caption.textContent = this.photos[currentIdx].caption || '';
+
+                    if(currentIdx === this.photos.length - 1) {
+                        document.getElementById('finish-album').classList.remove('hidden');
+                    }
+                };
+
+                document.getElementById('next-slide').addEventListener('click', () => {
+                    if(currentIdx < this.photos.length - 1) { currentIdx++; updateSlider(); }
+                });
+                document.getElementById('prev-slide').addEventListener('click', () => {
+                    if(currentIdx > 0) { currentIdx--; updateSlider(); }
+                });
+
+                wrapper.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+                wrapper.addEventListener('touchend', e => {
+                    const endX = e.changedTouches[0].clientX;
+                    const diff = startX - endX;
+                    if(Math.abs(diff) > 50) {
+                        if(diff > 0 && currentIdx < this.photos.length - 1) { currentIdx++; updateSlider(); }
+                        else if(diff < 0 && currentIdx > 0) { currentIdx--; updateSlider(); }
+                    }
+                });
+
+                updateSlider();
+            }
+
+            initHeart() {
+                const svg = document.querySelector('.heart-svg');
+                const name = document.getElementById('heart-name');
+                
+                svg.classList.add('draw');
+                setTimeout(() => {
+                    svg.classList.add('pulse');
+                    name.classList.remove('hidden');
+                    name.classList.add('glow-text');
+                }, 2000);
+
+                svg.addEventListener('click', () => {
+                    this.navigateTo('screen-letter');
+                    setTimeout(() => this.openEnvelope(), 1000);
+                });
+            }
+
+            openEnvelope() {
+                const env = document.getElementById('envelope');
+                env.classList.add('open');
+                
+                setTimeout(() => this.typeWriterEffect(), 1500);
+            }
+
+            typeWriterEffect() {
+                const text = "وجودك غيّر حاجات كتير في حياتي.. الرحلة دي معمولة عشان أقولك قد إيه إنتي غالية عندي ❤️";
+                const target = document.getElementById('typewriter-text');
+                target.innerHTML = '';
+                let i = 0;
+                
+                const type = () => {
+                    if (i < text.length) {
+                        target.innerHTML += text.charAt(i);
+                        this.playSound('type-sound');
+                        i++;
+                        setTimeout(type, 50);
+                    } else {
+                        document.getElementById('letter-continue').classList.remove('hidden');
+                    }
+                };
+                type();
+            }
+
+            dodgeButton(btn) {
+                const randomX = Math.random() * 100 - 50; 
+                const randomY = Math.random() * 100 - 50; 
+                
+                btn.style.position = 'absolute';
+                btn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+            }
+
+            setupBackground() {
+                const canvas = document.getElementById('bg-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const particles = [];
+                for(let i=0; i<50; i++) {
+                    particles.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 2 + 1,
+                        dy: Math.random() * 0.5 + 0.2
+                    });
+                }
+
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                    particles.forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        p.y -= p.dy;
+                        if(p.y < 0) p.y = canvas.height;
+                    });
+                    requestAnimationFrame(animate);
+                };
+                animate();
+            }
+
+            fireConfetti() {
+                const canvas = document.getElementById('confetti-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const pieces = [];
+                const colors = ['#ff1493', '#ff69b4', '#ffd1e8', '#ffffff'];
+
+                for(let i=0; i<100; i++) {
+                    pieces.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height - canvas.height,
+                        size: Math.random() * 10 + 5,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        velocity: { x: Math.random() * 2 - 1, y: Math.random() * 3 + 2 },
+                        rotation: Math.random() * 360,
+                        rotationSpeed: Math.random() * 10 - 5
+                    });
+                }
+
+                const render = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    let active = false;
+                    
+                    pieces.forEach(p => {
+                        if(p.y < canvas.height) active = true;
+                        
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                        ctx.restore();
+
+                        p.x += p.velocity.x;
+                        p.y += p.velocity.y;
+                        p.rotation += p.rotationSpeed;
+                    });
+
+                    if(active) requestAnimationFrame(render);
+                };
+                render();
             }
         }
 
-        function moveButton() {
-            playClickSound();
-            const btn = document.getElementById('runaway-btn');
-            btn.style.transform = `translate(${Math.random() * 140 - 70}px, ${Math.random() * 140 - 70}px)`;
-        }
-
-        function acceptLove() {
-            playClickSound();
-            confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 } });
-            setTimeout(() => goToScreen(6), 1000);
-        }
-
-        function resetJourney() {
-            playClickSound();
-            song2.pause(); song2.currentTime, 0;
-            song1.pause(); song1.currentTime = 0;
-            flippedCount = 0; qIdx = 0; currentPin = [0,0,0,0]; currentDotStep = 1;
-            for(let i=0; i<4; i++) document.getElementById(`digit-${i}`).innerText = "0";
-            document.getElementById('error-msg').innerText = "";
-            
-            document.getElementById('heartSvg').style.display = 'block';
-            document.getElementById('heartSvg').style.opacity = '1';
-            document.getElementById('dot-instruction').style.display = 'block';
-            document.getElementById('dot-instruction').style.opacity = '1';
-            document.getElementById('dot-instruction').innerText = "اضعي على النقطة (1) للبدء ❤️";
-            document.getElementById('line-1-2').setAttribute('d', '');
-            document.getElementById('line-2-3').setAttribute('d', '');
-            document.getElementById('line-3-4').setAttribute('d', '');
-            document.getElementById('line-4-1').setAttribute('d', '');
-            
-            const centerHeart = document.getElementById('centerHeart');
-            centerHeart.style.display = 'flex';
-            centerHeart.classList.remove('show');
-
-            document.getElementById('confession-area').classList.remove('show');
-            document.getElementById('ambientBg').style.background = '';
-            document.getElementById('cardContainer').style.background = '';
-            document.getElementById('toHeartBtn').style.display = 'none';
-
-            goToScreen(1);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            new AppController();
+        });
     </script>
 </body>
 </html>
