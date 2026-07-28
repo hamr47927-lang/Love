@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --main-bg: #0c0814; --card-bg: rgba(25, 18, 38, 0.85); --accent: #ff4d6d; --gold: #ffd700; --text: #f0f0f5; }
+        :root { --main-bg: #0c0814; --card-bg: rgba(25, 18, 38, 0.88); --accent: #ff4d6d; --gold: #ffd700; --text: #f0f0f5; }
         * { box-sizing: border-box; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--main-bg); color: var(--text); overflow: hidden; }
         
@@ -23,92 +23,80 @@
         button { background: linear-gradient(145deg, #ff4d6d, #d9163b); color: white; border: none; padding: 12px 20px; border-radius: 20px; width: 100%; font-weight: bold; cursor: pointer; font-size: 0.95rem; box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); transition: 0.3s; margin-top: 8px; }
         button:active { transform: scale(0.97); }
 
-        /* المحطة الثانية: شريط الذكريات بالصور */
-        .timeline-card { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 15px; border: 1px solid rgba(255,77,109,0.2); margin-bottom: 10px; width: 100%; }
-        .timeline-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2); margin-bottom: 8px; }
-        
-        /* المحطة الثالثة: نبتة الوقت */
-        .seed-box { font-size: 50px; color: var(--gold); margin: 10px 0; transition: 0.5s; }
+        /* المحطة الأولى: راديو كلمة السر */
+        .radio-container { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); width: 100%; margin: 10px 0; }
+        input[type=range] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: 15px 0; }
 
-        /* المحطة الرابعة: راديو الترددات (الباسورد) */
-        .radio-container { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 15px; border: 1px solid rgba(255,215,0,0.3); width: 100%; margin: 8px 0; }
-        input[type=range] { width: 100%; accent-color: var(--gold); cursor: pointer; margin: 12px 0; }
+        /* المحطة الثانية: ألبوم الـ 38 صورة (شات وصور) */
+        .chat-card { background: rgba(0, 0, 0, 0.4); padding: 10px; border-radius: 18px; border: 1px solid rgba(255, 77, 109, 0.3); width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .chat-frame { width: 100%; height: 220px; background: #000; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 8px; }
+        .chat-screenshot { width: 100%; height: 100%; object-fit: contain; }
+        .album-nav { display: flex; gap: 10px; width: 100%; margin-top: 8px; }
 
-        /* المحطة الخامسة: النجوم */
-        #star-canvas { width: 100%; height: 150px; background: rgba(0,0,0,0.3); border-radius: 15px; cursor: crosshair; margin-bottom: 8px; display: block; }
+        /* المحطة الثالثة: النجوم */
+        #star-canvas { width: 100%; height: 155px; background: rgba(0,0,0,0.3); border-radius: 15px; cursor: crosshair; margin-bottom: 8px; display: block; }
 
-        /* أزرار القرار الأخير */
         .choice-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
         .btn-secondary { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
-<!-- عنصر الصوت (حط اسم الأغنية بتاعتك مكان src) -->
-<audio id="bgSong" src="your-song.mp3" loop></audio>
+<!-- ملفات الصوت الخاصة بك -->
+<audio id="radioSong" src="1000451616.mp3" loop></audio>
+<audio id="memorySong" src="1000451619h.mp3" loop></audio>
 
 <div class="container">
     
-    <!-- المحطة الأولى: الباب -->
+    <!-- المحطة الأولى: راديو الترددات (كلمة السر 1107) -->
     <div id="s1" class="section active">
-        <div>
-            <h2>مرحباً بكِ... ✨</h2>
-            <p>هناك رحلة صغيرة، وكلمات خارجة من القلب بالكامل، أتمنى أن تأخذي دقيقة واحدة لقراءتها بهدوء.</p>
-        </div>
-        <button onclick="startExperience()">مستعدة تشوفي حاجة طالعة من قلبي؟ ❤️</button>
-    </div>
-
-    <!-- المحطة الثانية: شريط الذكريات (صور حقيقية) -->
-    <div id="s2" class="section">
-        <h3>رحلتنا معاً 🕰️</h3>
-        <div class="timeline-card">
-            <img id="timeline-img" class="timeline-img" src="" alt="ذكرياتنا">
-            <div id="timeline-text" style="font-weight: bold; color: white; font-size: 0.9rem;"></div>
-        </div>
-        <p id="timeline-sub" style="font-size: 0.8rem; color: var(--gold);"></p>
-        <button onclick="nextTimelineStep()">التالي ➡️</button>
-    </div>
-
-    <!-- المحطة الثالثة: نبتة الوقت -->
-    <div id="s3" class="section">
-        <h3>قصة صبر ووقت 🌱</h3>
-        <div class="seed-box" id="seed-icon"><i class="fas fa-seedling"></i></div>
-        <p id="seed-msg" style="min-height: 40px; font-weight: bold; color: var(--gold);">في حاجات حلوة مبتجيش فجأة..</p>
-        <button id="seedBtn" onclick="waterSeed()">اسقي النبتة 💧</button>
-    </div>
-
-    <!-- المحطة الرابعة: راديو الترددات (كلمة السر 104) -->
-    <div id="s4" class="section">
         <h3>راديو الترددات (كلمة السر) 📻</h3>
-        <p style="font-size: 0.8rem;">لفتح الخطوة التالية، حركي المؤشر للبحث عن التردد الصحيح (104):</p>
+        <p style="font-size: 0.82rem;">للدخول وبدء الرحلة، حركي المؤشر للبحث عن التردد السري الخاص بينا (1107):</p>
         <div class="radio-container">
             <div id="radio-status" style="font-family: monospace; font-size: 0.85rem; color: var(--accent);">📶 جاري البحث (وشوشة راديو)...</div>
-            <input type="range" id="radioDial" min="88" max="108" value="88" oninput="checkRadioDial(this.value)">
+            <input type="range" id="radioDial" min="1000" max="1200" value="1000" oninput="checkRadioDial(this.value)">
         </div>
         <p id="radio-msg" style="min-height: 35px; font-size: 0.8rem;"></p>
-        <button id="radioNextBtn" style="display:none;" onclick="nextSection(5)">فتح الباب التالي ✨</button>
+        <button id="radioNextBtn" style="display:none;" onclick="enterMemories()">دخول ألبوم الذكريات ❤️</button>
     </div>
 
-    <!-- المحطة الخامسة: خريطة النجوم -->
-    <div id="s5" class="section">
+    <!-- المحطة الثانية: ألبوم الـ 38 صورة والاسكرينات -->
+    <div id="s2" class="section">
+        <h3>ألبوم ذكرياتنا وضحكتنا 💬📸</h3>
+        <div class="chat-card">
+            <div class="chat-frame">
+                <img id="memory-img" class="chat-screenshot" src="" alt="ذكرياتنا">
+            </div>
+            <div id="memory-counter" style="font-size: 0.75rem; color: var(--gold); margin-bottom: 4px;">صورة 1 من 38</div>
+            <div id="memory-text" style="font-weight: bold; color: white; font-size: 0.82rem;"></div>
+        </div>
+        <div class="album-nav">
+            <button class="btn-secondary" onclick="prevMemory()">⬅️ السابقة</button>
+            <button onclick="nextMemory()">التالية ➡️</button>
+        </div>
+        <button id="finishAlbumBtn" style="display:none; background: linear-gradient(145deg, #2ecc71, #27ae60); margin-top: 10px;" onclick="nextSection(3)">الانتقال للمحطة التالية ✨</button>
+    </div>
+
+    <!-- المحطة الثالثة: خريطة النجوم -->
+    <div id="s3" class="section">
         <h3>ارسمي الطريق بالضغط على النجوم ⭐</h3>
         <canvas id="star-canvas"></canvas>
         <p id="star-hint" style="font-size: 0.8rem;">اضغطي أو تمرري داخل المربع لتظهر الحقيقة...</p>
-        <button id="starNextBtn" style="display:none;" onclick="nextSection(6)">الخطوة الأخيرة ❤️</button>
+        <button id="starNextBtn" style="display:none;" onclick="nextSection(4)">الخطوة الأخيرة ❤️</button>
     </div>
 
-    <!-- المحطة السادسة: الوعد والضمان -->
-    <div id="s6" class="section">
+    <!-- المحطة الرابعة: الوعد والضمان -->
+    <div id="s4" class="section">
         <h3>اطمني... 💌</h3>
-        <p style="text-align: right; font-size: 0.82rem;">
+        <p style="text-align: right; font-size: 0.8rem;">
             أنا عارف إن الكلمة دي بتغير حاجات كتير، وعارف إنك ممكن تقلقي من فكرة "إحنا لسه قدامنا وقت". بس أنا مكنتش هقدر أسكت أكتر من كده وأنا شايفك بتبقي أهم حاجة في حياتي.<br><br>
             أنا مش بطلب منك تستنيني في المجهول، أنا بطلب منك تكوني الوجهة اللي أنا ببني مستقبلي عشان أكون جاهز أقف قدام العالم كله وأطلبك ليهم. أنا مش هضغط عليكي في أي حاجة، ولا هغير معاملتي ليكي، أنا بس حبيت أحجز مكاني في قلبك لحد ما أثبتلك ده بالأفعال.
         </p>
-        <button onclick="nextSection(7)">قراري النهائي...</button>
+        <button onclick="nextSection(5)">قراري النهائي...</button>
     </div>
 
-    <!-- المحطة السابعة: مساحة القرار بدون ضغط -->
-    <div id="s7" class="section">
+    <!-- المحطة الخامسة: مساحة القرار بدون ضغط -->
+    <div id="s5" class="section">
         <h3>خدي كل وقتك 🌸</h3>
         <p>مهما كان قرارك، قيمتك عندي لن تتغير أبداً.</p>
         <div class="choice-btns">
@@ -123,35 +111,121 @@
 <script>
 let currentSec = 1;
 
-// مصفوفة الذكريات (تقدر تغير أسماء الصور دي وتحط صورك الحقيقية زي img1.jpg و img2.jpg)
-const timelineSteps = [
-    { img: "IMG-20251030-WA0022.jpg", text: "بداية معرفتنا والصداقة التي جمعتنا وسط زحام الأيام والكلية.", sub: "وجودك كان دائماً يترك أثراً جميلاً ومختلفاً." },
-    { img: "IMG-20251030-WA0023.jpg", text: "مواقف الجدعنة والدعم المتبادل وسط ضغوط المحاضرات والمشاريع.", sub: "كنت أجد معك دائماً الراحة وسط أي تعب." },
-    { img: "IMG-20251012-WA0053.jpg", text: "أوقات الضحك والهزار البريء التي لا تُعوض.", sub: "هنا أدركت أنكِ لستِ مجرد صديقة عادية بالنسبة لي." }
-];
-let timelineIdx = 0;
+// تشغيل موسيقى الراديو عند التفاعل الأول أو الفتح
+window.addEventListener('load', () => {
+    const radioSong = document.getElementById('radioSong');
+    radioSong.play().catch(e => console.log("Autoplay restricted"));
+});
 
-// مراحل نبتة الوقت
-let seedStep = 0;
-const seedData = [
-    { msg: "بتحتاج صبر، ووقت، ومجهود عشان تطرح..", icon: "fa-spa" },
-    { msg: "وانتي أجمل حاجة أنا مستعد أسقيها وأصبر عليها لحد ما أكون جاهز أقطفها ❤️", icon: "fa-seedling" }
-];
-
-function startExperience() {
-    // تشغيل الأغنية أول ما تدوس على البداية
-    const song = document.getElementById('bgSong');
-    song.play().catch(e => console.log("Audio play blocked by browser policy until user interaction"));
+function checkRadioDial(val) {
+    const status = document.getElementById('radio-status');
+    const msg = document.getElementById('radio-msg');
+    const targetVal = 1107; // كلمة السر
     
-    // تحميل أول صورة في شريط الذكريات
-    updateTimelineUI();
+    if(Math.abs(val - targetVal) <= 2) {
+        status.innerHTML = "📻 تم التقاط التردد الصافي (كلمة السر 1107 صحيحة)!";
+        status.style.color = "var(--gold)";
+        msg.innerHTML = "<b>أنتِ التردد الوحيد الذي يصفّي دماغي ويعطيني سلاماً وسط كل هذا الصخب.</b>";
+        document.getElementById('radioNextBtn').style.display = 'block';
+    } else {
+        status.innerHTML = "📶 جاري البحث (وشوشة راديو)... التردد الحالي: " + val;
+        status.style.color = "var(--accent)";
+        msg.innerHTML = "حركي المؤشر للوصول إلى الرقم 1107 لفتح الباب...";
+        document.getElementById('radioNextBtn').style.display = 'none';
+    }
+}
+
+// الانتقال للذكريات وتغير الموسيقى تلقائياً
+function enterMemories() {
+    document.getElementById('radioSong').pause();
+    const memorySong = document.getElementById('memorySong');
+    memorySong.play().catch(e => console.log("Memory song play blocked"));
+    
+    loadMemory();
     nextSection(2);
 }
 
-function updateTimelineUI() {
-    document.getElementById('timeline-img').src = timelineSteps[timelineIdx].img;
-    document.getElementById('timeline-text').innerText = timelineSteps[timelineIdx].text;
-    document.getElementById('timeline-sub').innerText = timelineSteps[timelineIdx].sub;
+// مصفوفة الـ 38 صورة والاسكرينات مع تعليقات افتراضية مقترحة
+const memoriesData = [
+    // --- 1 إلى 5: بدايات ومعايدات ---
+    { img: "photo_01.jpg", text: "أول كلمة 'كل سنة وأنت طيب' منك.. كانت البداية لكل حاجة حلوة بيننا ❤️" },
+    { img: "photo_02.jpg", text: "أول ضحكة صافية في الشات بدأت تخليني أستنى رسالتك بفرغ الصبر." },
+    { img: "photo_03.jpg", text: "هنا بدأت ألاحظ قد ايه كلامك بسيط وبيفرح القلب." },
+    { img: "photo_04.jpg", text: "الموقف ده بالذات خلاني أحس إن في حاجة مختلفة وكبيرة بتتبني بيننا." },
+    { img: "photo_05.jpg", text: "لما قلتيلي كلام طيب وهديتي دماغي في يوم كان زحمة ومضغوط." },
+
+    // --- 6 إلى 15: لسان العسل والجلطة (مواقف الهزار والعصبية اللطيفة) ---
+    { img: "photo_06.jpg", text: "بداية رحلة 'الجلطة'.. لما بتبقي عاوزة تعصبيني بالعافية 😅" },
+    { img: "photo_07.jpg", text: "الاسكرين دي فيها كمية استفزاز بس بتموتني ضحك كل ما أقرأها!" },
+    { img: "photo_08.jpg", text: "لما تروحي وتردي بعد سنة وتعملي نفسك بريئة جداً!" },
+    { img: "photo_09.jpg", text: "هنا بقى كنتي بتجلطيني بجد بس ماكنتش قادر أزعل منك ثانية واحدة." },
+    { img: "photo_10.jpg", text: "ردك السريع والغير متوقع ده اللي ديماً بيفاجئني بيكي." },
+    { img: "photo_11.jpg", text: "لما تحاولي تثبتي إنك صح وأنتي عارفة إنك بتعاندي وبس 🙈" },
+    { img: "photo_12.jpg", text: "ضحكتك في المحادثة دي كانت كفيلة تتعدل بيها بقة اليوم كله." },
+    { img: "photo_13.jpg", text: "جلطة رقم 485.. بس أقسم بالله عسل على قلبي ❤️" },
+    { img: "photo_14.jpg", text: "لما نقعد نتجادل في موضوع هبل ساعة كاملة وفي الآخر نضحك." },
+    { img: "photo_15.jpg", text: "الاسكرين دي حاططها عشان أفتكر ديماً إنك أكتر حد بيعرف يخليني أبتسم." },
+
+    // --- 16 إلى 25: محطة الغيرة والاهتمام ---
+    { img: "photo_16.jpg", text: "أول مرة لاحظت فيها غيرتك.. وكانت أحلى حاجة حصلت في اليوم ده ❤️" },
+    { img: "photo_17.jpg", text: "لما تنكدي عليّا عشان خايفة عليّا أو مغيراني.. طريقتك تجنن!" },
+    { img: "photo_18.jpg", text: "اهتمامك بالتفاصيل الصغيرة دي هو اللي حسسني ب أمان حقيقي." },
+    { img: "photo_19.jpg", text: "غيرتك هنا كانت واضحة جداً، وأنا بيني وبين نفسي كنت طاير من الفرحة." },
+    { img: "photo_20.jpg", text: "لما تسأليني بتركيز وترقبي: 'كنت بتكلم مين أو بتعمل إيه؟' 😇" },
+    { img: "photo_21.jpg", text: "الخوف والاهتمام اللي في كلامك هنا مبيتقدرش بـ أي حاجة في الدنيا." },
+    { img: "photo_22.jpg", text: "لما تزعلي عشان قصرت في السؤال، وتعرفيني إن مكاني عندك كبير." },
+    { img: "photo_23.jpg", text: "الغيرة لما بتيجي منك بتكون أرق وأجمل نكد في الكون!" },
+    { img: "photo_24.jpg", text: "هنا حسيت أد ايه أنا مهم عندك وزادت مكانتك في قلبي أضعاف." },
+    { img: "photo_25.jpg", text: "اهتمامك ده هو اللي مخليني متطمن وعارف قيمة وجودك." },
+
+    // --- 26 إلى 32: الموقف المتكرر (الجوكر) ---
+    { img: "photo_26.jpg", text: "الموقف ده.. أول مرة يحصل بينا وماكنتش اعرف انه هيرجع يتكرر تاني." },
+    { img: "photo_27.jpg", text: "نفس الموقف اتكرر تاني بنفس التفاصيل والمشاعر الحلوة ❤️" },
+    { img: "photo_28.jpg", text: "وللمرة التالتة يتكرر نفس الموقف.. وعمري ما مليت ولا همل منه أبداً!" },
+    { img: "photo_29.jpg", text: "كل مرة الجملة دي بتتقال بينا، بحس إن العلاقات البسيطة هي الأصدق." },
+    { img: "photo_30.jpg", text: "تكرار التفاصيل دي هو اللي خلق بيننا لغة خاصة ما يفهمهاش غيرنا." },
+    { img: "photo_31.jpg", text: "موقف متكرر بس كل مرة بيكون ليه طعم أحدث وأجمل معيكي." },
+    { img: "photo_32.jpg", text: "هنا أكدت لنفسي إن الموقف ده مش صدفة، ده روتيننا الخاص." },
+
+    // --- 33 إلى 38: صور شخصية ولحظات مميزة وعميقة ---
+    { img: "photo_33.jpg", text: "الصورة دي ليكي بالذات.. بتفكرني بـ أرق وأجمل ملامح بشوفها." },
+    { img: "photo_34.jpg", text: "لما بعتيلي الصورة دي، اليوم اتغير 180 درجة للأفضل ❤️" },
+    { img: "photo_35.jpg", text: "من أكتر الصور اللي بحب أفتحها وأتأملها لما أكون مستوحشك." },
+    { img: "photo_36.jpg", text: "اللحظة دي في الشات ما تتنسيش، اتكشف فيها كل مشاعرنا بوضوح." },
+    { img: "photo_37.jpg", text: "صورة بتلخص كل النقاء والطيبة اللي جواه قلبك." },
+    { img: "photo_38.jpg", text: "وهنا وصلنا لآخر صورة في الألبوم.. بس البداية الحقيقية لكل اللي جاي ❤️" }
+];
+
+let currentMemoryIdx = 0;
+
+function loadMemory() {
+    if(memoriesData.length > 0) {
+        document.getElementById('memory-img').src = memoriesData[currentMemoryIdx].img;
+        document.getElementById('memory-text').innerText = memoriesData[currentMemoryIdx].text;
+        document.getElementById('memory-counter').innerText = `صورة ${currentMemoryIdx + 1} من ${memoriesData.length}`;
+        
+        if(currentMemoryIdx === memoriesData.length - 1) {
+            document.getElementById('finishAlbumBtn').style.display = 'block';
+        } else {
+            document.getElementById('finishAlbumBtn').style.display = 'none';
+        }
+    }
+}
+
+function nextMemory() {
+    if(currentMemoryIdx < memoriesData.length - 1) {
+        currentMemoryIdx++;
+        loadMemory();
+    } else {
+        nextSection(3);
+    }
+}
+
+function prevMemory() {
+    if(currentMemoryIdx > 0) {
+        currentMemoryIdx--;
+        loadMemory();
+    }
 }
 
 function nextSection(n) {
@@ -159,50 +233,8 @@ function nextSection(n) {
     currentSec = n;
     document.getElementById('s' + currentSec).classList.add('active');
     
-    if(n === 5) {
+    if(n === 3) {
         initStarCanvas();
-    }
-}
-
-function nextTimelineStep() {
-    timelineIdx++;
-    if(timelineIdx < timelineSteps.length) {
-        updateTimelineUI();
-    } else {
-        nextSection(3); // الانتقال لمحطة البذرة
-    }
-}
-
-function waterSeed() {
-    if(seedStep === 0) {
-        document.getElementById('seed-msg').innerText = seedData[0].msg;
-        document.getElementById('seed-icon').innerHTML = `<i class="fas ${seedData[0].icon}"></i>`;
-        seedStep++;
-    } else if(seedStep === 1) {
-        document.getElementById('seed-msg').innerText = seedData[1].msg;
-        document.getElementById('seed-icon').innerHTML = `<i class="fas fa-tree" style="color: var(--accent);"></i>`;
-        document.getElementById('seedBtn').innerText = "الانتقال لكلمة السر (الراديو) 📻";
-        seedStep++;
-    } else {
-        nextSection(4); // الانتقال لمحطة الراديو (الباسورد 104)
-    }
-}
-
-function checkRadioDial(val) {
-    const status = document.getElementById('radio-status');
-    const msg = document.getElementById('radio-msg');
-    const targetVal = 104; // كلمة السر
-    
-    if(Math.abs(val - targetVal) <= 2) {
-        status.innerHTML = "📻 تم التقاط التردد الصافي (كلمة السر صحيحة)!";
-        status.style.color = "var(--gold)";
-        msg.innerHTML = "<b>أنتِ التردد الوحيد الذي يصفّي دماغي ويعطيني سلاماً وسط كل هذا الصخب. أنا بحبك.</b>";
-        document.getElementById('radioNextBtn').style.display = 'block';
-    } else {
-        status.innerHTML = "📶 جاري البحث (وشوشة راديو)... التردد الحالي: " + val + " MHz";
-        status.style.color = "var(--accent)";
-        msg.innerHTML = "حركي المؤشر للوصول إلى الرقم 104 لفك القفل...";
-        document.getElementById('radioNextBtn').style.display = 'none';
     }
 }
 
