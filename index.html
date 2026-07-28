@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For Amal - Our Quiet Journey ❤️</title>
+    <title>For Amal - Our Special Journey ❤️</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         * {
@@ -14,8 +14,8 @@
         body {
             margin: 0;
             padding: 0;
-            background: #120811; /* خلفية ناعمة ودافئة وهادئة جداً */
-            color: #fce4ec;
+            background: #1a0515;
+            color: #ffffff;
             font-family: 'Tahoma', sans-serif;
             display: flex;
             flex-direction: column;
@@ -26,7 +26,7 @@
             position: relative;
         }
 
-        /* خلفية هادئة ورومانسية بتتنفس ببطء */
+        /* خلفية ديناميكية 3D مبهجة في البداية */
         .ambient-bg {
             position: fixed;
             top: 0;
@@ -35,15 +35,15 @@
             height: 100%;
             pointer-events: none;
             background: 
-                radial-gradient(circle at 15% 20%, rgba(216, 112, 147, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, rgba(142, 68, 173, 0.1) 0%, transparent 45%),
-                #120811;
+                radial-gradient(circle at 20% 20%, rgba(255, 0, 128, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 50%),
+                #1a0515;
             z-index: -1;
-            animation: softBreathe 8s ease-in-out infinite alternate;
+            animation: vibrantGlow 6s ease-in-out infinite alternate;
         }
-        @keyframes softBreathe {
-            0% { opacity: 0.7; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.03); }
+        @keyframes vibrantGlow {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.04); }
         }
 
         .screen {
@@ -57,44 +57,58 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
         .active {
             display: flex;
         }
 
-        /* كارت زجاجي هادئ وراقي جداً */
+        /* كارت زجاجي بلمسة 3D */
         .glass-card {
-            background: rgba(30, 15, 28, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(216, 112, 147, 0.25);
-            border-radius: 24px;
+            background: rgba(40, 10, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 26px;
             padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(216, 112, 147, 0.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.1);
             max-width: 95%;
-            width: 350px;
+            width: 360px;
+            transition: transform 0.3s ease;
         }
 
-        /* أزرار هادئة ورومانسية */
-        .soft-btn {
+        /* تأثير اهتزاز الكارت عند الخطأ (رقم 4) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-10px); }
+            40% { transform: translateX(10px); }
+            60% { transform: translateX(-8px); }
+            80% { transform: translateX(8px); }
+            100% { transform: translateX(0); }
+        }
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .neon-btn {
             padding: 12px 24px;
             font-size: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(216, 112, 147, 0.4);
-            background: rgba(216, 112, 147, 0.15);
-            color: #fce4ec;
+            border-radius: 14px;
+            border: 1px solid #ff1493;
+            background: rgba(255, 20, 147, 0.2);
+            color: #fff;
             cursor: pointer;
             font-weight: bold;
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.4);
             transition: 0.2s ease;
         }
-        .soft-btn:hover {
-            background: rgba(216, 112, 147, 0.35);
-            border-color: #d87093;
-            transform: translateY(-2px);
+        .neon-btn:hover {
+            background: #ff1493;
+            box-shadow: 0 0 25px #ff1493;
+            transform: scale(0.98);
         }
 
-        /* قفل الأرقام من الشمال لليمين LTR */
+        /* قفل الأرقام LTR */
         .pin-container {
             display: flex;
             justify-content: center;
@@ -106,89 +120,81 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: rgba(20, 10, 18, 0.6);
-            border: 1px solid rgba(216, 112, 147, 0.3);
-            border-radius: 10px;
+            background: rgba(255, 20, 147, 0.08);
+            border: 1px solid rgba(255, 20, 147, 0.4);
+            border-radius: 12px;
             width: 55px;
             padding: 6px 0;
         }
         .pin-box button.arrow {
             background: transparent;
             border: none;
-            color: #d87093;
+            color: #ff69b4;
             font-size: 16px;
             cursor: pointer;
-            padding: 2px;
         }
         .pin-digit {
             font-size: 24px;
             font-weight: bold;
-            color: #fce4ec;
+            color: #fff;
             margin: 4px 0;
+            text-shadow: 0 0 10px rgba(255, 20, 147, 0.6);
         }
 
-        /* ألبوم الصور الجديد تماماً (شكل بولارويد فخم وهادئ) */
-        .polaroid-frame {
-            background: #fdfbf7;
-            padding: 12px 12px 35px 12px;
-            border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-            width: 270px;
-            margin: 0 auto 15px auto;
-            transform: rotate(-1deg);
-            transition: transform 0.3s ease;
-        }
-        .polaroid-frame:hover {
-            transform: rotate(0deg);
-        }
-        .polaroid-img-container {
-            width: 100%;
-            height: 260px;
-            overflow: hidden;
-            border-radius: 4px;
-            background: #000;
-        }
-        .polaroid-img-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.2s ease-in-out;
-        }
-        .polaroid-caption {
-            color: #4a3b46;
-            font-size: 13px;
-            margin-top: 12px;
-            text-align: center;
-            font-family: 'Georgia', serif;
-            line-height: 1.4;
-            min-height: 35px;
-        }
-        .album-counter {
-            font-size: 12px;
-            color: #d87093;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-
-        /* الأسئلة */
+        /* صفحة الأسئلة الحية المليئة بالروح */
         .quiz-btn {
             width: 100%;
-            background: rgba(216, 112, 147, 0.1);
-            border: 1px solid rgba(216, 112, 147, 0.3);
-            color: #fce4ec;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 15px;
+            background: rgba(255, 20, 147, 0.1);
+            border: 1px solid rgba(255, 20, 147, 0.3);
+            color: #fff;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
             cursor: pointer;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             transition: 0.2s;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.1);
         }
         .quiz-btn:hover {
-            background: rgba(216, 112, 147, 0.3);
+            background: #ff1493;
+            border-color: #ff1493;
+            box-shadow: 0 0 20px #ff1493;
+            transform: translateY(-2px);
         }
 
-        /* رسم القلب الكامل واسم أمل */
-        .heart-container {
+        /* ألبوم الصور (شريط السينما المتوافق مع الموبايل) */
+        .film-strip {
+            background: #000;
+            border: 2px solid #ff1493;
+            border-radius: 16px;
+            width: 280px;
+            height: 340px;
+            margin: 0 auto 12px auto;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .film-strip img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: opacity 0.2s ease;
+        }
+        .album-caption {
+            font-size: 13px;
+            color: #fce4ec;
+            min-height: 40px;
+            padding: 0 5px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            font-family: 'Georgia', serif;
+        }
+
+        /* مرحلة رسم القلب والظلام والهدوء الرومانسي */
+        .heart-stage-box {
             position: relative;
             width: 220px;
             height: 180px;
@@ -196,40 +202,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: opacity 1s ease;
         }
-        .heart-svg {
+        .heart-svg-line {
             width: 130px;
             height: 130px;
-            fill: #d87093;
-            filter: drop-shadow(0 0 10px rgba(216,112,147,0.6));
-            opacity: 0;
-            transition: opacity 1s ease;
-            animation: heartPulse 1.2s infinite alternate;
+            fill: none;
+            stroke: #ff1493;
+            stroke-width: 2;
+            stroke-dasharray: 300;
+            stroke-dashoffset: 300;
+            animation: drawHeart 2.5s ease forwards;
         }
-        .amal-name-text {
+        @keyframes drawHeart {
+            to { stroke-dashoffset: 0; fill: rgba(255, 20, 147, 0.6); }
+        }
+
+        .heart-name-glow {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             color: #ffffff;
-            text-shadow: 0 0 12px #d87093;
-            opacity: 0;
-            transition: opacity 1s ease 0.4s;
-            letter-spacing: 2px;
-        }
-        @keyframes heartPulse {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.07); }
-        }
-
-        #confession-box {
-            display: none;
+            text-shadow: 0 0 15px #ff1493, 0 0 30px #ff1493;
             opacity: 0;
             transition: opacity 1s ease;
+            letter-spacing: 2px;
         }
-        #confession-box.show {
+
+        #confession-area {
+            display: none;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        #confession-area.show {
             display: block;
             opacity: 1;
         }
@@ -237,13 +245,14 @@
 </head>
 <body>
 
-    <div class="ambient-bg"></div>
+    <div class="ambient-bg" id="ambientBg"></div>
 
     <!-- 1. شاشة الباسورد -->
     <div id="screen-1" class="screen active">
-        <div class="glass-card">
-            <h3 style="color: #d87093; margin-bottom: 5px;">خزنة القلوب 🔒</h3>
-            <p style="font-size: 12px; color: #b09cb0; margin-bottom: 15px;">اكتبي الرقم السري (1107)</p>
+        <div class="glass-card" id="passCard">
+            <div style="font-size: 26px; margin-bottom: 5px;">💖✨</div>
+            <h3 style="color: #ff69b4; margin-bottom: 5px;">خزنة القلوب السرية</h3>
+            <p style="font-size: 12px; color: #ffb6c1; margin-bottom: 15px;">اكتبي الرقم السري (1107)</p>
             
             <div class="pin-container">
                 <div class="pin-box">
@@ -268,73 +277,71 @@
                 </div>
             </div>
 
-            <button class="soft-btn" onclick="checkPassword()" style="width: 100%;">فتح القفل ✨</button>
-            <p id="error-msg" style="color: #e57373; font-size: 12px; margin-top: 10px;"></p>
+            <button class="neon-btn" onclick="checkPassword()" style="width: 100%;">فتح القفل 🔓</button>
+            <p id="error-msg" style="color: #ff80ab; font-size: 12px; margin-top: 10px;"></p>
         </div>
     </div>
 
-    <!-- 2. الأسئلة -->
+    <!-- 2. شاشة الأسئلة الحية -->
     <div id="screen-2" class="screen">
         <div class="glass-card">
-            <p id="quiz-step" style="font-size: 12px; color: #d87093; margin-bottom: 8px;">السؤال 1 من 3</p>
-            <h3 id="quiz-text" style="font-size: 15px; margin-bottom: 20px; line-height: 1.5;">مين اللي بيغير أكتر؟</h3>
+            <p id="quiz-step" style="font-size: 12px; color: #ff69b4; margin-bottom: 8px; font-weight: bold;">السؤال 1 من 3</p>
+            <h3 id="quiz-text" style="font-size: 16px; margin-bottom: 20px; line-height: 1.5;">مين اللي بيغير أكتر؟</h3>
             <button class="quiz-btn" onclick="answerQuiz()">عمرو</button>
             <button class="quiz-btn" onclick="answerQuiz()">أمل</button>
         </div>
     </div>
 
-    <!-- 3. ألبوم الصور (شكل بولارويد هادئ) -->
+    <!-- 3. شاشة الألبوم (شريط السينما المتوافق مع الموبايل) -->
     <div id="screen-3" class="screen">
-        <div class="glass-card" style="width: 320px; padding: 15px;">
-            <div class="album-counter" id="photo-counter">1 / 37</div>
-            <div class="polaroid-frame">
-                <div class="polaroid-img-container">
-                    <img id="album-img" src="1.png" alt="Memory">
-                </div>
-                <div class="polaroid-caption" id="photo-desc">أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️</div>
+        <div class="glass-card" style="width: 330px;">
+            <div style="font-size: 12px; color: #ff69b4; margin-bottom: 6px; font-weight: bold;" id="photo-counter">1 / 37</div>
+            <div class="film-strip">
+                <img id="album-img" src="1.png" alt="Memory">
             </div>
+            <p class="album-caption" id="photo-desc">أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️</p>
             <div style="display: flex; gap: 10px;">
-                <button class="soft-btn" onclick="prevPhoto()" style="flex: 1; padding: 10px; font-size: 13px;">◀ السابق</button>
-                <button class="soft-btn" onclick="nextPhoto()" style="flex: 1; padding: 10px; font-size: 13px;" id="next-album-btn">التالي ▶</button>
+                <button class="neon-btn" onclick="prevPhoto()" style="flex: 1; padding: 10px; font-size: 13px;">◀ السابق</button>
+                <button class="neon-btn" onclick="nextPhoto()" style="flex: 1; padding: 10px; font-size: 13px;" id="next-album-btn">التالي ▶</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. رسم القلب والاعتراف (تبدأ الأغنية الثانية هنا وتتوقف الأولى) -->
+    <!-- 4. شاشة رسم القلب، الظلام، والهدوء الرومانسي -->
     <div id="screen-4" class="screen">
-        <div class="glass-card" style="width: 340px;">
+        <div class="glass-card" style="width: 350px;" id="cardContainer">
             
-            <div id="heart-stage">
-                <h3 style="color: #d87093; font-size: 16px; margin-bottom: 15px;">نبضات قلبنا.. ❤️</h3>
-                <div class="heart-container">
-                    <svg class="heart-svg" id="heartSvg" viewBox="0 0 32 29.6">
+            <div id="heartStage">
+                <h3 style="color: #ff69b4; font-size: 16px; margin-bottom: 10px;">ارسمي نبضات قلبنا.. ❤️</h3>
+                <div class="heart-stage-box">
+                    <svg class="heart-svg-line" viewBox="0 0 32 29.6">
                         <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
                         c6.5-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
                     </svg>
-                    <div class="amal-name-text" id="amalName">أمل</div>
+                    <div class="heart-name-glow" id="heartName">أمل</div>
                 </div>
             </div>
 
-            <div id="confession-box">
+            <div id="confession-area">
                 <div style="font-size: 20px; margin-bottom: 8px; letter-spacing: 6px;">🕯️ 🌹 🕯️</div>
-                <h3 style="color: #d87093; margin-bottom: 10px; font-size: 18px;">من قلبي لقلبك 🌹</h3>
+                <h3 style="color: #ff69b4; margin-bottom: 10px; font-size: 18px;">من قلبي لقلبك 🌹</h3>
                 <p style="font-size: 13px; line-height: 1.8; color: #fce4ec; margin-bottom: 20px;">
                     "مشاعري رايحه لامل ومعجب بيها وبنلها دا وهيا كمان في اهتمام ونا بهتم وبتغير عليا وبغير عليها".. وجودك بيفرق في كل تفصيلة وبيخلي الدنيا أطعم وأجمل بكتير. ❤️
                 </p>
-                <button class="soft-btn" onclick="goToScreen(5)" style="width: 100%;">كملي الرحلة 🥰</button>
+                <button class="neon-btn" onclick="goToScreen(5)" style="width: 100%;">كملي الرحلة 🥰</button>
             </div>
 
         </div>
     </div>
 
-    <!-- 5. سؤال الاستعداد (مع زر الهروب الشقي) -->
+    <!-- 5. شاشة سؤال الاستعداد -->
     <div id="screen-5" class="screen">
         <div class="glass-card">
-            <h3 style="color: #d87093; font-size: 16px; margin-bottom: 10px;">سؤال بخصوص قلبك؟ 😌</h3>
+            <h3 style="color: #ff69b4; font-size: 16px; margin-bottom: 10px;">سؤال بخصوص قلبك؟ 😌</h3>
             <p style="font-size: 14px; margin: 15px 0; color: #fce4ec;">بتحبيني ولا محتاجة وقت تفكري؟</p>
             <div style="display: flex; flex-direction: column; gap: 12px;">
-                <button class="soft-btn" onclick="acceptLove()" style="width: 100%;">مغروسة وبحبك أكتر يا سيدي 🥰</button>
-                <button class="soft-btn" id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()" style="width: 100%; background: transparent; border-color: rgba(255,255,255,0.2);">محتاجة وقت أفكر يا عم الحج 😌</button>
+                <button class="neon-btn" onclick="acceptLove()" style="width: 100%;">مغروسة وبحبك أكتر يا سيدي 🥰</button>
+                <button class="neon-btn" id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()" style="width: 100%; background: transparent; border-color: rgba(255,255,255,0.2); box-shadow: none;">محتاجة وقت أفكر يا عم الحج 😌</button>
             </div>
         </div>
     </div>
@@ -342,15 +349,14 @@
     <!-- 6. النهاية -->
     <div id="screen-6" class="screen">
         <div class="glass-card">
-            <h3 style="color: #d87093; font-size: 18px; margin-bottom: 10px;">النهاية السعيدة 🎉</h3>
+            <h3 style="color: #ff69b4; font-size: 18px; margin-bottom: 10px;">النهاية السعيدة 🎉</h3>
             <p style="font-size: 13px; line-height: 1.6; margin: 15px 0; color: #fce4ec;">
-                هاه.. الموقع الهادي عجبك ولا أطير أعدل حاجة تاني يا غيبوبة؟ 😂❤️
+                هاه.. الموقع ظبط وبقى في حتة تانية خالص يا غيبوبة؟ 😂❤️
             </p>
-            <button class="soft-btn" onclick="resetJourney()" style="width: 100%;">عيد الرحلة من جديد 🔄</button>
+            <button class="neon-btn" onclick="resetJourney()" style="width: 100%;">عيد الرحلة من جديد 🔄</button>
         </div>
     </div>
 
-    <!-- الأغاني -->
     <audio id="song1" src="1000451616.mp3" preload="auto" loop></audio>
     <audio id="song2" src="1000451619h.mp3" preload="auto" loop></audio>
 
@@ -358,10 +364,29 @@
         const song1 = document.getElementById('song1');
         const song2 = document.getElementById('song2');
 
+        // ميزة رقم 2: صوت نقرات رقيق وواقعي عند الضغط (باستخدام Web Audio API عشان يشتغل بدون ملفات خارجية)
+        function playClickSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.05);
+            } catch (e) {}
+        }
+
         let currentPin = [0, 0, 0, 0];
         const targetPin = [1, 1, 0, 7];
 
         function changeDigit(index, delta) {
+            playClickSound();
             currentPin[index] += delta;
             if (currentPin[index] > 9) currentPin[index] = 0;
             if (currentPin[index] < 0) currentPin[index] = 9;
@@ -369,6 +394,7 @@
         }
 
         function checkPassword() {
+            playClickSound();
             let ok = true;
             for (let i = 0; i < 4; i++) {
                 if (currentPin[i] !== targetPin[i]) ok = false;
@@ -377,6 +403,10 @@
                 confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
                 goToScreen(2);
             } else {
+                // ميزة رقم 4: اهتزاز الكارت عند الخطأ
+                const card = document.getElementById('passCard');
+                card.classList.add('shake');
+                setTimeout(() => card.classList.remove('shake'), 400);
                 document.getElementById('error-msg').innerText = "كلمة السر غلط! (1107) ❌";
             }
         }
@@ -384,6 +414,7 @@
         const quizQ = ["مين اللي بيغير أكتر؟", "مين صاحب لقب 'رادار التأخير'؟", "مين بيحب التاني أكتر؟"];
         let qIdx = 0;
         function answerQuiz() {
+            playClickSound();
             confetti({ particleCount: 40, spread: 50, origin: { y: 0.6 } });
             qIdx++;
             if (qIdx < quizQ.length) {
@@ -453,6 +484,7 @@
         }
 
         function nextPhoto() {
+            playClickSound();
             if (pIdx < albumData.length - 1) {
                 pIdx++;
                 updatePhoto();
@@ -462,6 +494,7 @@
         }
 
         function prevPhoto() {
+            playClickSound();
             if (pIdx > 0) {
                 pIdx--;
                 updatePhoto();
@@ -479,51 +512,58 @@
                 song1.currentTime = 0;
                 song2.play().catch(e => {});
 
-                // تشغيل رسم القلب ثم إظهار الاعتراف بالشموع
-                const heartSvg = document.getElementById('heartSvg');
-                const amalName = document.getElementById('amalName');
-                const heartStage = document.getElementById('heart-stage');
-                const confessionBox = document.getElementById('confession-box');
+                const heartName = document.getElementById('heartName');
+                const heartStage = document.getElementById('heartStage');
+                const confessionArea = document.getElementById('confession-area');
+                const ambientBg = document.getElementById('ambientBg');
+                const cardContainer = document.getElementById('cardContainer');
 
                 setTimeout(() => {
-                    heartSvg.style.opacity = '1';
-                    amalName.style.opacity = '1';
-                }, 300);
+                    heartName.style.opacity = '1';
+                }, 2200);
 
                 setTimeout(() => {
                     heartStage.style.opacity = '0';
+                    ambientBg.style.background = '#0a0208';
+                    cardContainer.style.background = 'rgba(15, 3, 12, 0.9)';
+
                     setTimeout(() => {
                         heartStage.style.display = 'none';
-                        confessionBox.classList.add('show');
+                        confessionArea.classList.add('show');
                         confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
-                    }, 600);
-                }, 3500);
+                    }, 1500);
+
+                }, 4000);
             }
         }
 
         function moveButton() {
+            playClickSound();
             const btn = document.getElementById('runaway-btn');
             btn.style.transform = `translate(${Math.random() * 140 - 70}px, ${Math.random() * 140 - 70}px)`;
         }
 
         function acceptLove() {
+            playClickSound();
             confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 } });
             setTimeout(() => goToScreen(6), 1000);
         }
 
         function resetJourney() {
+            playClickSound();
             song2.pause(); song2.currentTime = 0;
             song1.pause(); song1.currentTime = 0;
             pIdx = 0; qIdx = 0; currentPin = [0,0,0,0];
             for(let i=0; i<4; i++) document.getElementById(`digit-${i}`).innerText = "0";
             document.getElementById('error-msg').innerText = "";
             
-            const heartStage = document.getElementById('heart-stage');
+            const heartStage = document.getElementById('heartStage');
             heartStage.style.display = 'block';
             heartStage.style.opacity = '1';
-            document.getElementById('heartSvg').style.opacity = '0';
-            document.getElementById('amalName').style.opacity = '0';
-            document.getElementById('confession-box').classList.remove('show');
+            document.getElementById('heartName').style.opacity = '0';
+            document.getElementById('confession-area').classList.remove('show');
+            document.getElementById('ambientBg').style.background = '';
+            document.getElementById('cardContainer').style.background = '';
 
             updatePhoto();
             goToScreen(1);
