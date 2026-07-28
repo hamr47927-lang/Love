@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Special Journey</title>
+    <title>Our Special Journey - For Amal ❤️</title>
     <!-- مكتبة الكونفيتي للاحتفال -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -15,7 +15,7 @@
         body {
             margin: 0;
             padding: 0;
-            background: #0c0206;
+            background: #0d0208;
             color: #ffffff;
             font-family: 'Tahoma', sans-serif;
             display: flex;
@@ -27,8 +27,8 @@
             position: relative;
         }
 
-        /* خلفية نيون رومانسية دافئة (بين الوردي الغامق والمجنتا والأحمر) */
-        .stars {
+        /* خلفية نيون رومانسية دافئة بتتنفس (Breathing Glow) */
+        .ambient-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -36,10 +36,15 @@
             height: 100%;
             pointer-events: none;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 0, 110, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(255, 75, 145, 0.1) 0%, transparent 40%),
-                #0c0206;
+                radial-gradient(circle at 20% 30%, rgba(255, 0, 110, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 75, 145, 0.12) 0%, transparent 50%),
+                #0d0208;
             z-index: -1;
+            animation: bgBreathe 6s ease-in-out infinite alternate;
+        }
+        @keyframes bgBreathe {
+            0% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
         }
 
         .screen {
@@ -59,26 +64,27 @@
             display: flex;
         }
 
-        /* كارت زجاجي بحدود نيون رومانسية متوهجة */
+        /* كارت زجاجي بحدود نيون رومانسية متوهجة وتأثير 3D ناعم */
         .neon-card {
-            background: rgba(20, 5, 15, 0.8);
+            background: rgba(25, 5, 18, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 0, 127, 0.4);
+            border: 1px solid rgba(255, 0, 127, 0.45);
             border-radius: 28px;
             padding: 25px;
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.2), inset 0 0 15px rgba(255, 75, 145, 0.08);
+            box-shadow: 0 0 35px rgba(255, 0, 127, 0.25), inset 0 0 20px rgba(255, 75, 145, 0.08);
             max-width: 95%;
             width: 360px;
+            transition: transform 0.2s ease;
         }
 
-        /* أزرار نيون رومانسية متوهجة احترافية */
+        /* أزرار نيون رومانسية احترافية */
         .neon-btn {
             padding: 12px 24px;
             font-size: 15px;
             border-radius: 14px;
             border: 1px solid #ff007f;
-            background: rgba(255, 0, 127, 0.15);
+            background: rgba(255, 0, 127, 0.18);
             color: #fff;
             cursor: pointer;
             font-weight: bold;
@@ -91,12 +97,13 @@
             transform: scale(0.98);
         }
 
-        /* قفل الأرقام الـ 4 الاحترافي بلون وردي رومانسي */
+        /* قفل الأرقام الـ 4 (من الشمال لليمين LTR) */
         .pin-container {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin: 20px 0;
+            direction: ltr; /* اتجاه كتابة الباسورد من الشمال لليمين */
         }
         .pin-box {
             display: flex;
@@ -165,14 +172,13 @@
             margin-bottom: 15px;
             line-height: 1.5;
         }
-
         .album-nav-btns {
             display: flex;
             gap: 15px;
             justify-content: center;
         }
 
-        /* أزرار الأسئلة نيون وردي */
+        /* أزرار الأسئلة نيون */
         .quiz-options-container {
             display: flex;
             gap: 12px;
@@ -198,57 +204,67 @@
             box-shadow: 0 0 20px #ff007f;
         }
 
-        /* تصميم مرحلة رسم القلب المضيء والرسالة المنبثقة */
-        .heart-container {
+        /* مرحلة رسم القلب الكامل والاسم والشموع */
+        .heart-draw-container {
             position: relative;
             width: 260px;
-            height: 240px;
-            margin: 0 auto 15px auto;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.8s ease;
-        }
-        .dot {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #ff4b91;
-            border-radius: 50%;
+            height: 220px;
+            margin: 0 auto 10px auto;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        /* تصميم القلب المتصل وكتابة اسم أمل جواه */
+        .full-heart-shape {
+            position: relative;
+            width: 140px;
+            height: 130px;
+            background: transparent;
+            animation: heartBeatPulse 1.2s infinite alternate;
+        }
+        /* شكل هندسي للقلب بالـ CSS والنقط المتوهجة */
+        .heart-svg-glow {
+            width: 100%;
+            height: 100%;
+            fill: #ff007f;
+            filter: drop-shadow(0 0 15px #ff007f) drop-shadow(0 0 30px #ff4b91);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        .amal-name-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
             font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 13px;
-            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+            z-index: 3;
+            letter-spacing: 2px;
         }
-        .dot.active-dot {
-            background: #ff007f;
-            border-color: #ff007f;
-            color: white;
-            box-shadow: 0 0 20px #ff007f, 0 0 40px #ff007f;
-            transform: scale(1.1);
-        }
-        /* وميض كل النقط مع بعضها */
-        .dot.pulse-all {
-            animation: neonPulse 0.6s infinite alternate;
-        }
-        @keyframes neonPulse {
-            0% { background: #ff4b91; border-color: #ff4b91; box-shadow: 0 0 15px #ff4b91; }
-            100% { background: #ff007f; border-color: #ff007f; box-shadow: 0 0 25px #ff007f, 0 0 50px #ff007f; }
+        @keyframes heartBeatPulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
         }
 
-        /* رسالة الاعتراف التي تظهر بعد تكبير واختفاء القلب */
-        #confession-popup {
+        /* صفحة الاعتراف بالشموع والورد المنسق */
+        #confession-section {
             display: none;
             opacity: 0;
-            transform: scale(0.5);
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: opacity 1s ease;
         }
-        #confession-popup.show {
+        #confession-section.show {
             display: block;
             opacity: 1;
-            transform: scale(1);
+        }
+        .candle-rose-decor {
+            font-size: 22px;
+            margin-bottom: 8px;
+            letter-spacing: 8px;
+            text-shadow: 0 0 10px rgba(255,0,127,0.6);
         }
 
         #runaway-btn {
@@ -262,14 +278,14 @@
 </head>
 <body>
 
-    <div class="stars"></div>
+    <div class="ambient-bg"></div>
 
-    <!-- المحطة الأولى: قفل الأرقام الـ 4 (الخزنة السرية) -->
+    <!-- المحطة الأولى: قفل الأرقام (LTR من الشمال لليمين) -->
     <div id="screen-1" class="screen active">
         <div class="neon-card">
             <div style="font-size: 28px; margin-bottom: 5px; color: #ff007f;">🔒✨</div>
             <h2 style="margin-bottom: 5px; font-size: 18px; color: #ff4b91; text-shadow: 0 0 10px rgba(255,0,127,0.4);">قفل مفتاح قلب أمل</h2>
-            <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">اكتبي الرقم السري لفتح الرحلة (1107)</p>
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">اكتبي الرقم السري (1107)</p>
             
             <div class="pin-container">
                 <div class="pin-box">
@@ -299,7 +315,7 @@
         </div>
     </div>
 
-    <!-- المحطة الثانية: الأسئلة الـ 3 (بين عمرو وأمل) -->
+    <!-- المحطة الثانية: الأسئلة الـ 3 الاحترافية 3D -->
     <div id="screen-2" class="screen">
         <div class="neon-card" style="width: 360px;">
             <p id="quiz-step-indicator" style="font-size: 12px; color: #ff4b91; margin-bottom: 10px; font-weight: bold; text-shadow: 0 0 8px rgba(255,0,127,0.4);">السؤال 1 من 3</p>
@@ -312,7 +328,7 @@
         </div>
     </div>
 
-    <!-- المحطة الثالثة: ألبوم الصور السريع والسلس للموبايل -->
+    <!-- المحطة الثالثة: ألبوم الصور الرومانسي والسريع -->
     <div id="screen-3" class="screen">
         <div class="neon-card" style="width: 330px;">
             <div class="counter" id="photo-counter">1 / 37</div>
@@ -327,28 +343,31 @@
         </div>
     </div>
 
-    <!-- المحطة الرابعة: رسم القلب والاعتراف (تعمل فيها الأغنية الثانية) -->
+    <!-- المحطة الرابعة: القلب الكامل، اسم أمل، والشموع والورد (تشتغل الأغنية الثانية هنا) -->
     <div id="screen-4" class="screen">
         <div class="neon-card" style="width: 350px;">
             
-            <!-- مرحلة رسم القلب -->
-            <div id="heart-stage">
-                <h3 style="font-size: 16px; margin-bottom: 5px; color: #ff4b91;">ارسمي قلبنا المضيء ❤️</h3>
-                <p style="font-size: 11px; color: #aaa; margin-bottom: 15px;">اضغطي على النقط من 1 إلى 6 بالترتيب</p>
+            <!-- مرحلة ظهور القلب الكامل واسم أمل -->
+            <div id="heart-anim-stage">
+                <h3 style="font-size: 16px; margin-bottom: 5px; color: #ff4b91;">نبضات قلبنا.. ❤️</h3>
+                <p style="font-size: 11px; color: #aaa; margin-bottom: 10px;">شاهدي كيف ينبض بالحب</p>
                 
-                <div class="heart-container" id="heart-grid-box">
-                    <div class="dot" style="top: 25px; left: 105px;" onclick="connectDot(1)">1</div>
-                    <div class="dot" style="top: 65px; left: 55px;" onclick="connectDot(2)">2</div>
-                    <div class="dot" style="top: 65px; left: 155px;" onclick="connectDot(3)">3</div>
-                    <div class="dot" style="top: 125px; left: 30px;" onclick="connectDot(4)">4</div>
-                    <div class="dot" style="top: 125px; left: 180px;" onclick="connectDot(5)">5</div>
-                    <div class="dot" style="top: 185px; left: 105px;" onclick="connectDot(6)">6</div>
+                <div class="heart-draw-container">
+                    <div class="full-heart-shape">
+                        <!-- رسمة قلب SVG متوهجة -->
+                        <svg class="heart-svg-glow" id="heartSvg" viewBox="0 0 32 29.6">
+                            <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2
+                            c6.5-9.3,16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+                        </svg>
+                        <div class="amal-name-overlay" id="amalName">أمل</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- رسالة الاعتراف التي تظهر بعد اختفاء القلب -->
-            <div id="confession-popup">
-                <h2 style="color: #ff007f; margin-bottom: 12px; font-size: 20px; text-shadow: 0 0 15px rgba(255,0,127,0.6);">من قلبي لقلبك 🌹</h2>
+            <!-- صفحة الاعتراف بالشموع والورد (تظهر بعد اختفاء القلب بثواني) -->
+            <div id="confession-section">
+                <div class="candle-rose-decor">🕯️ 🌹 🕯️</div>
+                <h2 style="color: #ff007f; margin-bottom: 10px; font-size: 19px; text-shadow: 0 0 15px rgba(255,0,127,0.6);">من قلبي لقلبك 🌹</h2>
                 <p style="font-size: 13px; line-height: 1.8; color: #e0e0e0; margin-bottom: 20px;">
                     "مشاعري رايحه لامل ومعجب بيها وبنلها دا وهيا كمان في اهتمام ونا بهتم وبتغير عليا وبغير عليها".. وجودك بيفرق في كل تفصيلة وبيخلي الدنيا أطعم وأجمل بكتير من أي حاجة قبل كده. ❤️
                 </p>
@@ -358,7 +377,7 @@
         </div>
     </div>
 
-    <!-- المحطة السادسة: سؤال المشاعر والشقاوة -->
+    <!-- المحطة السادسة: سؤال الاستعداد والتفكير (مع زر الهروب الشقي) -->
     <div id="screen-6" class="screen">
         <div class="neon-card">
             <h3 style="font-size: 16px; margin-bottom: 10px; color: #ff4b91;">سؤال بخصوص قلبك الصغير؟ 😌</h3>
@@ -370,7 +389,7 @@
         </div>
     </div>
 
-    <!-- المحطة السابعة والأخيرة: الختام الكوميدي -->
+    <!-- المحطة السابعة والأخيرة: الختام الكوميدي الأنيق -->
     <div id="screen-7" class="screen">
         <div class="neon-card">
             <h2 style="color: #ff007f; font-size: 20px; margin-bottom: 10px; text-shadow: 0 0 15px rgba(255,0,127,0.5);">النهاية السعيدة 🎉</h2>
@@ -389,7 +408,7 @@
         const song1 = document.getElementById('song1');
         const song2 = document.getElementById('song2');
 
-        // قفل الـ 4 أرقام
+        // قفل الـ 4 أرقام (LTR)
         let currentPin = [0, 0, 0, 0];
         const targetPin = [1, 1, 0, 7];
 
@@ -418,7 +437,7 @@
             }
         }
 
-        // الأسئلة الـ 3 بين عمرو وأمل
+        // الأسئلة الـ 3
         const quizQuestions = [
             { question: "مين اللي بيغير أكتر؟" },
             { question: "مين صاحب لقب 'رادار التأخير'؟" },
@@ -443,7 +462,7 @@
             }
         }
 
-        // الألبوم السريع والسلس (37 صورة مع زر السابق والتالي)
+        // ألبوم الصور (37 صورة)
         const albumData = [
             { img: "1.png", text: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
             { img: "2.png", text: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من زمان." },
@@ -498,7 +517,7 @@
 
             const nextBtn = document.getElementById('next-album-btn');
             if (currentPhotoIndex === albumData.length - 1) {
-                nextBtn.innerText = "التالي لفصل الاعتراف ✨";
+                nextBtn.innerText = "التالي لفصل الحب ✨";
             } else {
                 nextBtn.innerText = "التالي ▶";
             }
@@ -509,7 +528,7 @@
                 currentPhotoIndex++;
                 updatePhotoDisplay();
             } else {
-                goToScreen(4); // الانتقال لمرحلة رسم القلب والاعتراف
+                goToScreen(4); // الانتقال لمرحلة القلب والاعتراف
             }
         }
 
@@ -527,43 +546,38 @@
             if (screenNum === 3) {
                 song1.play().catch(e => console.log("Audio play blocked:", e));
             } else if (screenNum === 4) {
-                // إيقاف الأغنية الأولى وتشغيل الأغنية الثانية عند الدخول لمرحلة رسم القلب والاعتراف
+                // تشغيل الأغنية الثانية وإيقاف الأولى فور الدخول لشاشة رسم القلب
                 song1.pause();
                 song1.currentTime = 0;
                 song2.play().catch(e => console.log("Audio play blocked:", e));
+
+                // تشغيل الأنيميشن للقلب واسم أمل ثم الانتقال لصفحة الشموع والورد
+                triggerHeartAnimation();
             }
         }
 
-        // تفاعل رسم القلب المضيء والرسالة المنبثقة
-        let nextExpectedDot = 1;
-        function connectDot(dotNum) {
-            if (dotNum === nextExpectedDot) {
-                const dots = document.querySelectorAll('.dot');
-                dots[dotNum - 1].classList.add('active-dot');
-                nextExpectedDot++;
+        // تفاعل القلب الكامل واسم أمل والشموع
+        function triggerHeartAnimation() {
+            const heartSvg = document.getElementById('heartSvg');
+            const amalName = document.getElementById('amalName');
+            const heartAnimStage = document.getElementById('heart-anim-stage');
+            const confessionSection = document.getElementById('confession-section');
 
-                if (nextExpectedDot > 6) {
-                    // عندما تكتمل النقط الـ 6، تطفي وتتنور كلها مع بعضها
-                    setTimeout(() => {
-                        dots.forEach(d => d.classList.add('pulse-all'));
-                    }, 300);
+            // إظهار القلب واسم أمل بالتدريج
+            setTimeout(() => {
+                heartSvg.style.opacity = '1';
+                amalName.style.opacity = '1';
+            }, 300);
 
-                    // بعد وميض النقط، يكبر القلب ويختفي ويظهر مكانة رسالة الاعتراف
-                    setTimeout(() => {
-                        const heartStage = document.getElementById('heart-stage');
-                        heartStage.style.transform = 'scale(1.5)';
-                        heartStage.style.opacity = '0';
-
-                        setTimeout(() => {
-                            heartStage.style.display = 'none';
-                            const popup = document.getElementById('confession-popup');
-                            popup.classList.add('show');
-                            confetti({ particleCount: 180, spread: 120, origin: { y: 0.5 } });
-                        }, 700);
-
-                    }, 1800);
-                }
-            }
+            // بعد ثواني: إطفاء القلب وتلاشيه وإظهار صفحة الشموع والاعتراف
+            setTimeout(() => {
+                heartAnimStage.style.opacity = '0';
+                setTimeout(() => {
+                    heartAnimStage.style.display = 'none';
+                    confessionSection.classList.add('show');
+                    confetti({ particleCount: 180, spread: 120, origin: { y: 0.5 } });
+                }, 800);
+            }, 3500);
         }
 
         function moveButton() {
@@ -589,17 +603,13 @@
             for(let i=0; i<4; i++) document.getElementById(`digit-${i}`).innerText = "0";
             document.getElementById('error-msg').innerText = "";
             
-            // إعادة ضبط مرحلة القلب
-            nextExpectedDot = 1;
-            const heartStage = document.getElementById('heart-stage');
-            heartStage.style.display = 'block';
-            heartStage.style.transform = 'scale(1)';
-            heartStage.style.opacity = '1';
-            document.querySelectorAll('.dot').forEach(d => {
-                d.classList.remove('active-dot');
-                d.classList.remove('pulse-all');
-            });
-            document.getElementById('confession-popup').classList.remove('show');
+            // إعادة ضبط مرحلة القلب والاعتراف
+            const heartAnimStage = document.getElementById('heart-anim-stage');
+            heartAnimStage.style.display = 'block';
+            heartAnimStage.style.opacity = '1';
+            document.getElementById('heartSvg').style.opacity = '0';
+            document.getElementById('amalName').style.opacity = '0';
+            document.getElementById('confession-section').classList.remove('show');
 
             updatePhotoDisplay();
             goToScreen(1);
