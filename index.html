@@ -258,7 +258,7 @@
         }
         .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: red !important; }
 
-        /* --- Book Album Styles --- */
+        /* --- Premium Book Album Styles --- */
         .album-dim-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -300,11 +300,24 @@
             transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease;
             box-shadow: 0 0 50px rgba(255, 20, 147, 0.4);
             border-radius: 20px;
-            perspective: 1500px;
+            perspective: 2000px;
         }
         .book-container.open {
             transform: scale(1);
             opacity: 1;
+        }
+
+        .book-spine-shadow {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: linear-gradient(90deg, rgba(0,0,0,0.6), transparent);
+            z-index: 10;
+            pointer-events: none;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
         }
 
         .book-page {
@@ -321,18 +334,46 @@
             transform-style: preserve-3d;
             transform-origin: left center;
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.8s ease;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.6), inset 15px 0 25px rgba(0,0,0,0.4);
+            box-shadow: -15px 0 40px rgba(0,0,0,0.7), inset 20px 0 30px rgba(0,0,0,0.5);
             will-change: transform;
         }
 
         .book-cover {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #2b0819, var(--primary-dark));
             border: 2px solid var(--accent-1);
             cursor: pointer;
             justify-content: center;
             align-items: center;
             text-align: center;
             transform-origin: left center;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), -15px 0 40px rgba(0,0,0,0.7);
+            position: relative;
+            overflow: hidden;
+        }
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20px; width: 10px; height: 100%;
+            background: rgba(0,0,0,0.4);
+            box-shadow: inset 2px 0 5px rgba(0,0,0,0.5);
+        }
+        .leather-texture {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(255,255,255,0.03) 15%, transparent 16%);
+            background-size: 4px 4px;
+            pointer-events: none;
+        }
+        .bookmark-ribbon {
+            position: absolute;
+            top: -10px;
+            right: 40px;
+            width: 25px;
+            height: 80px;
+            background: linear-gradient(180deg, var(--accent-1), #8b0046);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            z-index: 5;
         }
 
         .page-header {
@@ -343,6 +384,7 @@
             color: var(--accent-2);
             text-align: left;
             margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .page-img-container {
@@ -357,46 +399,80 @@
             position: relative;
             margin: 10px 0;
             border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .blur-bg-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            filter: blur(20px) brightness(0.4);
+            transform: scale(1.1);
+            z-index: 1;
         }
         .page-img-container img {
-            width: 100%;
-            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
             filter: blur(15px);
             opacity: 0;
             transform: scale(1.05);
             transition: filter 1s ease, opacity 1s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 2;
+            position: relative;
         }
         .page-img-container img.loaded {
             filter: blur(0);
             opacity: 1;
-            transform: scale(1);
         }
+        
+        /* Subtle Dynamic Image Animations */
+        .anim-zoom-in img.loaded { animation: animZoomIn 6s infinite alternate ease-in-out; }
+        .anim-zoom-out img.loaded { animation: animZoomOut 6s infinite alternate ease-in-out; }
+        .anim-pan-right img.loaded { animation: animPanRight 6s infinite alternate ease-in-out; }
+        .anim-pan-left img.loaded { animation: animPanLeft 6s infinite alternate ease-in-out; }
+
+        @keyframes animZoomIn { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
+        @keyframes animZoomOut { 0% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        @keyframes animPanRight { 0% { transform: scale(1.05) translateX(-3px); } 100% { transform: scale(1.05) translateX(3px); } }
+        @keyframes animPanLeft { 0% { transform: scale(1.05) translateX(3px); } 100% { transform: scale(1.05) translateX(-3px); } }
+
         .page-img-container img.zoomed {
-            transform: scale(1.4);
+            transform: scale(1.4) !important;
+            animation: none !important;
         }
 
         .page-caption-box {
-            min-height: 60px;
+            min-height: 70px;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
             position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
         }
         .page-caption {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             text-align: center;
             color: var(--text-light);
             line-height: 1.5;
         }
         .page-hint {
             position: absolute;
-            bottom: 0;
-            font-size: 0.85rem;
+            bottom: 5px;
+            font-size: 0.8rem;
             color: var(--accent-2);
             opacity: 0;
             animation: fadeInHint 0.5s forwards;
+        }
+        .caption-heart {
+            font-size: 1.2rem;
+            margin-top: 5px;
+            animation: heartPulseNatural 1.2s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-block;
         }
 
         .page-final {
@@ -594,7 +670,9 @@
             <div class="gift-box" id="gift-box-btn">🎁</div>
             <div class="gift-text">في هدية صغيرة ليكي... افتحيها ❤️</div>
         </div>
-        <div class="book-container" id="book-container"></div>
+        <div class="book-container" id="book-container">
+            <div class="book-spine-shadow"></div>
+        </div>
     </section>
 
     <!-- 6. Heart Animation -->
@@ -855,7 +933,6 @@
                 }, 150);
             }
 
-            // Audio Management System with Fade In/Out
             fadeInAudio(audio, duration = 2000) {
                 audio.volume = 0;
                 audio.play().catch(() => {});
@@ -997,6 +1074,7 @@
                 loadQ();
             }
 
+            // --- Premium Optimized Book Album System ---
             initAlbumBook() {
                 const overlay = document.getElementById('album-overlay');
                 const giftBox = document.getElementById('gift-box-btn');
@@ -1005,14 +1083,22 @@
                 overlay.style.opacity = '1';
                 overlay.style.pointerEvents = 'auto';
                 bookContainer.classList.remove('open');
+                
+                // Clear previous book pages except spine shadow
+                const spineShadow = bookContainer.querySelector('.book-spine-shadow');
                 bookContainer.innerHTML = '';
+                if(spineShadow) bookContainer.appendChild(spineShadow);
+                else {
+                    const spine = document.createElement('div');
+                    spine.className = 'book-spine-shadow';
+                    bookContainer.appendChild(spine);
+                }
 
                 const openGiftHandler = () => {
                     giftBox.classList.add('shake');
                     this.playSound('success-sound');
                     if(navigator.vibrate) navigator.vibrate(200);
                     
-                    // تشغيل الموسيقى الأولى حصرياً عند فتح الهدية والألبوم
                     if (!this.isMusicPlaying) {
                         this.fadeInAudio(this.audio1, 2000);
                     } else if (this.currentAudioActive !== this.audio1) {
@@ -1023,7 +1109,7 @@
                         overlay.style.opacity = '0';
                         overlay.style.pointerEvents = 'none';
                         bookContainer.classList.add('open');
-                        this.buildBookStructure();
+                        this.setupVirtualizedBook();
                     }, 500);
                 };
 
@@ -1031,199 +1117,228 @@
                 giftBox.addEventListener('click', openGiftHandler, { once: true });
             }
 
-            buildBookStructure() {
+            setupVirtualizedBook() {
                 const container = document.getElementById('book-container');
-                container.innerHTML = '';
+                let totalPages = this.photos.length + 2; // Cover + Photos + Final
+                let currentPageIndex = 0;
+                const animationClasses = ['anim-zoom-in', 'anim-zoom-out', 'anim-pan-right', 'anim-pan-left'];
 
-                let totalPages = this.photos.length + 2;
-                let currentPageIdx = 0;
-                let pagesHTML = [];
+                // Smart Preloader for images
+                const preloadImage = (index) => {
+                    if(index >= 0 && index < this.photos.length) {
+                        const img = new Image();
+                        img.src = this.photos[index].src;
+                    }
+                };
 
-                // 1. Cover Page
-                pagesHTML.unshift(`
-                    <div class="book-page book-cover" data-page="0">
-                        <h1 class="glow-text">❤️ ذكرياتنا</h1>
-                        <h2 style="color:var(--accent-2); margin-top:10px;">Amr ❤️ Amal</h2>
-                        <p style="margin-top:30px; font-size:1rem; opacity:0.8;">اضغط لفتح الكتاب</p>
-                    </div>
-                `);
+                const renderPage = (index) => {
+                    // Remove existing rendered pages inside container (keep spine)
+                    const spine = container.querySelector('.book-spine-shadow');
+                    container.innerHTML = '';
+                    if(spine) container.appendChild(spine);
 
-                // 2. Photo Pages
-                this.photos.forEach((photo, idx) => {
-                    let pageNum = idx + 1;
-                    pagesHTML.push(`
-                        <div class="book-page" data-page="${pageNum}" style="z-index: ${totalPages - pageNum};">
-                            <div class="page-header">
-                                <div class="page-counter">${pageNum} / ${this.photos.length}</div>
-                                <div class="progress-bar-container" style="margin:5px 0;">
-                                    <div class="progress-bar" style="width: ${(pageNum / this.photos.length) * 100}%;"></div>
+                    let pageHTML = '';
+                    if(index === 0) {
+                        // Cover Page
+                        pageHTML = `
+                            <div class="book-page book-cover" data-page="0" style="z-index: 10;">
+                                <div class="leather-texture"></div>
+                                <div class="bookmark-ribbon"></div>
+                                <h1 class="glow-text">Our Story</h1>
+                                <h2 style="color:var(--accent-2); margin-top:10px;">Amr ❤️ Amal</h2>
+                                <p style="margin-top:30px; font-size:1rem; opacity:0.8;">اضغط لفتح الكتاب</p>
+                            </div>
+                        `;
+                    } else if(index === totalPages - 1) {
+                        // Final Page
+                        pageHTML = `
+                            <div class="book-page page-final" data-page="${index}" style="z-index: 10;">
+                                <h2 style="color: var(--accent-3); margin-bottom: 10px;">وصلنا لنهاية ذكرياتنا هنا... بس الحكاية لسه مبدعتش ❤️</h2>
+                                <p style="font-size: 0.95rem; opacity: 0.8; margin-bottom: 10px;">اضغط على ختم الشمع لغلق الكتاب وختم الحب</p>
+                                <div class="wax-seal" id="wax-seal-btn">💌</div>
+                            </div>
+                        `;
+                    } else {
+                        // Photo Page
+                        let photoIdx = index - 1;
+                        let photo = this.photos[photoIdx];
+                        let animClass = animationClasses[photoIdx % animationClasses.length];
+                        pageHTML = `
+                            <div class="book-page" data-page="${index}" style="z-index: 10;">
+                                <div class="page-header">
+                                    <div class="page-counter">${index} / ${this.photos.length}</div>
+                                    <div class="progress-bar-container" style="margin:5px 0;">
+                                        <div class="progress-bar" style="width: ${(index / this.photos.length) * 100}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="page-img-container ${animClass}">
+                                    <img src="${photo.src}" alt="Memory" class="lazy-img loaded" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23220612\\'/%3E%3Ctext x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'14\\' fill=\\'white\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3Eصورة ${index}%3C/text%3E%3C/svg%3E'">
+                                </div>
+                                <div class="page-caption-box">
+                                    <div class="page-caption" data-caption="${photo.caption}"></div>
                                 </div>
                             </div>
-                            <div class="page-img-container">
-                                <img data-src="${photo.src}" alt="Memory" loading="lazy" class="lazy-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'100\\' height=\\'100\\'%3E%3Crect width=\\'100\\' height=\\'100\\' fill=\\'%23220612\\'/%3E%3Ctext x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'14\\' fill=\\'white\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\'%3Eصورة ${pageNum}%3C/text%3E%3C/svg%3E'">
-                            </div>
-                            <div class="page-caption-box">
-                                <div class="page-caption" data-caption="${photo.caption}"></div>
-                            </div>
-                        </div>
-                    `);
-                });
+                        `;
+                    }
 
-                // 3. Final Page with Wax Seal
-                let finalPageNum = totalPages - 1;
-                pagesHTML.push(`
-                    <div class="book-page page-final" data-page="${finalPageNum}" style="z-index: 1;">
-                        <h2 style="color: var(--accent-3); margin-bottom: 10px;">وصلنا لنهاية ذكرياتنا هنا... بس الحكاية لسه مبدعتش ❤️</h2>
-                        <p style="font-size: 0.95rem; opacity: 0.8; margin-bottom: 10px;">اضغط على ختم الشمع لغلق الكتاب وختم الحب</p>
-                        <div class="wax-seal" id="wax-seal-btn">💌</div>
-                    </div>
-                `);
+                    container.insertAdjacentHTML('beforeend', pageHTML);
 
-                container.innerHTML = pagesHTML.join('');
+                    // Trigger interactions for rendered page
+                    if(index > 0 && index < totalPages - 1) {
+                        this.triggerTypewriter(container.querySelector(`[data-page="${index}"]`));
+                        // Preload next 2 images
+                        preloadImage(index);
+                        preloadImage(index + 1);
+                    } else if(index === 0) {
+                        const cover = container.querySelector('.book-cover');
+                        cover.addEventListener('click', () => {
+                            this.flipPage(cover, index, totalPages, renderPage, currentPageIndex);
+                        });
+                    } else if(index === totalPages - 1) {
+                        const waxSealBtn = document.getElementById('wax-seal-btn');
+                        if(waxSealBtn) {
+                            waxSealBtn.addEventListener('click', () => {
+                                waxSealBtn.classList.add('break');
+                                this.playSound('success-sound');
+                                if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
 
-                const loadImagesAround = (idx) => {
-                    const pages = container.querySelectorAll('.book-page');
-                    [idx - 1, idx, idx + 1].forEach(i => {
-                        if(pages[i]) {
-                            const img = pages[i].querySelector('.lazy-img');
-                            if(img && img.dataset.src && !img.getAttribute('src')) {
-                                img.src = img.dataset.src;
-                                img.onload = () => {
-                                    setTimeout(() => img.classList.add('loaded'), 100);
-                                };
-                            } else if (img && img.getAttribute('src') && !img.classList.contains('loaded')) {
-                                setTimeout(() => img.classList.add('loaded'), 100);
-                            }
+                                this.fadeOutAudio(this.audio1, 2500, () => {
+                                    this.fadeInAudio(this.audio2, 2500);
+                                });
+
+                                container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
+                                container.style.transform = 'scale(0) rotate(10deg)';
+                                container.style.opacity = '0';
+
+                                setTimeout(() => {
+                                    this.navigateTo('screen-heart');
+                                }, 1000);
+                            });
                         }
-                    });
+                    }
+
+                    // Setup swipe/click handler for current page
+                    const currentPageEl = container.querySelector(`[data-page="${index}"]`);
+                    if(currentPageEl && index < totalPages - 1 && index > 0) {
+                        this.setupPageInteraction(currentPageEl, index, totalPages, renderPage);
+                    }
                 };
 
-                const triggerTypewriter = (pageEl) => {
-                    const captionBox = pageEl.querySelector('.page-caption');
-                    if(!captionBox) return;
-                    const text = captionBox.dataset.caption || '';
-                    captionBox.innerHTML = '';
+                renderPage(0);
+            }
+
+            setupPageInteraction(pageEl, index, totalPages, renderPageCallback) {
+                let startX = 0;
+                let currentX = 0;
+                let isDragging = false;
+
+                const onStart = (clientX) => {
+                    startX = clientX;
+                    isDragging = true;
+                    pageEl.style.transition = 'none';
+                };
+
+                const onMove = (clientX) => {
+                    if (!isDragging) return;
+                    currentX = clientX;
+                    let diff = currentX - startX;
+                    if (diff > 0) diff = 0;
                     
-                    setTimeout(() => {
-                        let i = 0;
-                        const type = () => {
-                            if (i < text.length) {
-                                captionBox.innerHTML += text.charAt(i);
-                                this.playSound('type-sound');
-                                i++;
-                                setTimeout(type, 35);
-                            } else {
-                                if(!pageEl.querySelector('.page-hint')) {
-                                    const hint = document.createElement('div');
-                                    hint.className = 'page-hint';
-                                    hint.textContent = 'اسحب لقلب الصفحة ❯';
-                                    pageEl.querySelector('.page-caption-box').appendChild(hint);
-                                }
-                            }
-                        };
-                        type();
-                    }, 600); // إعطاء فرصة للـ Fade In والـ Zoom للصورة أولاً
+                    pageEl.style.transform = `translateX(${diff}px) rotateY(${diff * 0.05}deg)`;
+                    pageEl.style.boxShadow = `${Math.abs(diff) * 0.1}px 10px 40px rgba(0,0,0,0.7)`;
                 };
 
-                loadImagesAround(0);
-                triggerTypewriter(container.querySelector('[data-page="0"]'));
+                const onEnd = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    let diff = currentX - startX;
+                    pageEl.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.6s ease';
 
-                const pages = container.querySelectorAll('.book-page');
-                
-                pages.forEach((page, index) => {
-                    let startX = 0;
-                    let currentX = 0;
-                    let isDragging = false;
+                    if (diff < -60) {
+                        pageEl.style.transform = 'translateX(-100%) rotateY(-25deg)';
+                        pageEl.style.opacity = '0';
+                        this.playSound('page-flip-sound');
+                        setTimeout(() => {
+                            renderPageCallback(index + 1);
+                        }, 400);
+                    } else {
+                        pageEl.style.transform = 'translateX(0px) rotateY(0deg)';
+                        pageEl.style.boxShadow = '-15px 0 40px rgba(0,0,0,0.7), inset 20px 0 30px rgba(0,0,0,0.5)';
+                    }
+                };
 
-                    const onStart = (clientX) => {
-                        if (index !== currentPageIdx) return;
-                        startX = clientX;
-                        isDragging = true;
-                        page.style.transition = 'none';
-                    };
+                pageEl.addEventListener('mousedown', (e) => onStart(e.clientX));
+                window.addEventListener('mousemove', (e) => onMove(e.clientX));
+                window.addEventListener('mouseup', onEnd);
 
-                    const onMove = (clientX) => {
-                        if (!isDragging || index !== currentPageIdx) return;
-                        currentX = clientX;
-                        let diff = currentX - startX;
-                        if (diff > 0) diff = 0; 
-                        
-                        page.style.transform = `translateX(${diff}px) rotateY(${diff * 0.05}deg)`;
-                        page.style.boxShadow = `${Math.abs(diff) * 0.1}px 10px 30px rgba(0,0,0,0.6)`;
-                    };
+                pageEl.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX), {passive: true});
+                window.addEventListener('touchmove', (e) => {
+                    if(e.touches && e.touches[0]) onMove(e.touches[0].clientX);
+                }, {passive: true});
+                window.addEventListener('touchend', onEnd);
 
-                    const onEnd = () => {
-                        if (!isDragging || index !== currentPageIdx) return;
-                        isDragging = false;
-                        let diff = currentX - startX;
-                        page.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.6s ease';
-
-                        if (diff < -80 && currentPageIdx < totalPages - 1) {
-                            page.style.transform = 'translateX(-100%) rotateY(-25deg)';
-                            page.style.opacity = '0';
-                            this.playSound('page-flip-sound');
-                            currentPageIdx++;
-                            loadImagesAround(currentPageIdx);
-                            triggerTypewriter(container.querySelector(`[data-page="${currentPageIdx}"]`));
-                        } else {
-                            page.style.transform = 'translateX(0px) rotateY(0deg)';
-                            page.style.boxShadow = '-10px 0 30px rgba(0,0,0,0.6), inset 15px 0 25px rgba(0,0,0,0.4)';
-                        }
-                    };
-
-                    page.addEventListener('mousedown', (e) => onStart(e.clientX));
-                    window.addEventListener('mousemove', (e) => onMove(e.clientX));
-                    window.addEventListener('mouseup', onEnd);
-
-                    page.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX), {passive: true});
-                    window.addEventListener('touchmove', (e) => {
-                        if(e.touches && e.touches[0]) onMove(e.touches[0].clientX);
-                    }, {passive: true});
-                    window.addEventListener('touchend', onEnd);
-
-                    page.addEventListener('click', (e) => {
-                        if (Math.abs(currentX - startX) < 5 && index === currentPageIdx && index < totalPages - 1) {
-                            page.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease';
-                            page.style.transform = 'translateX(-100%) rotateY(-25deg)';
-                            page.style.opacity = '0';
-                            this.playSound('page-flip-sound');
-                            currentPageIdx++;
-                            loadImagesAround(currentPageIdx);
-                            triggerTypewriter(container.querySelector(`[data-page="${currentPageIdx}"]`));
-                        }
-                    });
+                pageEl.addEventListener('click', (e) => {
+                    if (Math.abs(currentX - startX) < 5) {
+                        pageEl.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.6s ease';
+                        pageEl.style.transform = 'translateX(-100%) rotateY(-25deg)';
+                        pageEl.style.opacity = '0';
+                        this.playSound('page-flip-sound');
+                        setTimeout(() => {
+                            renderPageCallback(index + 1);
+                        }, 400);
+                    }
                 });
 
-                container.querySelectorAll('.page-img-container img').forEach(img => {
+                const img = pageEl.querySelector('.lazy-img');
+                if(img) {
                     img.addEventListener('click', (e) => {
                         e.stopPropagation();
                         img.classList.toggle('zoomed');
                     });
-                });
-
-                // Wax Seal Logic
-                const waxSealBtn = document.getElementById('wax-seal-btn');
-                if(waxSealBtn) {
-                    waxSealBtn.addEventListener('click', () => {
-                        waxSealBtn.classList.add('break');
-                        this.playSound('success-sound');
-                        if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
-
-                        // Fade Out الموسيقى الأولى تدريجياً لمدة 2.5 ثانية
-                        this.fadeOutAudio(this.audio1, 2500, () => {
-                            // التبديل التلقائي للموسيقى الثانية بـ Fade In
-                            this.fadeInAudio(this.audio2, 2500);
-                        });
-
-                        container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
-                        container.style.transform = 'scale(0) rotate(10deg)';
-                        container.style.opacity = '0';
-
-                        setTimeout(() => {
-                            this.navigateTo('screen-heart');
-                        }, 1000);
-                    });
                 }
+            }
+
+            flipPage(coverEl, index, totalPages, renderPageCallback) {
+                coverEl.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
+                coverEl.style.transform = 'translateX(-100%) rotateY(-25deg)';
+                coverEl.style.opacity = '0';
+                this.playSound('page-flip-sound');
+                setTimeout(() => {
+                    renderPageCallback(index + 1);
+                }, 500);
+            }
+
+            triggerTypewriter(pageEl) {
+                const captionBox = pageEl.querySelector('.page-caption');
+                if(!captionBox) return;
+                const text = captionBox.dataset.caption || '';
+                captionBox.innerHTML = '';
+                
+                setTimeout(() => {
+                    let i = 0;
+                    const type = () => {
+                        if (i < text.length) {
+                            captionBox.innerHTML += text.charAt(i);
+                            this.playSound('type-sound');
+                            i++;
+                            setTimeout(type, 35);
+                        } else {
+                            if(!pageEl.querySelector('.page-hint')) {
+                                const hint = document.createElement('div');
+                                hint.className = 'page-hint';
+                                hint.textContent = 'اسحب لقلب الصفحة ❯';
+                                pageEl.querySelector('.page-caption-box').appendChild(hint);
+                            }
+                            if(!pageEl.querySelector('.caption-heart')) {
+                                const h = document.createElement('span');
+                                h.className = 'caption-heart';
+                                h.innerHTML = ' ❤️';
+                                pageEl.querySelector('.page-caption-box').appendChild(h);
+                            }
+                        }
+                    };
+                    type();
+                }, 400);
             }
 
             initHeart() {
@@ -1237,7 +1352,6 @@
                     name.classList.remove('hidden');
                     name.classList.add('glow-text');
 
-                    // توليد جزيئات قلوب صغيرة حول القلب الكبير
                     for(let i=0; i<8; i++) {
                         let heartParticle = document.createElement('div');
                         heartParticle.className = 'floating-mini-heart';
@@ -1288,7 +1402,7 @@
                             target.innerHTML += "<br>";
                             lineIdx++;
                             charIdx = 0;
-                            setTimeout(typeLine, 500); // Pause قصيرة بين السطور
+                            setTimeout(typeLine, 500);
                         }
                     } else {
                         document.getElementById('letter-continue').classList.remove('hidden');
