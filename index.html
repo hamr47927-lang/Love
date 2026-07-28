@@ -14,7 +14,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #0c0c0c;
+            background: radial-gradient(circle at center, #141218 0%, #070609 100%);
             color: #ffffff;
             font-family: 'Tahoma', sans-serif;
             display: flex;
@@ -26,7 +26,7 @@
             position: relative;
         }
 
-        /* خلفية النجوم المتحركة */
+        /* خلفية نجوم متلألئة رومانسية */
         .stars {
             position: fixed;
             top: 0;
@@ -34,7 +34,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            background: radial-gradient(ellipse at bottom, rgba(255, 71, 87, 0.05) 0%, transparent 70%);
             z-index: -1;
         }
 
@@ -55,92 +55,146 @@
             display: flex;
         }
 
-        /* تصميم Glassmorphism الفخم */
+        /* كارت زجاجي ثلاثي الأبعاد فخم جداً */
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            border-radius: 28px;
+            padding: 35px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             max-width: 90%;
-            width: 350px;
+            width: 360px;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease;
         }
 
         input {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             font-size: 18px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.4);
+            color: #ff6b81;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             outline: none;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            letter-spacing: 5px;
+        }
+        input:focus {
+            border-color: #ff4757;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.4), inset 0 2px 4px rgba(0,0,0,0.5);
         }
 
+        /* أزرار 3D بارزة فخمة */
         button {
-            padding: 12px 20px;
-            font-size: 15px;
-            border-radius: 10px;
+            padding: 14px 24px;
+            font-size: 16px;
+            border-radius: 14px;
             border: none;
-            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            background: linear-gradient(135deg, #ff4757, #ff3838);
             color: white;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
-            transition: 0.3s;
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: 0.2s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(255, 71, 87, 0.6), 0 6px 8px rgba(0, 0, 0, 0.4);
         }
         button:active {
-            transform: scale(0.95);
+            transform: translateY(1px);
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.4);
         }
 
-        /* الألبوم والصور */
+        /* ألبوم الذكريات بتصميم 3D وتأثير زجاجي مذهل */
+        .album-wrapper {
+            perspective: 1200px;
+            margin: 0 auto 15px auto;
+        }
         .album-container {
             position: relative;
-            width: 250px;
+            width: 240px;
             height: 310px;
             cursor: pointer;
-            perspective: 1000px;
-            margin: 0 auto 10px auto;
+            border-radius: 20px;
+            transform-style: preserve-3d;
+            box-shadow: 0 20px 40px rgba(255, 71, 87, 0.25);
+            transition: transform 0.3s ease;
         }
         .album-cover {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(255,71,87,0.3);
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
         .counter {
-            font-size: 14px;
+            font-size: 13px;
             color: #ff6b81;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
+            letter-spacing: 1px;
         }
         .photo-caption {
             font-size: 14px;
-            color: #ddd;
+            color: #e0e0e0;
             min-height: 45px;
             padding: 0 5px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            line-height: 1.6;
         }
 
-        /* لعبة توصيل النقاط للقلب */
-        .dots-grid {
+        /* تنسيق أزرار الأسئلة الثنائية 3D */
+        .quiz-options-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .quiz-btn {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            padding: 14px 10px;
+            border-radius: 14px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            transition: 0.3s;
+        }
+        .quiz-btn:hover {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            border-color: #ff4757;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);
+        }
+
+        /* شبكة رسم القلب الرومانسي الدقيق */
+        .heart-grid {
             position: relative;
             width: 260px;
-            height: 250px;
+            height: 240px;
             margin: 0 auto 15px auto;
-            border: 1px dashed rgba(255,255,255,0.1);
-            border-radius: 50%;
+        }
+        /* شكل خطوط وهمية للقلب */
+        .heart-line {
+            position: absolute;
+            background: rgba(255, 71, 87, 0.2);
+            height: 2px;
+            transform-origin: left center;
+            display: none;
         }
         .dot {
             position: absolute;
-            width: 32px;
-            height: 32px;
-            background: rgba(255,255,255,0.1);
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.05);
             border: 2px solid #ff4757;
             border-radius: 50%;
             display: flex;
@@ -150,16 +204,21 @@
             cursor: pointer;
             transition: 0.3s;
             font-size: 14px;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+            z-index: 2;
         }
         .dot.active-dot {
             background: #ff4757;
-            box-shadow: 0 0 15px #ff4757;
+            color: white;
+            box-shadow: 0 0 20px #ff4757, 0 0 40px #ff4757;
+            transform: scale(1.15);
         }
 
         #runaway-btn {
             position: relative;
             transition: 0.2s ease-out;
-            background: #57606f;
+            background: linear-gradient(135deg, #2f3542, #1e272e);
+            border: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -167,80 +226,90 @@
 
     <div class="stars"></div>
 
-    <!-- المحطة الأولى: شاشة الباسورد -->
+    <!-- المحطة الأولى: شاشة الباسورد بصندوق السحر الرومانسي -->
     <div id="screen-1" class="screen active">
         <div class="glass-card">
-            <h2>مرحباً بكِ يا أمل ✨</h2>
-            <p style="font-size: 13px; color: #aaa; margin-bottom: 15px;">أدخلي كلمة السر لتبدأ الرحلة (1107)</p>
-            <input type="password" id="pass-input" placeholder="كلمة السر">
-            <button onclick="checkPassword()">دخول</button>
-            <p id="error-msg" style="color: #ff4757; font-size: 13px; margin-top: 10px;"></p>
+            <div style="font-size: 32px; margin-bottom: 10px;">🔐✨</div>
+            <h2 style="margin-bottom: 8px; font-weight: 500; font-size: 20px;">مفتاح قلب أمل</h2>
+            <p style="font-size: 13px; color: #aaa; margin-bottom: 25px;">أدخلي الرمز السري لنفتح باب الحكاية</p>
+            <input type="password" id="pass-input" placeholder="••••" maxlength="4">
+            <button onclick="checkPassword()" style="width: 100%;">افتحي الرحلة 💖</button>
+            <p id="error-msg" style="color: #ff4757; font-size: 13px; margin-top: 15px;"></p>
         </div>
     </div>
 
-    <!-- المحطة الثانية: أسئلة تأكيد الهوية -->
+    <!-- المحطة الثانية: الأسئلة (3 أسئلة بين عمرو وأمل بأزرار 3D) -->
     <div id="screen-2" class="screen">
-        <div class="glass-card">
-            <h3>سؤال تأكيد الهوية 🛑</h3>
-            <p id="security-question" style="font-size: 15px; margin: 15px 0;">مين صاحب لقب "رادار التأخير" في الكلية؟ 😂</p>
-            <div id="quiz-options" style="display: flex; flex-direction: column; gap: 10px;">
-                <button onclick="checkQuiz(false)" style="background: #2f3542;">يوسف</button>
-                <button onclick="checkQuiz(true)" style="background: #2f3542;">أمل بنفسها</button>
-                <button onclick="checkQuiz(false)" style="background: #2f3542;">دكتور المادة</button>
+        <div class="glass-card" style="width: 380px;">
+            <p id="quiz-step-indicator" style="font-size: 12px; color: #ff6b81; margin-bottom: 12px; font-weight: bold; letter-spacing: 1px;">السؤال 1 من 3</p>
+            <h3 id="quiz-question-text" style="font-size: 17px; margin: 10px 0 25px 0; line-height: 1.6;">مين اللي بيغير أكتر؟</h3>
+            
+            <div class="quiz-options-container">
+                <button class="quiz-btn" onclick="answerQuiz('عمرو')">عمرو</button>
+                <button class="quiz-btn" onclick="answerQuiz('أمل')">أمل</button>
             </div>
-            <p id="quiz-msg" style="font-size: 13px; margin-top: 15px; color: #ff4757;"></p>
+            <p id="quiz-msg" style="font-size: 13px; margin-top: 20px; color: #ff4757; min-height: 18px;"></p>
         </div>
     </div>
 
-    <!-- المحطة الثالثة: ألبوم الذكريات (الأسماء من 1.png إلى 37.png) -->
+    <!-- المحطة الثالثة: ألبوم الذكريات 3D الرومانسي (37 صورة) -->
     <div id="screen-3" class="screen">
-        <div class="glass-card" style="width: 330px;">
+        <div class="glass-card" style="width: 340px;">
             <div class="counter" id="photo-counter">1 / 37</div>
-            <div class="album-container" onclick="nextPhoto()">
-                <img id="album-img" src="1.png" class="album-cover" alt="Memory">
+            <div class="album-wrapper">
+                <div class="album-container" id="album-card" onclick="nextPhoto()">
+                    <img id="album-img" src="1.png" class="album-cover" alt="Memory">
+                </div>
             </div>
             <p id="photo-desc" class="photo-caption">أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️</p>
             <button id="next-album-btn" onclick="finishAlbum()" style="display: none; width: 100%;">التالي للفصل الأخير ✨</button>
         </div>
     </div>
 
-    <!-- المحطة الرابعة: لعبة تجميع الأرقام لرسم القلب -->
+    <!-- المحطة الرابعة: رسم القلب المضيء الحقيقي -->
     <div id="screen-4" class="screen">
-        <div class="glass-card" style="width: 330px;">
-            <h3>ارسمي قلبنا المضيء ❤️</h3>
-            <p style="font-size: 12px; color: #aaa; margin-bottom: 15px;">اضغطي على النقط بالترتيب من 1 إلى 6</p>
-            <div class="dots-grid" id="dots-container">
-                <div class="dot" style="top: 25px; left: 115px;" onclick="connectDot(1)">1</div>
-                <div class="dot" style="top: 65px; left: 65px;" onclick="connectDot(2)">2</div>
-                <div class="dot" style="top: 65px; left: 165px;" onclick="connectDot(3)">3</div>
-                <div class="dot" style="top: 130px; left: 35px;" onclick="connectDot(4)">4</div>
-                <div class="dot" style="top: 130px; left: 195px;" onclick="connectDot(5)">5</div>
-                <div class="dot" style="top: 195px; left: 115px;" onclick="connectDot(6)">6</div>
+        <div class="glass-card" style="width: 350px;">
+            <h3 style="font-size: 17px; margin-bottom: 5px;">ارسمي قلبنا المضيء ❤️</h3>
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 20px;">اضغطي على النقط بالترتيب من 1 إلى 6 لنبض القلب</p>
+            
+            <div class="heart-grid" id="dots-container">
+                <!-- إحداثيات مرسومة لتكوين شكل قلب حقيقي متناسق -->
+                <!-- القمة اليسرى واليمنى -->
+                <div class="dot" style="top: 35px; left: 80px;" onclick="connectDot(1)">1</div>
+                <div class="dot" style="top: 35px; left: 144px;" onclick="connectDot(2)">2</div>
+                <!-- وسط الجوانب -->
+                <div class="dot" style="top: 75px; left: 40px;" onclick="connectDot(3)">3</div>
+                <div class="dot" style="top: 75px; left: 184px;" onclick="connectDot(4)">4</div>
+                <!-- النزول للأسفل -->
+                <div class="dot" style="top: 135px; left: 80px;" onclick="connectDot(5)">5</div>
+                <!-- القمة السفلية (سن القلبي) -->
+                <div class="dot" style="top: 195px; left: 112px;" onclick="connectDot(6)">6</div>
             </div>
-            <button id="to-confession-btn" onclick="goToScreen(5)" style="display: none; width: 100%;">استمري للاعتراف 💌</button>
+
+            <button id="to-confession-btn" onclick="goToScreen(5)" style="display: none; width: 100%; margin-top: 10px;">استمري للاعتراف 💌</button>
         </div>
     </div>
 
     <!-- المحطة الخامسة: اعتراف الحب الصادق -->
     <div id="screen-5" class="screen">
         <div class="glass-card">
-            <h2 style="color: #ff4757; margin-bottom: 15px;">من قلبي لقلبك 🌹</h2>
-            <p style="font-size: 14px; line-height: 1.7; color: #ddd;">
+            <h2 style="color: #ff4757; margin-bottom: 15px; font-size: 22px;">من قلبي لقلبك 🌹</h2>
+            <p style="font-size: 14px; line-height: 1.8; color: #ddd;">
                 "مشاعري رايحه لامل ومعجب بيها وبنلها دا وهيا كمان في اهتمام ونا بهتم وبتغير عليا وبغير عليها".. وجودك بيفرق في كل تفصيلة وبيخلي الدنيا أطعم وأجمل بكتير من أي حاجة قبل كده. ❤️
             </p>
             <br>
-            <button onclick="goToScreen(6)">كملي الرحلة 🥰</button>
+            <button onclick="goToScreen(6)" style="width: 100%;">كملي الرحلة 🥰</button>
         </div>
     </div>
 
     <!-- المحطة السادسة: سؤال المشاعر والشقاوة -->
     <div id="screen-6" class="screen">
         <div class="glass-card">
-            <h3>سؤال بخصوص قلبك الصغير؟ 😌</h3>
-            <p style="font-size: 15px; margin: 20px 0;">بتحبيني ولا محتاجة وقت تفكري؟</p>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="acceptLove()" style="background: #2ed573;">مغروسة وبحبك أكتر يا سيدي 🥰</button>
-                <button id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()">محتاجة وقت أفكر يا عم الحج 😌</button>
+            <h3 style="font-size: 17px; margin-bottom: 10px;">سؤال بخصوص قلبك الصغير؟ 😌</h3>
+            <p style="font-size: 14px; margin: 15px 0; color: #ccc;">بتحبيني ولا محتاجة وقت تفكري؟</p>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <button onclick="acceptLove()" style="background: linear-gradient(135deg, #2ed573, #26af5f); width: 100%;">مغروسة وبحبك أكتر يا سيدي 🥰</button>
+                <button id="runaway-btn" onmouseover="moveButton()" onclick="moveButton()" style="width: 100%;">محتاجة وقت أفكر يا عم الحج 😌</button>
             </div>
         </div>
     </div>
@@ -248,11 +317,11 @@
     <!-- المحطة السابعة والأخيرة: الختام الكوميدي والأغنية الثانية -->
     <div id="screen-7" class="screen">
         <div class="glass-card">
-            <h2 style="color: #ff4757;">النهاية السعيدة 🎉</h2>
-            <p style="font-size: 15px; line-height: 1.6; margin: 20px 0;">
+            <h2 style="color: #ff4757; font-size: 22px; margin-bottom: 12px;">النهاية السعيدة 🎉</h2>
+            <p style="font-size: 14px; line-height: 1.7; margin: 15px 0; color: #ccc;">
                 هاه.. الموقع عجبك ولا نعمل تعديلات تانية يا غيبوبة؟ 😂❤️
             </p>
-            <button onclick="resetJourney()">عيد الرحلة من جديد 🔄</button>
+            <button onclick="resetJourney()" style="width: 100%;">عيد الرحلة من جديد 🔄</button>
         </div>
     </div>
 
@@ -264,7 +333,15 @@
         const song1 = document.getElementById('song1');
         const song2 = document.getElementById('song2');
 
-        // مصفوفة الـ 37 صورة بالأسماء الصحيحة (من 1.png إلى 37.png، مع بقاء 300.png في مكانها)
+        // الأسئلة الـ 3 الجديدة بين عمرو وأمل
+        const quizQuestions = [
+            { question: "مين اللي بيغير أكتر؟" },
+            { question: "مين صاحب لقب 'رادار التأخير'؟" },
+            { question: "مين بيحب التاني أكتر؟" }
+        ];
+        let currentQuizIndex = 0;
+
+        // مصفوفة الـ 37 صورة
         const albumData = [
             { img: "1.png", text: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
             { img: "2.png", text: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من زمان." },
@@ -324,17 +401,27 @@
             const pass = document.getElementById('pass-input').value;
             if (pass === "1107") {
                 goToScreen(2);
+                loadQuiz();
             } else {
                 document.getElementById('error-msg').innerText = "كلمة السر غلط يا غيبوبة! جربي تاني 😂";
             }
         }
 
-        function checkQuiz(isCorrect) {
-            if (isCorrect) {
-                confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-                setTimeout(() => goToScreen(3), 1000);
+        function loadQuiz() {
+            if (currentQuizIndex < quizQuestions.length) {
+                document.getElementById('quiz-step-indicator').innerText = `السؤال ${currentQuizIndex + 1} من 3`;
+                document.getElementById('quiz-question-text').innerText = quizQuestions[currentQuizIndex].question;
+                document.getElementById('quiz-msg').innerText = "";
+            }
+        }
+
+        function answerQuiz(choice) {
+            confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 } });
+            currentQuizIndex++;
+            if (currentQuizIndex < quizQuestions.length) {
+                loadQuiz();
             } else {
-                document.getElementById('quiz-msg').innerText = "انتي مش أمل الحقيقية! هسألك سؤال تاني 🛑";
+                setTimeout(() => goToScreen(3), 800);
             }
         }
 
@@ -345,6 +432,11 @@
                 document.getElementById('album-img').src = albumData[currentPhotoIndex].img;
                 document.getElementById('photo-desc').innerText = albumData[currentPhotoIndex].text;
                 
+                // تأثير حركي خفيف 3D عند قلب الصورة
+                const card = document.getElementById('album-card');
+                card.style.transform = 'rotateY(15deg) scale(1.03)';
+                setTimeout(() => card.style.transform = 'rotateY(0deg) scale(1)', 200);
+
                 if (currentPhotoIndex === albumData.length - 1) {
                     document.getElementById('next-album-btn').style.display = 'block';
                 }
@@ -361,7 +453,7 @@
                 event.target.classList.add('active-dot');
                 nextExpectedDot++;
                 if (nextExpectedDot > 6) {
-                    confetti({ particleCount: 120, spread: 90, origin: { y: 0.5 } });
+                    confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
                     document.getElementById('to-confession-btn').style.display = 'block';
                 }
             }
@@ -375,7 +467,7 @@
         }
 
         function acceptLove() {
-            confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+            confetti({ particleCount: 200, spread: 120, origin: { y: 0.5 } });
             setTimeout(() => goToScreen(7), 1200);
         }
 
@@ -385,8 +477,12 @@
             song1.pause();
             song1.currentTime = 0;
             currentPhotoIndex = 0;
+            currentQuizIndex = 0;
+            nextExpectedDot = 1;
             document.getElementById('pass-input').value = "";
             document.getElementById('next-album-btn').style.display = 'none';
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active-dot'));
+            document.getElementById('to-confession-btn').style.display = 'none';
             document.getElementById('album-img').src = albumData[0].img;
             document.getElementById('photo-desc').innerText = albumData[0].text;
             goToScreen(1);
