@@ -153,14 +153,15 @@
             transform: translateY(-2px);
         }
 
+        /* ألبوم الصور (Book Flip) بنفس الوان وشكل البطاقات اللي فوق */
         .album-container { width:260px; height:320px; margin:15px auto; perspective:2000px; position:relative;}
         .book { width:100%; height:100%; position:relative; transform-style:preserve-3d;}
         .page { width:100%; height:100%; position:absolute; top:0; left:0; transform-origin: right center; transform-style:preserve-3d; transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1); cursor:pointer;}
-        .page img { width:100%; height:100%; object-fit:cover; border-radius:15px; border:5px solid white; backface-visibility:hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .page img { width:100%; height:100%; object-fit:cover; border-radius:15px; border:3px solid rgba(255, 105, 180, 0.4); backface-visibility:hidden; box-shadow: -5px 0 15px rgba(0,0,0,0.3); }
         .page.flipped { transform:rotateY(160deg);} 
-        .page-back { position:absolute; top:0; left:0; width:100%; height:100%; background:#fff; transform:rotateY(180deg); backface-visibility:hidden; border-radius:15px; border:5px solid white; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#ff4d6d;}
+        .page-back { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(40, 10, 30, 0.95); transform:rotateY(180deg); backface-visibility:hidden; border-radius:15px; border:3px solid rgba(255, 105, 180, 0.4); display:flex; align-items:center; justify-content:center; font-weight:bold; color:#ff69b4; font-size: 1.5rem; }
 
-        #photo-caption { font-size:1.1rem; font-weight:bold; color:#ff69b4; margin-top:15px; min-height:45px; line-height: 1.5; }
+        #photo-caption { font-size: 13px; font-weight: bold; color: #fce4ec; margin-top: 15px; min-height: 45px; line-height: 1.6; padding: 0 10px; }
 
         /* شاشة رسم القلب التفاعلية بالأرقام والنقاط */
         .heart-stage-box {
@@ -207,7 +208,6 @@
             filter: drop-shadow(0 0 6px #ff1493);
         }
 
-        /* القلب النبيل اللي جواه الاسم */
         .center-heart-container {
             position: absolute;
             top: 50%;
@@ -306,7 +306,7 @@
         </div>
     </div>
 
-    <!-- 3. شاشة ألبوم الصور (Book Flip) بالـ 37 صورة والأغنية -->
+    <!-- 3. شاشة ألبوم الصور (Book Flip) بنفس الوان وأزرار وكلام التطبيق المتسق -->
     <div id="screen-3" class="screen">
         <div class="glass-card" style="width: 340px;">
             <div style="font-size: 12px; color: #ff69b4; margin-bottom: 6px; font-weight: bold;" id="photo-counter">افتحي الغلاف..</div>
@@ -329,35 +329,29 @@
                 <h3 id="dot-instruction" style="color: #ff69b4; font-size: 15px; margin-bottom: 5px;">اضعي على النقطة (1) للبدء ❤️</h3>
                 <div class="heart-stage-box">
                     <svg class="dot-svg" viewBox="0 0 100 100" id="heartSvg">
-                        <!-- مسارات التوصيل اللي هتترسم بالتدريج -->
                         <path id="line-1-2" class="user-drawn-line" d="" />
                         <path id="line-2-3" class="user-drawn-line" d="" />
                         <path id="line-3-4" class="user-drawn-line" d="" />
                         <path id="line-4-1" class="user-drawn-line" d="" />
 
-                        <!-- نقطة 1 -->
                         <g class="interactive-dot" onclick="handleDotClick(1)">
-                            <circle cx="50" cy="30" r="5" id=" dot-circle-1"></circle>
+                            <circle cx="50" cy="30" r="5" id="dot-circle-1"></circle>
                             <text class="dot-number-label" x="53" y="25">1</text>
                         </g>
-                        <!-- نقطة 2 -->
                         <g class="interactive-dot" onclick="handleDotClick(2)">
                             <circle cx="20" cy="35" r="5" id="dot-circle-2"></circle>
                             <text class="dot-number-label" x="8" y="32">2</text>
                         </g>
-                        <!-- نقطة 3 -->
                         <g class="interactive-dot" onclick="handleDotClick(3)">
                             <circle cx="50" cy="80" r="5" id="dot-circle-3"></circle>
                             <text class="dot-number-label" x="53" y="92">3</text>
                         </g>
-                        <!-- نقطة 4 -->
                         <g class="interactive-dot" onclick="handleDotClick(4)">
                             <circle cx="80" cy="35" r="5" id="dot-circle-4"></circle>
                             <text class="dot-number-label" x="84" y="32">4</text>
                         </g>
                     </svg>
 
-                    <!-- قلب الشاشة المنتصفية اللي جواه الاسم -->
                     <div class="center-heart-container" id="centerHeart" onclick="revealConfession()">
                         <div class="glowing-heart-shape">❤️</div>
                         <div class="inner-name-text">أمل</div>
@@ -466,10 +460,11 @@
             }
         }
 
+        // الـ 37 صورة بالكامل مع النصوص المعبرة والمتسقة مع أسلوبكم ورومانسيتكم
         const memories = [
             { img: "1.png", t: "أول ضحكة بدأت حكايتنا منها ولخبطت دنيتي.. ❤️" },
-            { img: "2.png", t: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من zaman." },
-            { img: "3.png", t: "نظرات العيون اللي بتقول كل الكلام من غير مالمح تكمل." },
+            { img: "2.png", t: "لما قعدنا نتكلم لأول مرة وحسيت إننا بنعرف بعض من زمان." },
+            { img: "3.png", t: "نظرات العيون اللي بتقول كل الكلام من غير ملامح تكمل." },
             { img: "4.png", t: "أجمل صدفة جمعتني بكي في الكلية." },
             { img: "5.png", t: "ضحكتك اللي بتنور أي يوم ضلمة وعدا علي." },
             { img: "6.png", t: "لما بتتعصبي وتتغيري عليا.. بكون باين قدامك هادي بس من جوه بايب! 🥰" },
@@ -515,7 +510,7 @@
             const cover = document.createElement('div');
             cover.className = 'page';
             cover.style.zIndex = 50;
-            cover.innerHTML = `<div style="width:100%; height:100%; background:linear-gradient(45deg,#ff1493,#c9184a); color:white; display:flex; align-items:center; justify-content:center; border-radius:15px; border:5px solid gold; text-align:center; padding:10px;"><h2>ألبومها ❤️</h2></div><div class="page-back">يلا نبدأ الحكاية..</div>`;
+            cover.innerHTML = `<div style="width:100%; height:100%; background:rgba(40, 10, 30, 0.95); color:#ff69b4; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:15px; border:3px solid rgba(255, 105, 180, 0.4); text-align:center; padding:10px;"><h2 style="color:#ff1493; margin-bottom:10px;">ألبومها ❤️</h2><p style="font-size:12px; color:#fce4ec;">اضغطي لفتح الصفحات..</p></div><div class="page-back">يلا نبدأ الحكاية..</div>`;
             cover.onclick = function() { flipPage.call(this); };
             book.appendChild(cover);
 
@@ -566,7 +561,6 @@
             }
         }
 
-        // تفاعل رسم القلب اليدوي خطوة بخطوة
         let currentDotStep = 1;
         function handleDotClick(dotNum) {
             if (dotNum === currentDotStep) {
@@ -589,7 +583,6 @@
                     currentDotStep = 5;
                     confetti({ particleCount: 70, spread: 80, origin: { y: 0.5 } });
 
-                    // إخفاء النقاط مؤقتاً لمدة ثانيتين ثم إظهار قلب الاسم في المنتصف
                     setTimeout(() => {
                         document.getElementById('heartSvg').style.opacity = '0';
                         document.getElementById('dot-instruction').style.opacity = '0';
@@ -603,7 +596,6 @@
             }
         }
 
-        // عندما تضغط أمل على القلب الذي يضم اسمها (الانتقال للجو الرومانسي المظلم مع الشمع والورد)
         function revealConfession() {
             playClickSound();
             song1.pause();
@@ -615,7 +607,6 @@
             const centerHeart = document.getElementById('centerHeart');
             const confessionArea = document.getElementById('confession-area');
 
-            // إضاءة رومانسية هادئة جداً (ظلام خفيف مع الشمع والورد)
             ambientBg.style.background = '#0a0208';
             cardContainer.style.background = 'rgba(15, 3, 12, 0.95)';
             centerHeart.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -639,7 +630,7 @@
         }
 
         function moveButton() {
-            playClickSound();
+            playClientSoundIfPossible();
             const btn = document.getElementById('runaway-btn');
             btn.style.transform = `translate(${Math.random() * 140 - 70}px, ${Math.random() * 140 - 70}px)`;
         }
@@ -658,7 +649,6 @@
             for(let i=0; i<4; i++) document.getElementById(`digit-${i}`).innerText = "0";
             document.getElementById('error-msg').innerText = "";
             
-            // إعادة ضبط شاشة القلب
             document.getElementById('heartSvg').style.display = 'block';
             document.getElementById('heartSvg').style.opacity = '1';
             document.getElementById('dot-instruction').style.display = 'block';
@@ -671,6 +661,7 @@
             
             const centerHeart = document.getElementById('centerHeart');
             centerHeart.style.display = 'flex';
+            centerHeart.classList.remove('`;
             centerHeart.classList.remove('show');
 
             document.getElementById('confession-area').classList.remove('show');
