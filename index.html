@@ -206,11 +206,13 @@
             margin-top: 10px;
         }
 
+        /* Password Safe Wheels - LTR fix for 0000 */
         .safe-wheels {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin: 25px 0;
+            direction: ltr !important;
         }
         .wheel {
             width: 55px;
@@ -222,6 +224,7 @@
             scroll-snap-type: y mandatory;
             scrollbar-width: none;
             box-shadow: inset 0 0 15px rgba(255, 126, 182, 0.25);
+            direction: ltr !important;
         }
         .wheel::-webkit-scrollbar { display: none; }
         .wheel-inner div {
@@ -233,10 +236,11 @@
             font-weight: bold;
             scroll-snap-align: start;
             color: var(--accent-2);
+            direction: ltr !important;
         }
         .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: #ff4a4a !important; }
 
-        /* --- Premium Real Book Styles (60fps Stacked Architecture) --- */
+        /* --- Album & Smooth Book Styles (Fixed Flicker & Lag) --- */
         .album-dim-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -309,9 +313,10 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
             transform-origin: left center;
-            transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.7s ease;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.4), inset 15px 0 25px rgba(0,0,0,0.06);
-            will-change: transform, opacity;
+            /* Smooth acceleration and stable render to completely eliminate flicker/lag */
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.25);
+            will-change: transform;
         }
 
         .book-cover {
@@ -322,7 +327,6 @@
             align-items: center;
             text-align: center;
             transform-origin: left center;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), -15px 0 40px rgba(0,0,0,0.7);
             position: relative;
             overflow: hidden;
         }
@@ -371,7 +375,6 @@
             align-items: center;
             position: relative;
             margin: 8px 0;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
         }
         .blur-bg-img {
             position: absolute;
@@ -385,22 +388,13 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: blur(15px);
             opacity: 0;
-            transform: scale(1.05);
-            transition: filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: opacity 0.4s ease;
             z-index: 2;
             position: relative;
         }
         .page-img-container img.loaded {
-            filter: blur(0);
             opacity: 1;
-            transform: scale(1);
-            animation: subtleZoomAnim 6s infinite alternate ease-in-out;
-        }
-        @keyframes subtleZoomAnim {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05); }
         }
 
         .page-caption-box {
@@ -575,7 +569,6 @@
 <body>
     <canvas id="bg-canvas"></canvas>
 
-    <!-- Audio Elements strictly pointing to root files without assets folder -->
     <audio id="bg-music-1" preload="auto"> 
         <source src="1000451616.mp3" type="audio/mpeg"> 
     </audio> 
@@ -681,15 +674,16 @@
         </div>
     </section>
 
+    <!-- Letter Screen: Clear separation between envelope and button -->
     <section id="screen-letter" class="screen hidden">
-        <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
-            <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="order: 2;">Continue</button>
+        <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; height: 100%;">
             <div class="envelope" id="envelope" style="order: 1;">
                 <div class="flap"></div>
                 <div class="paper glass-panel" style="padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <p id="typewriter-text" style="font-size: 1rem; color: #333; text-align: center; margin: 0; line-height: 1.8;"></p>
                 </div>
             </div>
+            <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="order: 2; margin-top: 10px;">Continue</button>
         </div>
     </section>
 
@@ -772,7 +766,6 @@
             }
 
             setupAudioTimeLimiters() {
-                // Skip last 3 seconds of each audio track seamlessly
                 const limitAudio = (audio) => {
                     audio.addEventListener('timeupdate', () => {
                         if (audio.duration && audio.currentTime >= audio.duration - 3) {
@@ -925,16 +918,11 @@
                 let totalImages = this.photos.length;
                 let simulatedProgress = 0;
                 
-                // Preload all album photos during loading screen to completely eliminate lag/freezing
                 this.photos.forEach(p => {
                     const img = new Image();
                     img.src = p.src;
-                    img.onload = () => {
-                        loadedCount++;
-                    };
-                    img.onerror = () => {
-                        loadedCount++; // Count even on error to prevent hanging
-                    };
+                    img.onload = () => { loadedCount++; };
+                    img.onerror = () => { loadedCount++; };
                 });
 
                 const loadInterval = setInterval(() => {
@@ -1037,10 +1025,10 @@
                     w.innerHTML = html;
                 });
                 
-                // Initialize precisely at 0 | 0 | 0 | 0 with visible numbers
+                // Set precise LTR initial 0000 position
                 setTimeout(() => {
                     wheels.forEach(w => {
-                        w.scrollTop = 75; // Index 1 in DOM corresponds to digit '0' (since index 0 is empty padding div)
+                        w.scrollTop = 75; // Index 1 is '0'
                     });
                 }, 50);
 
@@ -1055,7 +1043,7 @@
                         password += digit.toString();
                     });
 
-                    if(password === "1107") {
+                    if(password === "0000") {
                         this.playSound('success-sound');
                         if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
                         this.navigateTo('screen-questions');
@@ -1107,7 +1095,6 @@
                 loadQ();
             }
 
-            // --- Robust 60fps Stacked Book Architecture with Dynamic Preloading & Memory Management ---
             initAlbumBook() {
                 const overlay = document.getElementById('album-overlay');
                 const giftBox = document.getElementById('gift-box-btn');
@@ -1150,7 +1137,6 @@
                 let allPages = [];
                 let totalItems = this.photos.length;
 
-                // 1. Cover Page (index 0)
                 let coverEl = document.createElement('div');
                 coverEl.className = 'book-page book-cover';
                 coverEl.style.zIndex = totalItems + 5;
@@ -1162,7 +1148,6 @@
                 container.appendChild(coverEl);
                 allPages.push(coverEl);
 
-                // 2. Photo Pages
                 this.photos.forEach((photo, idx) => {
                     let pageEl = document.createElement('div');
                     pageEl.className = 'book-page';
@@ -1185,7 +1170,6 @@
                     allPages.push(pageEl);
                 });
 
-                // 3. Final Page
                 let finalEl = document.createElement('div');
                 finalEl.className = 'book-page page-final';
                 finalEl.style.zIndex = 1;
@@ -1197,7 +1181,6 @@
                 container.appendChild(finalEl);
                 allPages.push(finalEl);
 
-                // Preload window function (Current, Next, Next+1)
                 const updatePreloads = (currentIndex) => {
                     for(let i = currentIndex; i <= Math.min(currentIndex + 2, allPages.length - 1); i++) {
                         let p = allPages[i];
@@ -1215,10 +1198,8 @@
                     }
                 };
 
-                // Trigger initial preload for first 3 items
                 updatePreloads(0);
 
-                // Setup Unified Global Gesture Listener for 60fps smooth page turning
                 let activeIdx = 0;
                 let startX = 0;
                 let currentX = 0;
@@ -1249,11 +1230,10 @@
                     if (!isDragging || !targetPage) return;
                     isDragging = false;
                     let diff = currentX - startX;
-                    targetPage.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.6s ease';
+                    targetPage.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
 
                     if (diff < -40) {
                         targetPage.style.transform = 'rotateY(-180deg)';
-                        targetPage.style.boxShadow = '10px 0 30px rgba(0,0,0,0.3)';
                         this.playSound('page-flip-sound');
 
                         let oldPage = targetPage;
@@ -1261,7 +1241,7 @@
                             if(oldPage && oldPage.parentNode) {
                                 oldPage.remove();
                             }
-                        }, 650);
+                        }, 450);
 
                         activeIdx++;
                         updatePreloads(activeIdx);
@@ -1294,7 +1274,6 @@
                         this.playSound('success-sound');
                         if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
 
-                        // Transition to audio 2 with slightly lower volume (e.g. 0.65)
                         this.transitionAudioTrack(this.audio1, this.audio2, 2500, 0.65);
 
                         container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
@@ -1310,14 +1289,14 @@
                     if(activeIdx < allPages.length && !isDragging) {
                         let cur = allPages[activeIdx];
                         if(cur && !cur.classList.contains('page-final')) {
-                            cur.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.6s ease';
+                            cur.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
                             cur.style.transform = 'rotateY(-180deg)';
                             this.playSound('page-flip-sound');
 
                             let oldPage = cur;
                             setTimeout(() => {
                                 if(oldPage && oldPage.parentNode) oldPage.remove();
-                            }, 650);
+                            }, 450);
 
                             activeIdx++;
                             updatePreloads(activeIdx);
@@ -1382,7 +1361,6 @@
                             target.innerHTML += currentLineText.charAt(charIdx);
                             if(charIdx % 2 === 0) this.playSound('type-sound');
                             charIdx++;
-                            // Slower typewriter speed for extra romantic calm
                             setTimeout(typeLine, 110);
                         } else {
                             target.innerHTML += "<br>";
