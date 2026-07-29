@@ -304,7 +304,6 @@
             transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 1s ease;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 126, 182, 0.2);
             border-radius: 16px;
-            perspective: 2500px;
         }
         .book-container.open {
             transform: scale(1);
@@ -325,12 +324,11 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            backface-visibility: hidden;
-            transform-style: preserve-3d;
-            transform-origin: left center;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: -5px 0 15px rgba(0,0,0,0.25);
-            will-change: transform;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+        }
+        .book-page.active-page {
+            display: flex;
         }
 
         .book-cover {
@@ -340,9 +338,9 @@
             justify-content: center;
             align-items: center;
             text-align: center;
-            transform-origin: left center;
             position: relative;
             overflow: hidden;
+            display: flex !important;
         }
         .book-cover::before {
             content: '';
@@ -368,13 +366,32 @@
             margin-bottom: 10px;
         }
 
-        .page-header { width: 100%; }
+        .page-header { 
+            width: 100%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
         .page-counter {
             font-size: 0.85rem;
             color: #8c7365;
             text-align: left;
-            margin-bottom: 4px;
             font-weight: 600;
+        }
+
+        .btn-prev-page {
+            background: rgba(140, 115, 101, 0.15);
+            border: 1px solid rgba(140, 115, 101, 0.3);
+            color: #5c3a21;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-prev-page:hover {
+            background: rgba(140, 115, 101, 0.3);
         }
 
         .page-img-container {
@@ -389,19 +406,14 @@
             align-items: center;
             position: relative;
             margin: 8px 0;
+            cursor: pointer; /* تلميح إن النقر على الصورة يقلبها للالتالية */
         }
         .page-img-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
             z-index: 2;
             position: relative;
-            will-change: opacity;
-        }
-        .page-img-container img.loaded {
-            opacity: 1;
         }
 
         .page-caption-box {
@@ -451,10 +463,9 @@
             animation: pulseBox 1.5s infinite alternate;
         }
         .wax-seal:hover { transform: scale(1.1); }
-        .wax-seal.break { animation: sealBreak 0.6s forwards cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+        .wax-seal.break { animation: sealBreak 0.4s forwards; }
         @keyframes sealBreak {
             0% { transform: scale(1) rotate(0); }
-            40% { transform: scale(1.2) rotate(-10deg); filter: brightness(1.3); }
             100% { transform: scale(0) rotate(45deg); opacity: 0; }
         }
 
@@ -790,7 +801,6 @@
             setupAudioTimeLimiters() {
                 const limitAudio = (audio) => {
                     audio.addEventListener('timeupdate', () => {
-                        // قص آخر 3 ثوانٍ من طول الأغنية وإعادة تشغيلها من البداية
                         if (audio.duration && audio.currentTime >= audio.duration - 3) {
                             audio.currentTime = 0;
                             audio.play().catch(()=>{}); 
@@ -1215,16 +1225,13 @@
 
             buildBookStack() {
                 const container = document.getElementById('book-container');
-                const spine = container.querySelector('.book-spine-shadow');
                 container.innerHTML = '';
-                if(spine) container.appendChild(spine);
 
                 let allPages = [];
                 let totalItems = this.photos.length;
 
                 let coverEl = document.createElement('div');
-                coverEl.className = 'book-page book-cover';
-                coverEl.style.zIndex = totalItems + 5;
+                coverEl.className = 'book-page book-cover active-page';
                 coverEl.innerHTML = `
                     <div class="leather-texture"></div>
                     <h1 class="gold-title">Amr ❤️ Amal</h1>
@@ -1236,21 +1243,20 @@
                 this.photos.forEach((photo, idx) => {
                     let pageEl = document.createElement('div');
                     pageEl.className = 'book-page';
-                    pageEl.style.zIndex = totalItems - idx;
                     pageEl.dataset.caption = photo.caption;
                     
-                    // استخدام الصور المخزنة مسبقاً ومعالجة أي تأخير في العرض
                     let cachedImgSrc = this.imageCache.has(photo.src) ? this.imageCache.get(photo.src).src : photo.src;
 
                     pageEl.innerHTML = `
                         <div class="page-header">
                             <div class="page-counter">${idx + 1} / ${totalItems}</div>
-                            <div class="progress-bar-container" style="margin:4px 0;">
-                                <div class="progress-bar" style="width: ${((idx + 1) / totalItems) * 100}%;"></div>
-                            </div>
+                            <button class="btn-prev-page">⬅ السابق</button>
+                        </div>
+                        <div class="progress-bar-container" style="margin:4px 0;">
+                            <div class="progress-bar" style="width: ${((idx + 1) / totalItems) * 100}%;"></div>
                         </div>
                         <div class="page-img-container">
-                            <img src="${cachedImgSrc}" alt="Memory" class="lazy-img loaded" decoding="async">
+                            <img src="${cachedImgSrc}" alt="Memory" loading="lazy">
                         </div>
                         <div class="page-caption-box">
                             <div class="page-caption"></div>
@@ -1262,14 +1268,26 @@
 
                 let finalEl = document.createElement('div');
                 finalEl.className = 'book-page page-final';
-                finalEl.style.zIndex = 1;
                 finalEl.innerHTML = `
                     <h2 style="color: #5c3a21; margin-bottom: 12px; font-size: 1.3rem;">وصلنا لنهاية ذكرياتنا... بس الحكاية لسه مبدعتش ❤️</h2>
                     <p style="font-size: 0.95rem; color: #7a553c; margin-bottom: 15px;">اضغط على ختم الشمع لختم الحب والانتقال للخطوة التالية</p>
                     <div class="wax-seal" id="wax-seal-btn">💌</div>
+                    <button class="btn-prev-page" style="margin-top: 20px;">⬅ السابق</button>
                 `;
                 container.appendChild(finalEl);
                 allPages.push(finalEl);
+
+                let activeIdx = 0;
+
+                const showPage = (index) => {
+                    allPages.forEach((p, i) => {
+                        if (i === index) {
+                            p.classList.add('active-page');
+                        } else {
+                            p.classList.remove('active-page');
+                        }
+                    });
+                };
 
                 setTimeout(() => {
                     if (allPages[1] && allPages[1].dataset.caption) {
@@ -1278,80 +1296,30 @@
                     }
                 }, 400);
 
-                let activeIdx = 0;
-                let startX = 0;
-                let currentX = 0;
-                let isDragging = false;
-                let targetPage = null;
+                // ربط أزرار "السابق" في كل صفحة
+                allPages.forEach((page, idx) => {
+                    if (idx > 0) {
+                        const prevBtn = page.querySelector('.btn-prev-page');
+                        if (prevBtn) {
+                            prevBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                                if (activeIdx > 0) {
+                                    activeIdx--;
+                                    showPage(activeIdx);
+                                    this.playSound('page-flip-sound');
 
-                const onDragStart = (clientX) => {
-                    if(activeIdx >= allPages.length) return;
-                    targetPage = allPages[activeIdx];
-                    if(!targetPage || targetPage.classList.contains('page-final')) {
-                        return;
-                    }
-                    startX = clientX;
-                    currentX = clientX;
-                    isDragging = true;
-                    targetPage.style.transition = 'none';
-                };
-
-                const onDragMove = (clientX) => {
-                    if (!isDragging || !targetPage) return;
-                    currentX = clientX;
-                    let diff = currentX - startX;
-                    if (diff > 0) diff = 0;
-                    targetPage.style.transform = `translateX(${diff}px) rotateY(${diff * 0.04}deg)`;
-                };
-
-                const onDragEnd = () => {
-                    if (!isDragging || !targetPage) return;
-                    isDragging = false;
-                    let diff = currentX - startX;
-                    targetPage.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-
-                    if (diff < -40) {
-                        targetPage.style.transform = 'rotateY(-180deg)';
-                        this.playSound('page-flip-sound');
-
-                        let oldPage = targetPage;
-                        setTimeout(() => {
-                            if(oldPage && oldPage.parentNode) {
-                                oldPage.remove();
-                            }
-                        }, 450);
-
-                        activeIdx++;
-                        
-                        let nextPage = allPages[activeIdx];
-                        if (nextPage && nextPage.dataset.caption) {
-                            let capEl = nextPage.querySelector('.page-caption');
-                            if (capEl) {
-                                this.typeWriterCaption(capEl, nextPage.dataset.caption);
-                            }
+                                    let currentPage = allPages[activeIdx];
+                                    if (currentPage && currentPage.dataset.caption) {
+                                        let capEl = currentPage.querySelector('.page-caption');
+                                        if (capEl) {
+                                            this.typeWriterCaption(capEl, currentPage.dataset.caption);
+                                        }
+                                    }
+                                }
+                            });
                         }
-
-                    } else {
-                        targetPage.style.transform = 'translateX(0px) rotateY(0deg)';
                     }
-                    targetPage = null;
-                };
-
-                container.onmousedown = (e) => {
-                    if(e.target.id === 'wax-seal-btn') return;
-                    onDragStart(e.clientX);
-                };
-                window.onmousemove = (e) => { if(isDragging) onDragMove(e.clientX); };
-                window.onmouseup = () => { if(isDragging) onDragEnd(); };
-
-                container.onttouchstart = (e) => {
-                    if(e.target.id === 'wax-seal-btn') return;
-                    if(e.touches && e.touches[0]) onDragStart(e.touches[0].clientX);
-                };
-                window.onttouchmove = (e) => {
-                    if(isDragging && e.touches && e.touches[0]) onDragMove(e.touches[0].clientX);
-                };
-                window.onttouchend = () => { if(isDragging) onDragEnd(); };
+                });
 
                 container.onclick = (e) => {
                     const seal = document.getElementById('wax-seal-btn');
@@ -1376,26 +1344,17 @@
                         return;
                     }
 
-                    if(activeIdx < allPages.length && !isDragging) {
-                        let cur = allPages[activeIdx];
-                        if(cur && !cur.classList.contains('page-final')) {
-                            cur.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-                            cur.style.transform = 'rotateY(-180deg)';
-                            this.playSound('page-flip-sound');
+                    // التقليب للأمام عند النقر في أي مكان بالكتاب (عدا زر السابق أو ختم الشمع)
+                    if (activeIdx < allPages.length - 1) {
+                        activeIdx++;
+                        showPage(activeIdx);
+                        this.playSound('page-flip-sound');
 
-                            let oldPage = cur;
-                            setTimeout(() => {
-                                if(oldPage && oldPage.parentNode) oldPage.remove();
-                            }, 450);
-
-                            activeIdx++;
-
-                            let nextPage = allPages[activeIdx];
-                            if (nextPage && nextPage.dataset.caption) {
-                                let capEl = nextPage.querySelector('.page-caption');
-                                if (capEl) {
-                                    this.typeWriterCaption(capEl, nextPage.dataset.caption);
-                                }
+                        let currentPage = allPages[activeIdx];
+                        if (currentPage && currentPage.dataset.caption) {
+                            let capEl = currentPage.querySelector('.page-caption');
+                            if (capEl) {
+                                this.typeWriterCaption(capEl, currentPage.dataset.caption);
                             }
                         }
                     }
