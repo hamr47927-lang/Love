@@ -947,40 +947,34 @@
             startLoading() {
                 const bar = document.getElementById('loading-progress');
                 const percentageEl = document.getElementById('loading-percentage');
-                let loadedCount = 0;
-                let totalImages = this.photos.length;
-                let simulatedProgress = 0;
+                let currentProg = 0;
                 
+                // تحميل الصور في الخلفية بصمت تام بدون توقف الشاشة أو حدوث شاشة سوداء
                 this.photos.forEach(p => {
                     const img = new Image();
                     img.src = p.src;
-                    img.onload = () => { 
-                        loadedCount++; 
-                        this.imageCache.set(p.src, img);
-                    };
-                    img.onerror = () => { loadedCount++; };
+                    img.onload = () => this.imageCache.set(p.src, img);
                 });
 
+                // عداد سريع وسلس جداً يضمن الانتقال المباشر بدون أي تهنيج
                 const loadInterval = setInterval(() => {
-                    simulatedProgress += 3;
-                    let imageProgress = Math.floor((loadedCount / totalImages) * 100);
-                    let currentProg = Math.max(simulatedProgress, imageProgress);
+                    currentProg += 4;
                     
-                    if (currentProg >= 100 || loadedCount >= totalImages) {
+                    if (currentProg >= 100) {
                         currentProg = 100;
                         clearInterval(loadInterval);
-                        bar.style.width = `${currentProg}%`;
-                        percentageEl.textContent = `${currentProg}%`;
+                        bar.style.width = `100%`;
+                        percentageEl.textContent = `100%`;
                         setTimeout(() => {
                             if (this.currentScreen === 'screen-loading') {
                                 this.navigateTo('screen-start');
                             }
-                        }, 400);
+                        }, 200);
                         return;
                     }
                     bar.style.width = `${currentProg}%`;
                     percentageEl.textContent = `${currentProg}%`;
-                }, 80);
+                }, 40);
             }
 
             async startPreparingSequence() {
@@ -989,46 +983,46 @@
                 
                 progressBar.style.width = '10%';
                 statusText.textContent = '✨ تجهيز الذكريات...';
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 400));
 
                 progressBar.style.width = '40%';
                 statusText.textContent = '🖼️ تحميل الصور...';
                 
+                let loadedCount = 0;
                 await Promise.all(this.photos.map(p => {
                     return new Promise((resolve) => {
                         if (this.imageCache.has(p.src)) {
-                            let img = this.imageCache.get(p.src);
-                            if (img.decode) {
-                                img.decode().then(resolve).catch(resolve);
-                            } else {
-                                resolve();
-                            }
+                            loadedCount++;
+                            resolve();
                         } else {
                             const img = new Image();
                             img.src = p.src;
                             img.onload = () => {
                                 this.imageCache.set(p.src, img);
-                                if (img.decode) img.decode().then(resolve).catch(resolve);
-                                else resolve();
+                                loadedCount++;
+                                resolve();
                             };
-                            img.onerror = resolve;
+                            img.onerror = () => {
+                                loadedCount++;
+                                resolve();
+                            };
                         }
                     });
                 }));
 
                 progressBar.style.width = '70%';
                 statusText.textContent = '🎵 تجهيز الموسيقى...';
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 400));
 
                 progressBar.style.width = '90%';
                 statusText.textContent = '💖 تجهيز المفاجأة...';
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 400));
 
                 progressBar.style.width = '100%';
                 statusText.textContent = '✅ كل شيء أصبح جاهزاً ❤️';
                 this.isFullyLoaded = true;
 
-                await new Promise(r => setTimeout(r, 1000));
+                await new Promise(r => setTimeout(r, 600));
                 this.navigateTo('screen-album');
             }
 
@@ -1237,7 +1231,7 @@
                 coverEl.className = 'book-page book-cover active-page';
                 coverEl.innerHTML = `
                     <div class="leather-texture"></div>
-                    <h1 class="gold-title">Memories ♥️</h1>
+                    <h1 class="gold-title">طب مستنيه اي </h1>
                     <p style="color: #bfa15f; margin-top: 15px; font-size: 1rem; opacity: 0.9;">اضغط لفتح الكتاب</p>
                 `;
                 container.appendChild(coverEl);
@@ -1395,8 +1389,7 @@
                         container.appendChild(heartParticle);
                     }
 
-                    // بدء كتابة الكلام تدريجياً تحت القلب
-                    const heartMessage = "الموقع دا معمول عشان حاجه بسيطه وهيا اني اقولك بحبك حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير انا عايزك معايا.. اضغطي علي القلب ❤️";
+                    const heartMessage = "الموقع دا معمول عشان حاجه واحد بس  وهيا اني اقولك اني بحبك.. حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير اني عايزك معايا.. اضغطي علي القلب ❤️";
                     
                     let charIdx = 0;
                     const typeHeartText = () => {
