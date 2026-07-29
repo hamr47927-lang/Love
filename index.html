@@ -474,8 +474,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px;
         }
-        .heart-svg { width: 140px; height: 140px; fill: none; stroke: var(--accent-1); stroke-width: 2; cursor: pointer; }
+        .heart-svg { width: 110px; height: 110px; fill: none; stroke: var(--accent-1); stroke-width: 2; cursor: pointer; }
         .heart-svg.draw path {
             stroke-dasharray: 300; stroke-dashoffset: 300;
             animation: drawHeart 2.5s forwards ease-in-out;
@@ -619,7 +620,7 @@
     <div class="modal-overlay" id="thinking-modal">
         <div class="modal-content">
             <p style="font-size: 1.15rem; color: var(--accent-2); margin-bottom: 20px; line-height: 1.7;">
-                خدي وقتك فكري كويس انا كدا كدا موجود ومعاكي وهفهك وهحترم قرارك اي كان اي هوا ومش لازم تردي دلوقتي خالص خدي  وقتك فكري كويس وردي براحتك.♥️💫
+                خدي وقتك فكري كويس انا كدا كدا موجود ومعاكي وهفهك وهحترم قرارك اي كان اي هوا ومش لازم تردي دلوقتي خالص خدي وقتك فكري كويس وردي براحتك.♥️💫
             </p>
             <button class="btn-primary" id="modal-close-btn">رجوع</button>
         </div>
@@ -696,13 +697,15 @@
     </section>
 
     <section id="screen-heart" class="screen hidden">
-        <div class="content">
+        <div class="content glass-panel" style="max-height: 85vh; overflow-y: auto;">
             <div class="heart-svg-container">
                 <svg class="heart-svg" viewBox="0 0 100 100">
                     <path d="M 50,30 C 50,30 40,10 25,10 C 10,10 5,25 5,40 C 5,60 25,75 50,90 C 75,75 95,60 95,40 C 95,25 90,10 75,10 C 60,10 50,30 50,30 Z"></path>
                 </svg>
             </div>
-            <h2 id="heart-name" class="hidden" style="margin-top: 20px;"> الموقع دا معمول عشان حاجه بسيطه وهيا اني اقولك بحبك حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير انا عايزك معايا اضغطي علي القلب ❤️</h2>
+            <div id="heart-text-container" style="min-height: 120px;">
+                <p id="heart-typewriter-text" style="font-size: 1.05rem; line-height: 1.8; color: var(--accent-2); margin: 0; text-align: center;"></p>
+            </div>
         </div>
     </section>
 
@@ -1279,7 +1282,6 @@
 
                 let activeIdx = 0;
 
-                // الترتيب العكسي للصفحات لتبدأ من أقصى اليسار وتتراكم نحو اليمين (شكل تقليب الكتاب الصحيح)
                 allPages.forEach((page, i) => {
                     page.style.zIndex = allPages.length - i;
                     page.style.transformOrigin = 'left center';
@@ -1290,12 +1292,10 @@
                     allPages.forEach((p, i) => {
                         p.classList.add('active-page');
                         if (i < activeIdx) {
-                            // الصفحات التي تم تقليبها تختفي لليسار
                             p.style.transform = 'rotateY(-180deg)';
                             p.style.opacity = '0';
                             p.style.pointerEvents = 'none';
                         } else {
-                            // الصفحات الحالية والمستقبلية في مكانها الطبيعي
                             p.style.transform = 'rotateY(0deg)';
                             p.style.opacity = '1';
                             p.style.pointerEvents = (i === activeIdx) ? 'auto' : 'none';
@@ -1312,7 +1312,6 @@
                     }
                 }, 400);
 
-                // ربط أزرار "السابق" للرجوع للصفحة السابقة (تحريك الصفحة الحالية لليمين وإعادتها)
                 allPages.forEach((page, idx) => {
                     if (idx > 0) {
                         const prevBtn = page.querySelector('.btn-prev-page');
@@ -1360,7 +1359,6 @@
                         return;
                     }
 
-                    // التقليب للأمام عند النقر في أي مكان بالكتاب
                     if (activeIdx < allPages.length - 1) {
                         activeIdx++;
                         updateBookVisuals();
@@ -1379,14 +1377,13 @@
 
             initHeart() {
                 const svg = document.querySelector('.heart-svg');
-                const name = document.getElementById('heart-name');
                 const container = document.querySelector('.heart-svg-container');
+                const typewriterEl = document.getElementById('heart-typewriter-text');
                 
                 svg.classList.add('draw');
+                
                 setTimeout(() => {
                     svg.classList.add('pulse');
-                    name.classList.remove('hidden');
-                    name.classList.add('glow-text');
 
                     for(let i=0; i<8; i++) {
                         let heartParticle = document.createElement('div');
@@ -1397,6 +1394,21 @@
                         heartParticle.style.animationDelay = `${i * 0.25}s`;
                         container.appendChild(heartParticle);
                     }
+
+                    // بدء كتابة الكلام تدريجياً تحت القلب
+                    const heartMessage = "الموقع دا معمول عشان حاجه بسيطه وهيا اني اقولك بحبك حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير انا عايزك معايا.. اضغطي علي القلب ❤️";
+                    
+                    let charIdx = 0;
+                    const typeHeartText = () => {
+                        if (charIdx < heartMessage.length) {
+                            typewriterEl.innerHTML += heartMessage.charAt(charIdx);
+                            if(charIdx % 2 === 0) this.playSound('type-sound');
+                            charIdx++;
+                            setTimeout(typeHeartText, 45);
+                        }
+                    };
+                    typeHeartText();
+
                 }, 2500);
 
                 svg.addEventListener('click', () => {
@@ -1415,7 +1427,7 @@
             typeWriterLetterEffect() {
                 const lines = [
                     "انا ممكن اكون ...",
-                     "متلغبط شويه ...",
+                    "متلغبط شويه ...",
                     "بس المتاكد منو ...",
                     "اني عايزك ف حياتي ...",
                     "بكل تفاصيلك ❤️"
