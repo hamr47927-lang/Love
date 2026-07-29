@@ -576,10 +576,10 @@
     <canvas id="bg-canvas"></canvas>
 
     <!-- Audio Elements strictly pointing to root files without assets folder -->
-    <audio id="bg-music-1" loop> 
+    <audio id="bg-music-1" preload="auto"> 
         <source src="1000451616.mp3" type="audio/mpeg"> 
     </audio> 
-    <audio id="bg-music-2" loop> 
+    <audio id="bg-music-2" preload="auto"> 
         <source src="1000451619h.mp3" type="audio/mpeg"> 
     </audio>
 
@@ -619,7 +619,7 @@
     <section id="screen-loading" class="screen hidden">
         <div class="content">
             <h1 class="glow-text">Amr ❤️ Amal</h1>
-            <p>Loading Memories...</p>
+            <p>Loading Memories & Images...</p>
             <div class="progress-bar-container">
                 <div id="loading-progress" class="progress-bar"></div>
             </div>
@@ -682,14 +682,14 @@
     </section>
 
     <section id="screen-letter" class="screen hidden">
-        <div class="content">
-            <div class="envelope" id="envelope">
+        <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;">
+            <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="order: 2;">Continue</button>
+            <div class="envelope" id="envelope" style="order: 1;">
                 <div class="flap"></div>
                 <div class="paper glass-panel" style="padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
                     <p id="typewriter-text" style="font-size: 1rem; color: #333; text-align: center; margin: 0; line-height: 1.8;"></p>
                 </div>
             </div>
-            <button class="btn-primary hidden mt-2" id="letter-continue" data-next="screen-final-q">Continue</button>
         </div>
     </section>
 
@@ -767,7 +767,26 @@
                     { q: "مين بيحب التاني أكتر؟", options: ["أنا طبعاً", "أنتي ❤️", "إحنا الاتنين"] }
                 ];
 
+                this.setupAudioTimeLimiters();
                 this.init();
+            }
+
+            setupAudioTimeLimiters() {
+                // Skip last 3 seconds of each audio track seamlessly
+                const limitAudio = (audio) => {
+                    audio.addEventListener('timeupdate', () => {
+                        if (audio.duration && audio.currentTime >= audio.duration - 3) {
+                            audio.currentTime = 0;
+                            audio.pause();
+                            if (this.currentAudioActive === audio) {
+                                this.isMusicPlaying = false;
+                                this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
+                            }
+                        }
+                    });
+                };
+                limitAudio(this.audio1);
+                limitAudio(this.audio2);
             }
 
             init() {
@@ -902,13 +921,32 @@
             startLoading() {
                 const bar = document.getElementById('loading-progress');
                 const percentageEl = document.getElementById('loading-percentage');
-                let progress = 0;
+                let loadedCount = 0;
+                let totalImages = this.photos.length;
+                let simulatedProgress = 0;
                 
+                // Preload all album photos during loading screen to completely eliminate lag/freezing
+                this.photos.forEach(p => {
+                    const img = new Image();
+                    img.src = p.src;
+                    img.onload = () => {
+                        loadedCount++;
+                    };
+                    img.onerror = () => {
+                        loadedCount++; // Count even on error to prevent hanging
+                    };
+                });
+
                 const loadInterval = setInterval(() => {
-                    progress += Math.floor(Math.random() * 8) + 4;
-                    if (progress >= 100) {
-                        progress = 100;
+                    simulatedProgress += 3;
+                    let imageProgress = Math.floor((loadedCount / totalImages) * 100);
+                    let currentProg = Math.max(simulatedProgress, imageProgress);
+                    
+                    if (currentProg >= 100 || loadedCount >= totalImages) {
+                        currentProg = 100;
                         clearInterval(loadInterval);
+                        bar.style.width = `${currentProg}%`;
+                        percentageEl.textContent = `${currentProg}%`;
                         setTimeout(() => {
                             if (this.currentScreen === 'screen-loading') {
                                 this.navigateTo('screen-start');
@@ -918,28 +956,29 @@
                                 this.navigateTo(savedScreen);
                             }
                         }, 400);
+                        return;
                     }
-                    bar.style.width = `${progress}%`;
-                    percentageEl.textContent = `${progress}%`;
-                }, 120);
+                    bar.style.width = `${currentProg}%`;
+                    percentageEl.textContent = `${currentProg}%`;
+                }, 80);
             }
 
-            fadeInAudio(audio, duration = 2000) {
+            fadeInAudio(audio, duration = 2000, targetVolume = 1) {
                 audio.volume = 0;
                 audio.play().catch(() => {});
                 this.currentAudioActive = audio;
                 this.isMusicPlaying = true;
-                this.musicBtn.textContent = '🔇 إيقاف الموسيقى';
+                this.musicBtn.textContent = '🎵 إيقاف الموسيقى';
 
                 let stepTime = 50;
                 let steps = duration / stepTime;
-                let volumeIncrement = 1 / steps;
+                let volumeIncrement = targetVolume / steps;
                 
                 let fadeInterval = setInterval(() => {
-                    if (audio.volume < 1 - volumeIncrement) {
+                    if (audio.volume < targetVolume - volumeIncrement) {
                         audio.volume += volumeIncrement;
                     } else {
-                        audio.volume = 1;
+                        audio.volume = targetVolume;
                         clearInterval(fadeInterval);
                     }
                 }, stepTime);
@@ -966,9 +1005,9 @@
                 }, stepTime);
             }
 
-            transitionAudioTrack(fromAudio, toAudio, duration = 2500) {
+            transitionAudioTrack(fromAudio, toAudio, duration = 2500, targetVolume2 = 1) {
                 this.fadeOutAudio(fromAudio, duration, () => {
-                    this.fadeInAudio(toAudio, duration);
+                    this.fadeInAudio(toAudio, duration, targetVolume2);
                 });
             }
 
@@ -980,7 +1019,7 @@
                     });
                 } else {
                     let target = this.currentAudioActive || this.audio1;
-                    this.fadeInAudio(target, 1500);
+                    this.fadeInAudio(target, 1500, 1);
                 }
             }
 
@@ -998,10 +1037,12 @@
                     w.innerHTML = html;
                 });
                 
-                // Initialize strictly at 0 | 0 | 0 | 0
-                wheels.forEach(w => {
-                    w.scrollTop = 75;
-                });
+                // Initialize precisely at 0 | 0 | 0 | 0 with visible numbers
+                setTimeout(() => {
+                    wheels.forEach(w => {
+                        w.scrollTop = 75; // Index 1 in DOM corresponds to digit '0' (since index 0 is empty padding div)
+                    });
+                }, 50);
 
                 document.getElementById('check-password').addEventListener('click', () => {
                     const wheelsDivs = document.querySelectorAll('.wheel');
@@ -1083,9 +1124,9 @@
                     if(navigator.vibrate) navigator.vibrate(200);
                     
                     if (!this.isMusicPlaying) {
-                        this.fadeInAudio(this.audio1, 2000);
+                        this.fadeInAudio(this.audio1, 2000, 1);
                     } else if (this.currentAudioActive !== this.audio1) {
-                        this.transitionAudioTrack(this.currentAudioActive, this.audio1, 2000);
+                        this.transitionAudioTrack(this.currentAudioActive, this.audio1, 2000, 1);
                     }
 
                     setTimeout(() => {
@@ -1188,7 +1229,6 @@
                     if(activeIdx >= allPages.length) return;
                     targetPage = allPages[activeIdx];
                     if(!targetPage || targetPage.classList.contains('page-final')) {
-                        // Allow clicking final seal directly
                         return;
                     }
                     startX = clientX;
@@ -1201,7 +1241,7 @@
                     if (!isDragging || !targetPage) return;
                     currentX = clientX;
                     let diff = currentX - startX;
-                    if (diff > 0) diff = 0; // Turn forward on left swipe
+                    if (diff > 0) diff = 0;
                     targetPage.style.transform = `translateX(${diff}px) rotateY(${diff * 0.04}deg)`;
                 };
 
@@ -1212,12 +1252,10 @@
                     targetPage.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.6s ease';
 
                     if (diff < -40) {
-                        // Turn Page Forward
                         targetPage.style.transform = 'rotateY(-180deg)';
                         targetPage.style.boxShadow = '10px 0 30px rgba(0,0,0,0.3)';
                         this.playSound('page-flip-sound');
 
-                        // Memory Optimization: Remove old page from DOM after transition completion
                         let oldPage = targetPage;
                         setTimeout(() => {
                             if(oldPage && oldPage.parentNode) {
@@ -1228,13 +1266,11 @@
                         activeIdx++;
                         updatePreloads(activeIdx);
                     } else {
-                        // Snap back
                         targetPage.style.transform = 'translateX(0px) rotateY(0deg)';
                     }
                     targetPage = null;
                 };
 
-                // Attach unified listeners to book container
                 container.onmousedown = (e) => {
                     if(e.target.id === 'wax-seal-btn') return;
                     onDragStart(e.clientX);
@@ -1251,7 +1287,6 @@
                 };
                 window.onttouchend = () => { if(isDragging) onDragEnd(); };
 
-                // Click / Tap Handler for smooth single tap turning
                 container.onclick = (e) => {
                     const seal = document.getElementById('wax-seal-btn');
                     if(seal && (e.target === seal || seal.contains(e.target))) {
@@ -1259,7 +1294,8 @@
                         this.playSound('success-sound');
                         if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
 
-                        this.transitionAudioTrack(this.audio1, this.audio2, 2500);
+                        // Transition to audio 2 with slightly lower volume (e.g. 0.65)
+                        this.transitionAudioTrack(this.audio1, this.audio2, 2500, 0.65);
 
                         container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
                         container.style.transform = 'scale(0) rotate(10deg)';
@@ -1346,12 +1382,13 @@
                             target.innerHTML += currentLineText.charAt(charIdx);
                             if(charIdx % 2 === 0) this.playSound('type-sound');
                             charIdx++;
-                            setTimeout(typeLine, 55);
+                            // Slower typewriter speed for extra romantic calm
+                            setTimeout(typeLine, 110);
                         } else {
                             target.innerHTML += "<br>";
                             lineIdx++;
                             charIdx = 0;
-                            setTimeout(typeLine, 450);
+                            setTimeout(typeLine, 750);
                         }
                     } else {
                         document.getElementById('letter-continue').classList.remove('hidden');
@@ -1418,7 +1455,7 @@
                     let active = false;
                     
                     pieces.forEach(p => {
-                        if(p.y < canvas.height) active = true;
+                        if(p.y < canvas.height) active, active = true;
                         ctx.save();
                         ctx.translate(p.x, p.y);
                         ctx.rotate((p.rotation * Math.PI) / 180);
