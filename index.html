@@ -804,7 +804,7 @@
             setupAudioTimeLimiters() {
                 const limitAudio = (audio) => {
                     audio.addEventListener('timeupdate', () => {
-                        if (audio.duration && audio.currentTime >= audio.duration - 3) {
+                        if (audio.duration && audio.currentTime >= audio.duration - 4) {
                             audio.currentTime = 0;
                             audio.play().catch(()=>{}); 
                         }
