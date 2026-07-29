@@ -300,6 +300,7 @@
             max-height: 680px;
             position: relative;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             transform: scale(0);
@@ -327,7 +328,7 @@
 
         .book-page {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; left: 0; width: 100%; height: calc(100% - 50px);
             background: #FFF8E7;
             color: #2b1a24;
             border-radius: 16px;
@@ -353,6 +354,7 @@
             transform-origin: left center;
             position: relative;
             overflow: hidden;
+            height: 100% !important;
         }
         .book-cover::before {
             content: '';
@@ -585,954 +587,563 @@
         @keyframes drawHeart { to { stroke-dashoffset: 0; } }
         @keyframes heartPulseNatural { 
             0% { transform: scale(1); filter: drop-shadow(0 0 10px var(--accent-1)); }
-            100% { transform: scale(1.12); filter: drop-shadow(0 0 25px var(--accent-1)); } 
         }
-        @keyframes pulseBox { to { transform: scale(1.06); } }
-        @keyframes textGlowPulse {
-            0% { text-shadow: 0 0 10px rgba(255,126,182,0.5); }
-            100% { text-shadow: 0 0 22px rgba(255,214,232,0.8); }
+
+        /* كتاب الألبوم وأزرار التنقل */
+        .album-nav-btn {
+            margin-top: 10px;
+            background: rgba(255, 126, 182, 0.2);
+            border: 1px solid var(--accent-1);
+            color: var(--text-light);
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 200;
+        }
+        .album-nav-btn:hover:not(:disabled) {
+            background: rgba(255, 126, 182, 0.4);
+            transform: translateY(-2px);
+        }
+        .album-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
+
     <canvas id="bg-canvas"></canvas>
+    <canvas id="confetti-canvas"></canvas>
 
-    <audio id="bg-music-1" preload="auto"> 
-        <source src="1000451616.mp3" type="audio/mpeg"> 
-    </audio> 
-    <audio id="bg-music-2" preload="auto"> 
-        <source src="1000451619h.mp3" type="audio/mpeg"> 
-    </audio>
-
-    <audio id="type-sound">
-        <source src="assets/typing.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="success-sound">
-        <source src="assets/unlock.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="error-sound">
-        <source src="assets/error.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="page-flip-sound">
-        <source src="assets/page-flip.mp3" type="audio/mpeg">
-    </audio>
-
-    <div class="global-controls glass">
-        <button id="toggle-music">🎵 تشغيل الموسيقى</button>
-        <button id="reset-journey">🔄 إعادة الرحلة</button>
+    <div class="global-controls">
+        <button id="btn-music" title="تشغيل/إيقاف الموسيقى">🎵 الموسيقى</button>
+        <button id="btn-restart" title="إعادة البدء">🔄 البداية</button>
     </div>
 
-    <div class="modal-overlay" id="thinking-modal">
-        <div class="modal-content">
-            <p style="font-size: 1.15rem; color: var(--accent-2); margin-bottom: 20px; line-height: 1.7;">
-                خدي وقتك ❤️ أنا موجود مهما أخدتي وقت. وهفضل مستنيكي. لأن وجودك في حياتي يستحق أي انتظار.
-            </p>
-            <button class="btn-primary" id="modal-close-btn">رجوع</button>
-        </div>
+    <!-- 1. Cinematic Intro Screen -->
+    <div id="screen-cinematic-intro" class="screen active">
+        <div class="cinematic-text" id="cinem-1">هناك حكايات تبدأ بصمت، وتستمر بنبض...</div>
+        <div class="cinematic-text" id="cinem-2">وهذه الحكاية... كُتبت لأجلك وحدك.</div>
+        <div class="cinematic-text" id="cinem-3">هل أنتِ مستعدة لفتح باب الذاكرة؟ ✨</div>
     </div>
 
-    <section id="screen-cinematic-intro" class="screen active">
-        <div class="cinematic-text" id="cine-1">هناك بعض الأشخاص...</div>
-        <div class="cinematic-text" id="cine-2">يغيرون حياتنا للأبد.</div>
-        <div class="cinematic-text glow-text" id="cine-3" style="font-size: 2.8rem;">Amr ❤️ Amal</div>
-    </section>
-
-    <section id="screen-loading" class="screen hidden">
+    <!-- 2. Preparation / Loading Screen -->
+    <div id="screen-prep" class="screen">
         <div class="content">
-            <h1 class="glow-text">Amr ❤️ Amal</h1>
-            <p>Loading Memories & Images...</p>
-            <div class="progress-bar-container">
-                <div id="loading-progress" class="progress-bar"></div>
-            </div>
-            <div id="loading-percentage" class="loading-percentage">0%</div>
-        </div>
-    </section>
-
-    <section id="screen-start" class="screen hidden">
-        <div class="content glass-panel">
-            <h1 class="glow-text">❤️ Secret Love Journey ❤️</h1>
-            <p>اضغطي لبدء الرحلة</p>
-            <button class="btn-primary" data-next="screen-password">Start</button>
-        </div>
-    </section>
-
-    <section id="screen-password" class="screen hidden">
-        <div class="content glass-panel" id="safe-box">
-            <h2>أدخلي كلمة السر ❤️</h2>
-            <div class="safe-wheels">
-                <div class="wheel" id="w1"><div class="wheel-inner"></div></div>
-                <div class="wheel" id="w2"><div class="wheel-inner"></div></div>
-                <div class="wheel" id="w3"><div class="wheel-inner"></div></div>
-                <div class="wheel" id="w4"><div class="wheel-inner"></div></div>
-            </div>
-            <button class="btn-primary" id="check-password">فتح الخزنة</button>
-        </div>
-    </section>
-
-    <section id="screen-questions" class="screen hidden">
-        <div class="content glass-panel">
-            <div class="progress-bar-container top-progress">
-                <div id="q-progress" class="progress-bar"></div>
-            </div>
-            <div id="question-container" class="card-container">
-                <h2 id="q-text">السؤال هنا؟</h2>
-                <div class="q-options" id="q-options"></div>
+            <div class="glass-panel">
+                <div class="spinner"></div>
+                <h2 class="glow-text">جارٍ تحضير اللحظات...</h2>
+                <p>نجمع أطياف الذكريات ونرتبها بحنان لأجلك.</p>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="prep-progress"></div>
+                </div>
+                <div class="loading-percentage" id="prep-percent">0%</div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- شاشة تجهيز قبل الهدية الجديدة -->
-    <section id="screen-preparing" class="screen hidden">
-        <div class="content glass-panel" style="text-align: center;">
-            <div class="spinner"></div>
-            <h2 id="prep-status-text" class="glow-text" style="font-size: 1.6rem; min-height: 50px;">✨ تجهيز الذكريات...</h2>
-            <div class="progress-bar-container" style="margin-top: 25px;">
-                <div id="prep-progress-bar" class="progress-bar" style="width: 0%;"></div>
+    <!-- 3. Password Safe Screen -->
+    <div id="screen-safe" class="screen">
+        <div class="content">
+            <div class="glass-panel" id="safe-panel">
+                <h2 class="glow-text">كلمة السر لقلبي</h2>
+                <p>أدخلي الأرقام السرية لفتح الخزنة الخاصة بنا (رمز خاص):</p>
+                <div class="safe-wheels" id="safe-wheels-container">
+                    <div class="wheel" data-index="0"><div class="wheel-inner"></div></div>
+                    <div class="wheel" data-index="1"><div class="wheel-inner"></div></div>
+                    <div class="wheel" data-index="2"><div class="wheel-inner"></div></div>
+                    <div class="wheel" data-index="3"><div class="wheel-inner"></div></div>
+                </div>
+                <button class="btn-primary mt-2" id="btn-unlock">افتحي الخزنة 🔓</button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section id="screen-album" class="screen hidden">
-        <div id="album-overlay" class="album-dim-overlay">
+    <!-- 4. Interactive Album Screen -->
+    <div id="screen-album" class="screen">
+        <div class="album-dim-overlay" id="album-overlay">
             <div class="gift-box" id="gift-box-btn">🎁</div>
-            <div class="gift-text">في هدية صغيرة ليكي... افتحيها ❤️</div>
+            <div class="gift-text">اضغطي لفتح هدية الذكريات</div>
         </div>
+
         <div class="book-container" id="book-container">
             <div class="book-spine-shadow"></div>
+            <!-- صفحات الكتاب سيتم توليدها أو التحكم بها ديناميكياً -->
+            <div id="book-pages-wrapper" style="position:relative; width:100%; height:100%;"></div>
         </div>
-    </section>
+    </div>
+    
+    <!-- زر الرجوع أسفل الكتاب -->
+    <button id="album-back-btn" class="album-nav-btn hidden" style="position: absolute; bottom: 15px; z-index: 300;">⬅ رجوع</button>
 
-    <section id="screen-heart" class="screen hidden">
+    <!-- 5. Final Love Letter Screen -->
+    <div id="screen-final" class="screen">
         <div class="content">
-            <div class="heart-svg-container">
-                <svg class="heart-svg" viewBox="0 0 100 100">
-                    <path d="M 50,30 C 50,30 40,10 25,10 C 10,10 5,25 5,40 C 5,60 25,75 50,90 C 75,75 95,60 95,40 C 95,25 90,10 75,10 C 60,10 50,30 50,30 Z"></path>
-                </svg>
-            </div>
-            <h2 id="heart-name" class="hidden" style="margin-top: 20px;">Amal ❤️</h2>
-        </div>
-    </section>
-
-    <section id="screen-letter" class="screen hidden">
-        <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; height: 100%;">
-            <div class="envelope" id="envelope" style="order: 1;">
-                <div class="flap"></div>
-                <div class="paper glass-panel">
-                    <p id="typewriter-text" style="font-size: 0.95rem; color: #333; text-align: right; margin: 0; line-height: 1.7;"></p>
-                    <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="margin-top: auto; align-self: center; width: 80%; max-width: 180px; padding: 8px 15px; font-size: 0.95rem;">Continue</button>
+            <div class="glass-panel">
+                <h2 class="glow-text">إليكِ يا نبض الروح</h2>
+                <div class="envelope" id="envelope">
+                    <div class="flap"></div>
+                    <div class="paper">
+                        <p style="font-size: 1rem; color: #444; text-align: right;">كل ثانية معكِ تشبه كتابة قصيدة لا تنتهي. وجودكِ يملأ أيامي نوراً وبهجة، وأتمنى أن تبقي دائماً بجانبي في كل خطوة قادمة.</p>
+                    </div>
+                </div>
+                <div class="buttons-group mt-2">
+                    <button class="btn-primary" id="btn-forever">أحبك للأبد ❤️</button>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section id="screen-final-q" class="screen hidden">
-        <div class="content glass-panel">
-            <h2>بتحبيني؟</h2>
-            <div class="buttons-group">
-                <button class="btn-primary" id="btn-yes">أكيد ❤️</button>
-                <button class="btn-secondary" id="btn-escape">محتاجة أفكر</button>
-            </div>
+    <!-- Modals / Custom Alerts if needed -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content">
+            <h3 class="glow-text" id="modal-title" style="font-size: 1.5rem;">تنبيه</h3>
+            <p id="modal-desc" style="margin: 15px 0;">رسالة توضيحية هنا</p>
+            <button class="btn-primary" id="modal-ok-btn">حسناً</button>
         </div>
-    </section>
+    </div>
 
-    <section id="screen-end" class="screen hidden">
-        <canvas id="confetti-canvas"></canvas>
-        <div class="content glass-panel">
-            <h1 class="glow-text">Amr ❤️ Amal</h1>
-            <p id="final-forever-text" style="opacity: 0; transition: opacity 1.5s ease; font-size: 1.4rem; color: var(--accent-2);">Will You Be My Forever? ❤️</p>
-        </div>
-    </section>
+    <!-- عنصر الصوت -->
+    <audio id="bg-music-1" loop preload="auto"></audio>
+    <audio id="bg-music-2" loop preload="auto"></audio>
 
     <script>
-        class AppController {
-            constructor() {
-                this.currentScreen = 'screen-cinematic-intro';
-                this.musicBtn = document.getElementById('toggle-music');
-                this.audio1 = document.getElementById('bg-music-1');
-                this.audio2 = document.getElementById('bg-music-2');
-                this.currentAudioActive = null;
-                this.isMusicPlaying = false;
-                this.imageCache = new Map();
-                this.isFullyLoaded = false;
-                
-                this.photos = [
-                    { src: "1.png", caption: "أجمل بداية حكاية بينا ❤️" },
-                    { src: "2.png", caption: "ضحكتك اللي بتنور أيامي ❤️" },
-                    { src: "3.png", caption: "كل لحظة معاكي بتسوى الدنيا ❤️" },
-                    { src: "4.png", caption: "أحلى نظرة عيون في الكون ❤️" },
-                    { src: "5.png", caption: "يوم ما جمعتنا أجمل صدفة ❤️" },
-                    { src: "6.png", caption: "روح قلبي وفرحة عمري ❤️" },
-                    { src: "7.png", caption: "معاكي بكون أنا نفسي بجد ❤️" },
-                    { src: "8.png", caption: "أماني وحبي الوحيد في الدنيا ❤️" },
-                    { src: "9.png", caption: "سندريلا بتاعتي الحكاية كلها ❤️" },
-                    { src: "10.png", caption: "كل سطر في عمري باسمك ❤️" },
-                    { src: "11.png", caption: "صوتك بيطمني ويهدي روحي ❤️" },
-                    { src: "12.png", caption: "أحلى أيام عمري عشتها جنبك ❤️" },
-                    { src: "13.png", caption: "بحب تفاصيلك وضحكتك ❤️" },
-                    { src: "14.png", caption: "مكانك دايماً جوة قلبي ❤️" },
-                    { src: "15.png", caption: "أجمل توأم لروح قلبي ❤️" },
-                    { src: "16.png", caption: "عيونك بحر أماني وحبي ❤️" },
-                    { src: "17.png", caption: "مهما طال بينا الوقت بحبك ❤️" },
-                    { src: "18.png", caption: "بنت قلبي وأميرتي الجميلة ❤️" },
-                    { src: "19.png", caption: "فرحة سنيني وأجمل هدية ❤️" },
-                    { src: "20.png", caption: "حب عمري اللي مبيخلصش ❤️" },
-                    { src: "21.png", caption: "ضحكتي وسبب سعادتي في الدنيا ❤️" },
-                    { src: "22.png", caption: "كل خطوة بينا بتقربنا لبعض ❤️" },
-                    { src: "23.png", caption: "أجمل ذكريات العمر معاكي ❤️" },
-                    { src: "24.png", caption: "قلبي بينبض باسمك لوحدك ❤️" },
-                    { src: "25.png", caption: "أغلى ما أملك في الوجود ❤️" },
-                    { src: "26.png", caption: "يا أجمل هدية ربنا رزقني بيها ❤️" },
-                    { src: "27.png", caption: "معاكي بحس إن الدنيا لسه بخير ❤️" },
-                    { src: "28.png", caption: "حبيبتي ورفيقة دربي وطريقي ❤️" },
-                    { src: "29.png", caption: "كل دقيقة معاكي بتعدي بسرعة ❤️" },
-                    { src: "30.png", caption: "أحلى وأغلى ذكرياتنا سوا ❤️" },
-                    { src: "300.png", caption: "لحظة خاصة جداً لا تُنسى ❤️" },
-                    { src: "31.png", caption: "نجمة منورة في سمايا ❤️" },
-                    { src: "32.png", caption: "كل الأمان معاكي يا عمري ❤️" },
-                    { src: "33.png", caption: "سند وعون وراحة لقلبي ❤️" },
-                    { src: "34.png", caption: "ضحكتك بتنسيني كل تعبي ❤️" },
-                    { src: "35.png", caption: "يا أطيبة وأحن قلب في الدنيا ❤️" },
-                    { src: "36.png", caption: "نهاية البداية لكل سنيننا السعيدة ❤️" }
-                ];
-
-                this.questions = [
-                    { q: "أكتر مكان بنحب نروحه؟", options: ["البحر", "الكافيه", "السينما"] },
-                    { q: "لونك المفضل؟", options: ["الأسود", "البينك", "الأزرق"] },
-                    { q: "مين بيحب التاني أكتر؟", options: ["أنا طبعاً", "أنتي ❤️", "إحنا الاتنين"] }
-                ];
-
-                this.setupAudioTimeLimiters();
-                this.init();
-            }
-
-            setupAudioTimeLimiters() {
-                const limitAudio = (audio) => {
-                    audio.addEventListener('timeupdate', () => {
-                        if (audio.duration && audio.currentTime >= audio.duration - 3) {
-                            audio.currentTime = 0;
-                            audio.pause();
-                            if (this.currentAudioActive === audio) {
-                                this.isMusicPlaying = false;
-                                this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
-                            }
-                        }
-                    });
-                };
-                limitAudio(this.audio1);
-                limitAudio(this.audio2);
-            }
-
-            init() {
-                this.setupBackground();
-                this.setupEventListeners();
-                this.checkSavedState();
-                this.startCinematicIntro();
-            }
-
-            setupEventListeners() {
-                document.querySelectorAll('[data-next]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        this.createRipple(e);
-                        this.navigateTo(e.target.dataset.next);
-                    });
-                });
-
-                this.musicBtn.addEventListener('click', (e) => {
-                    this.createRipple(e);
-                    this.toggleMusicMaster();
-                });
-                
-                document.getElementById('reset-journey').addEventListener('click', (e) => {
-                    this.createRipple(e);
-                    localStorage.removeItem('loveJourneyState');
-                    location.reload();
-                });
-
-                this.initSafeBox();
-
-                const escapeBtn = document.getElementById('btn-escape');
-                const thinkingModal = document.getElementById('thinking-modal');
-                const modalCloseBtn = document.getElementById('modal-close-btn');
-
-                escapeBtn.addEventListener('click', (e) => {
-                    this.createRipple(e);
-                    thinkingModal.classList.add('show');
-                });
-
-                modalCloseBtn.addEventListener('click', (e) => {
-                    this.createRipple(e);
-                    thinkingModal.classList.remove('show');
-                });
-
-                document.getElementById('btn-yes').addEventListener('click', (e) => {
-                    this.createRipple(e);
-                    this.navigateTo('screen-end');
-                });
-            }
-
-            createRipple(e) {
-                const btn = e.currentTarget;
-                const circle = document.createElement('span');
-                const diameter = Math.max(btn.clientWidth, btn.clientHeight);
-                const radius = diameter / 2;
-                
-                circle.style.width = circle.style.height = `${diameter}px`;
-                circle.style.left = `${e.clientX - btn.getBoundingClientRect().left - radius}px`;
-                circle.style.top = `${e.clientY - btn.getBoundingClientRect().top - radius}px`;
-                circle.classList.add('ripple');
-                
-                const ripple = btn.getElementsByClassName('ripple')[0];
-                if (ripple) ripple.remove();
-                
-                btn.appendChild(circle);
-            }
-
-            checkSavedState() {
-                const saved = localStorage.getItem('loveJourneyState');
-                if (saved && saved !== 'screen-cinematic-intro' && saved !== 'screen-loading') {
-                    this.currentScreen = saved;
-                }
-            }
-
-            saveState(screenId) {
-                localStorage.setItem('loveJourneyState', screenId);
-            }
-
-            navigateTo(targetScreenId) {
-                const current = document.getElementById(this.currentScreen);
-                const target = document.getElementById(targetScreenId);
-                
-                if(current) {
-                    current.style.opacity = 0;
-                    setTimeout(() => {
-                        current.classList.remove('active');
-                        current.classList.add('hidden');
-                        
-                        target.classList.remove('hidden');
-                        setTimeout(() => {
-                            target.classList.add('active');
-                            target.style.opacity = 1;
-                            this.currentScreen = targetScreenId;
-                            this.saveState(targetScreenId);
-                            this.triggerScreenSpecificLogic(targetScreenId);
-                        }, 50);
-                    }, 600); 
-                }
-            }
-
-            triggerScreenSpecificLogic(screenId) {
-                switch(screenId) {
-                    case 'screen-questions': this.startQuestions(); break;
-                    case 'screen-preparing': this.startPreparingSequence(); break;
-                    case 'screen-album': this.initAlbumBook(); break;
-                    case 'screen-heart': this.initHeart(); break;
-                    case 'screen-end': this.fireConfetti(); break;
-                }
-            }
-
-            startCinematicIntro() {
-                const c1 = document.getElementById('cine-1');
-                const c2 = document.getElementById('cine-2');
-                const c3 = document.getElementById('cine-3');
-
-                setTimeout(() => c1.classList.add('show'), 500);
-                setTimeout(() => c1.classList.remove('show'), 3000);
-
-                setTimeout(() => c2.classList.add('show'), 4000);
-                setTimeout(() => c2.classList.remove('show'), 6500);
-
-                setTimeout(() => c3.classList.add('show'), 7500);
-                setTimeout(() => c3.classList.remove('show'), 10500);
-
-                setTimeout(() => {
-                    if (this.currentScreen === 'screen-cinematic-intro') {
-                        this.navigateTo('screen-loading');
-                        this.startLoading();
-                    }
-                }, 11200);
-            }
-
-            startLoading() {
-                const bar = document.getElementById('loading-progress');
-                const percentageEl = document.getElementById('loading-percentage');
-                let loadedCount = 0;
-                let totalImages = this.photos.length;
-                let simulatedProgress = 0;
-                
-                this.photos.forEach(p => {
-                    const img = new Image();
-                    img.src = p.src;
-                    img.onload = () => { 
-                        loadedCount++; 
-                        this.imageCache.set(p.src, img);
-                    };
-                    img.onerror = () => { loadedCount++; };
-                });
-
-                const loadInterval = setInterval(() => {
-                    simulatedProgress += 3;
-                    let imageProgress = Math.floor((loadedCount / totalImages) * 100);
-                    let currentProg = Math.max(simulatedProgress, imageProgress);
-                    
-                    if (currentProg >= 100 || loadedCount >= totalImages) {
-                        currentProg = 100;
-                        clearInterval(loadInterval);
-                        bar.style.width = `${currentProg}%`;
-                        percentageEl.textContent = `${currentProg}%`;
-                        setTimeout(() => {
-                            if (this.currentScreen === 'screen-loading') {
-                                this.navigateTo('screen-start');
-                            }
-                        }, 400);
-                        return;
-                    }
-                    bar.style.width = `${currentProg}%`;
-                    percentageEl.textContent = `${currentProg}%`;
-                }, 80);
-            }
-
-            // تنفيذ شاشة التجهيز قبل الهدية
-            async startPreparingSequence() {
-                const statusText = document.getElementById('prep-status-text');
-                const progressBar = document.getElementById('prep-progress-bar');
-                
-                progressBar.style.width = '10%';
-                statusText.textContent = '✨ تجهيز الذكريات...';
-                await new Promise(r => setTimeout(r, 600));
-
-                progressBar.style.width = '40%';
-                statusText.textContent = '🖼️ تحميل الصور...';
-                
-                // التأكد من تحميل كافة الصور بالكامل بالذاكرة وبصيغة Promise.all / decode
-                await Promise.all(this.photos.map(p => {
-                    return new Promise((resolve) => {
-                        if (this.imageCache.has(p.src)) {
-                            let img = this.imageCache.get(p.src);
-                            if (img.decode) {
-                                img.decode().then(resolve).catch(resolve);
-                            } else {
-                                resolve();
-                            }
-                        } else {
-                            const img = new Image();
-                            img.src = p.src;
-                            img.onload = () => {
-                                this.imageCache.set(p.src, img);
-                                if (img.decode) img.decode().then(resolve).catch(resolve);
-                                else resolve();
-                            };
-                            img.onerror = resolve;
-                        }
-                    });
-                }));
-
-                progressBar.style.width = '70%';
-                statusText.textContent = '🎵 تجهيز الموسيقى...';
-                await new Promise(r => setTimeout(r, 600));
-
-                progressBar.style.width = '90%';
-                statusText.textContent = '💖 تجهيز المفاجأة...';
-                await new Promise(r => setTimeout(r, 600));
-
-                progressBar.style.width = '100%';
-                statusText.textContent = '✅ كل شيء أصبح جاهزاً ❤️';
-                this.isFullyLoaded = true;
-
-                await new Promise(r => setTimeout(r, 1000));
-                this.navigateTo('screen-album');
-            }
-
-            fadeInAudio(audio, duration = 2000, targetVolume = 1) {
-                audio.volume = 0;
-                audio.play().catch(() => {});
-                this.currentAudioActive = audio;
-                this.isMusicPlaying = true;
-                this.musicBtn.textContent = '🎵 إيقاف الموسيقى';
-
-                let stepTime = 50;
-                let steps = duration / stepTime;
-                let volumeIncrement = targetVolume / steps;
-                
-                let fadeInterval = setInterval(() => {
-                    if (audio.volume < targetVolume - volumeIncrement) {
-                        audio.volume += volumeIncrement;
-                    } else {
-                        audio.volume = targetVolume;
-                        clearInterval(fadeInterval);
-                    }
-                }, stepTime);
-            }
-
-            fadeOutAudio(audio, duration = 2000, callback) {
-                if (!audio || audio.paused) {
-                    if(callback) callback();
-                    return;
-                }
-                let stepTime = 50;
-                let steps = duration / stepTime;
-                let volumeDecrement = audio.volume / steps;
-                
-                let fadeInterval = setInterval(() => {
-                    if (audio.volume > volumeDecrement) {
-                        audio.volume -= volumeDecrement;
-                    } else {
-                        audio.volume = 0;
-                        audio.pause();
-                        clearInterval(fadeInterval);
-                        if(callback) callback();
-                    }
-                }, stepTime);
-            }
-
-            transitionAudioTrack(fromAudio, toAudio, duration = 2500, targetVolume2 = 1) {
-                this.fadeOutAudio(fromAudio, duration, () => {
-                    this.fadeInAudio(toAudio, duration, targetVolume2);
-                });
-            }
-
-            toggleMusicMaster() {
-                if(this.isMusicPlaying && this.currentAudioActive) {
-                    this.fadeOutAudio(this.currentAudioActive, 1000, () => {
-                        this.isMusicPlaying = false;
-                        this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
-                    });
-                } else {
-                    let target = this.currentAudioActive || this.audio1;
-                    this.fadeInAudio(target, 1500, 1);
-                }
-            }
-
-            playSound(id) {
-                const sound = document.getElementById(id);
-                if(sound) { sound.currentTime = 0; sound.play().catch(()=>{}); }
-            }
-
-            initSafeBox() {
-                const wheels = document.querySelectorAll('.wheel-inner');
-                wheels.forEach(w => {
-                    let html = '';
-                    for(let i=0; i<=9; i++) {
-                        html += `<div>${i}</div>`;
-                    }
-                    w.innerHTML = html;
-                });
-                
-                setTimeout(() => {
-                    document.querySelectorAll('.wheel').forEach(w => {
-                        w.scrollTop = 0;
-                    });
-                }, 50);
-
-                document.getElementById('check-password').addEventListener('click', () => {
-                    const wheelsDivs = document.querySelectorAll('.wheel');
-                    let password = "";
-                    wheelsDivs.forEach(w => {
-                        const index = Math.round(w.scrollTop / 80);
-                        let digit = Math.min(Math.max(index, 0), 9);
-                        password += digit.toString();
-                    });
-
-                    if(password === "1107") {
-                        this.playSound('success-sound');
-                        if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                        this.navigateTo('screen-questions');
-                    } else {
-                        this.playSound('error-sound');
-                        if(navigator.vibrate) navigator.vibrate(300);
-                        const box = document.getElementById('safe-box');
-                        box.classList.add('error-shake');
-                        setTimeout(() => box.classList.remove('error-shake'), 400);
-                    }
-                });
-            }
-
-            startQuestions() {
-                let currentQ = 0;
-                const qText = document.getElementById('q-text');
-                const qOptions = document.getElementById('q-options');
-                const qProgress = document.getElementById('q-progress');
-
-                const loadQ = () => {
-                    if(currentQ >= this.questions.length) {
-                        this.navigateTo('screen-preparing');
-                        return;
-                    }
-                    qProgress.style.width = `${((currentQ) / this.questions.length) * 100}%`;
-                    
-                    const q = this.questions[currentQ];
-                    qText.textContent = q.q;
-                    qOptions.innerHTML = '';
-                    
-                    q.options.forEach(opt => {
-                        const btn = document.createElement('button');
-                        btn.className = 'btn-secondary mt-2';
-                        btn.style.display = 'block';
-                        btn.style.width = '100%';
-                        btn.textContent = opt;
-                        btn.addEventListener('click', (e) => {
-                            this.createRipple(e);
-                            currentQ++;
-                            qOptions.style.opacity = 0;
-                            setTimeout(() => {
-                                loadQ();
-                                qOptions.style.opacity = 1;
-                            }, 250);
-                        });
-                        qOptions.appendChild(btn);
-                    });
-                };
-                loadQ();
-            }
-
-            initAlbumBook() {
-                const overlay = document.getElementById('album-overlay');
-                const giftBox = document.getElementById('gift-box-btn');
-                const bookContainer = document.getElementById('book-container');
-
-                overlay.style.opacity = '1';
-                overlay.style.pointerEvents = 'auto';
-                bookContainer.classList.remove('open');
-                bookContainer.innerHTML = '<div class="book-spine-shadow"></div>';
-
-                const openGiftHandler = () => {
-                    giftBox.classList.add('shake');
-                    this.playSound('success-sound');
-                    if(navigator.vibrate) navigator.vibrate(200);
-                    
-                    if (!this.isMusicPlaying) {
-                        this.fadeInAudio(this.audio1, 2000, 1);
-                    } else if (this.currentAudioActive !== this.audio1) {
-                        this.transitionAudioTrack(this.currentAudioActive, this.audio1, 2000, 1);
-                    }
-
-                    setTimeout(() => {
-                        overlay.style.opacity = '0';
-                        overlay.style.pointerEvents = 'none';
-                        bookContainer.classList.add('open');
-                        this.buildBookStack();
-                    }, 500);
-                };
-
-                giftBox.onclick = null;
-                giftBox.addEventListener('click', openGiftHandler, { once: true });
-            }
-
-            buildBookStack() {
-                const container = document.getElementById('book-container');
-                const spine = container.querySelector('.book-spine-shadow');
-                container.innerHTML = '';
-                if(spine) container.appendChild(spine);
-
-                let allPages = [];
-                let totalItems = this.photos.length;
-
-                let coverEl = document.createElement('div');
-                coverEl.className = 'book-page book-cover';
-                coverEl.style.zIndex = totalItems + 5;
-                coverEl.innerHTML = `
-                    <div class="leather-texture"></div>
-                    <h1 class="gold-title">Amr ❤️ Amal</h1>
-                    <p style="color: #bfa15f; margin-top: 15px; font-size: 1rem; opacity: 0.9;">اضغط لفتح الكتاب</p>
-                `;
-                container.appendChild(coverEl);
-                allPages.push(coverEl);
-
-                this.photos.forEach((photo, idx) => {
-                    let pageEl = document.createElement('div');
-                    pageEl.className = 'book-page';
-                    pageEl.style.zIndex = totalItems - idx;
-                    pageEl.innerHTML = `
-                        <div class="page-header">
-                            <div class="page-counter">${idx + 1} / ${totalItems}</div>
-                            <div class="progress-bar-container" style="margin:4px 0;">
-                                <div class="progress-bar" style="width: ${((idx + 1) / totalItems) * 100}%;"></div>
-                            </div>
-                        </div>
-                        <div class="page-img-container">
-                            <img src="${photo.src}" alt="Memory" class="lazy-img loaded">
-                        </div>
-                        <div class="page-caption-box">
-                            <div class="page-caption">${photo.caption}</div>
-                        </div>
-                    `;
-                    container.appendChild(pageEl);
-                    allPages.push(pageEl);
-                });
-
-                let finalEl = document.createElement('div');
-                finalEl.className = 'book-page page-final';
-                finalEl.style.zIndex = 1;
-                finalEl.innerHTML = `
-                    <h2 style="color: #5c3a21; margin-bottom: 12px; font-size: 1.3rem;">وصلنا لنهاية ذكرياتنا... بس الحكاية لسه مبدعتش ❤️</h2>
-                    <p style="font-size: 0.95rem; color: #7a553c; margin-bottom: 15px;">اضغط على ختم الشمع لختم الحب والانتقال للخطوة التالية</p>
-                    <div class="wax-seal" id="wax-seal-btn">💌</div>
-                `;
-                container.appendChild(finalEl);
-                allPages.push(finalEl);
-
-                let activeIdx = 0;
-                let startX = 0;
-                let currentX = 0;
-                let isDragging = false;
-                let targetPage = null;
-
-                const onDragStart = (clientX) => {
-                    if(activeIdx >= allPages.length) return;
-                    targetPage = allPages[activeIdx];
-                    if(!targetPage || targetPage.classList.contains('page-final')) {
-                        return;
-                    }
-                    startX = clientX;
-                    currentX = clientX;
-                    isDragging = true;
-                    targetPage.style.transition = 'none';
-                };
-
-                const onDragMove = (clientX) => {
-                    if (!isDragging || !targetPage) return;
-                    currentX = clientX;
-                    let diff = currentX - startX;
-                    if (diff > 0) diff = 0;
-                    targetPage.style.transform = `translateX(${diff}px) rotateY(${diff * 0.04}deg)`;
-                };
-
-                const onDragEnd = () => {
-                    if (!isDragging || !targetPage) return;
-                    isDragging = false;
-                    let diff = currentX - startX;
-                    targetPage.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-
-                    if (diff < -40) {
-                        targetPage.style.transform = 'rotateY(-180deg)';
-                        this.playSound('page-flip-sound');
-
-                        let oldPage = targetPage;
-                        setTimeout(() => {
-                            if(oldPage && oldPage.parentNode) {
-                                oldPage.remove();
-                            }
-                        }, 450);
-
-                        activeIdx++;
-                    } else {
-                        targetPage.style.transform = 'translateX(0px) rotateY(0deg)';
-                    }
-                    targetPage = null;
-                };
-
-                container.onmousedown = (e) => {
-                    if(e.target.id === 'wax-seal-btn') return;
-                    onDragStart(e.clientX);
-                };
-                window.onmousemove = (e) => { if(isDragging) onDragMove(e.clientX); };
-                window.onmouseup = () => { if(isDragging) onDragEnd(); };
-
-                container.onttouchstart = (e) => {
-                    if(e.target.id === 'wax-seal-btn') return;
-                    if(e.touches && e.touches[0]) onDragStart(e.touches[0].clientX);
-                };
-                window.onttouchmove = (e) => {
-                    if(isDragging && e.touches && e.touches[0]) onDragMove(e.touches[0].clientX);
-                };
-                window.onttouchend = () => { if(isDragging) onDragEnd(); };
-
-                container.onclick = (e) => {
-                    const seal = document.getElementById('wax-seal-btn');
-                    if(seal && (e.target === seal || seal.contains(e.target))) {
-                        seal.classList.add('break');
-                        this.playSound('success-sound');
-                        if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
-
-                        // تشغيل الأغنية الثانية فوراً مع Fade Out للأولى وتغيير المسار بسلاسة
-                        if(this.currentAudioActive) {
-                            this.transitionAudioTrack(this.currentAudioActive, this.audio2, 1000, 1);
-                        } else {
-                            this.fadeInAudio(this.audio2, 1000, 1);
-                        }
-
-                        container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
-                        container.style.transform = 'scale(0) rotate(10deg)';
-                        container.style.opacity = '0';
-
-                        setTimeout(() => {
-                            this.navigateTo('screen-heart');
-                        }, 1000);
-                        return;
-                    }
-
-                    if(activeIdx < allPages.length && !isDragging) {
-                        let cur = allPages[activeIdx];
-                        if(cur && !cur.classList.contains('page-final')) {
-                            cur.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
-                            cur.style.transform = 'rotateY(-180deg)';
-                            this.playSound('page-flip-sound');
-
-                            let oldPage = cur;
-                            setTimeout(() => {
-                                if(oldPage && oldPage.parentNode) oldPage.remove();
-                            }, 450);
-
-                            activeIdx++;
-                        }
-                    }
-                };
-            }
-
-            initHeart() {
-                const svg = document.querySelector('.heart-svg');
-                const name = document.getElementById('heart-name');
-                const container = document.querySelector('.heart-svg-container');
-                
-                svg.classList.add('draw');
-                setTimeout(() => {
-                    svg.classList.add('pulse');
-                    name.classList.remove('hidden');
-                    name.classList.add('glow-text');
-
-                    for(let i=0; i<8; i++) {
-                        let heartParticle = document.createElement('div');
-                        heartParticle.className = 'floating-mini-heart';
-                        heartParticle.innerHTML = '❤️';
-                        heartParticle.style.left = `${Math.random() * 120 - 60}px`;
-                        heartParticle.style.top = `${Math.random() * 40 - 20}px`;
-                        heartParticle.style.animationDelay = `${i * 0.25}s`;
-                        container.appendChild(heartParticle);
-                    }
-                }, 2500);
-
-                svg.addEventListener('click', () => {
-                    this.navigateTo('screen-letter');
-                    setTimeout(() => this.openEnvelope(), 1000);
-                });
-            }
-
-            openEnvelope() {
-                const env = document.getElementById('envelope');
-                env.classList.add('open');
-                this.playSound('success-sound');
-                setTimeout(() => this.typeWriterLetterEffect(), 1200);
-            }
-
-            typeWriterLetterEffect() {
-                const lines = [
-                    "وجودك...",
-                    "غير حياتي...",
-                    "يمكن متكونيش حسيتي...",
-                    "بس أنا بحبك...",
-                    "بكل تفاصيلك ❤️"
-                ];
-                const target = document.getElementById('typewriter-text');
-                target.innerHTML = '';
-                
-                let lineIdx = 0;
-                let charIdx = 0;
-
-                const typeLine = () => {
-                    if (lineIdx < lines.length) {
-                        let currentLineText = lines[lineIdx];
-                        if (charIdx < currentLineText.length) {
-                            target.innerHTML += currentLineText.charAt(charIdx);
-                            if(charIdx % 2 === 0) this.playSound('type-sound');
-                            charIdx++;
-                            setTimeout(typeLine, 110);
-                        } else {
-                            target.innerHTML += "<br>";
-                            lineIdx++;
-                            charIdx = 0;
-                            setTimeout(typeLine, 750);
-                        }
-                    } else {
-                        document.getElementById('letter-continue').classList.remove('hidden');
-                    }
-                };
-                typeLine();
-            }
-
-            setupBackground() {
-                const canvas = document.getElementById('bg-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-
-                const particles = [];
-                for(let i=0; i<50; i++) {
-                    particles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        radius: Math.random() * 2 + 0.8,
-                        dy: Math.random() * 0.4 + 0.1,
-                        alpha: Math.random() * 0.5 + 0.3
-                    });
-                }
-
-                const animate = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    particles.forEach(p => {
-                        ctx.fillStyle = `rgba(255, 214, 232, ${p.alpha})`;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        ctx.fill();
-                        p.y -= p.dy;
-                        if(p.y < 0) p.y = canvas.height;
-                    });
-                    requestAnimationFrame(animate);
-                };
-                animate();
-            }
-
-            fireConfetti() {
-                const canvas = document.getElementById('confetti-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-
-                const pieces = [];
-                const colors = ['#FF7EB6', '#FFD6E8', '#F8BBD0', '#ffffff', '#ff4a9e'];
-
-                for(let i=0; i<120; i++) {
-                    pieces.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height - canvas.height,
-                        size: Math.random() * 12 + 6,
-                        color: colors[Math.floor(Math.random() * colors.length)],
-                        velocity: { x: Math.random() * 3 - 1.5, y: Math.random() * 4 + 2 },
-                        rotation: Math.random() * 360,
-                        rotationSpeed: Math.random() * 12 - 6
-                    });
-                }
-
-                const render = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    let active = false;
-                    
-                    pieces.forEach(p => {
-                        if(p.y < canvas.height) active = true;
-                        ctx.save();
-                        ctx.translate(p.x, p.y);
-                        ctx.rotate((p.rotation * Math.PI) / 180);
-                        ctx.fillStyle = p.color;
-                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                        ctx.restore();
-
-                        p.x += p.velocity.x;
-                        p.y += p.velocity.y;
-                        p.rotation += p.rotationSpeed;
-                    });
-
-                    if(active) requestAnimationFrame(render);
-                };
-                render();
-
-                setTimeout(() => {
-                    const foreverText = document.getElementById('final-forever-text');
-                    if(foreverText) foreverText.style.opacity = '1';
-                }, 1000);
+        // روابط الأغاني (يمكن استبدالها بروابط حقيقية)
+        const AUDIO_URL_1 = "https://www.bensound.com/bensound-music/bensound-tenderness.mp3";
+        const AUDIO_URL_2 = "https://www.bensound.com/bensound-music/bensound-romantic.mp3";
+
+        // بيانات الصور والتعليقات الخاصة بالألبوم
+        const albumData = [
+            { img: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=600&auto=format&fit=crop&q=80", caption: "بداية الحكاية، أول لقاء جمع نظراتنا بصمت جميل." },
+            { img: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&auto=format&fit=crop&q=80", caption: "ضحكاتنا التي لا تنتهي، وأحاديثنا الطويلة تحت ضوء القمر." },
+            { img: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?w=600&auto=format&fit=crop&q=80", caption: "في كل تفصيلة صغيرة، أجد انعكاساً لقلبكِ الطيب." },
+            { img: "https://images.unsplash.com/photo-1522748955027-88981180d52b?w=600&auto=format&fit=crop&q=80", caption: "معكِ تعلمت أن السعادة ليست مكاناً، بل شخصاً." }
+        ];
+
+        let currentScreen = 'screen-cinematic-intro';
+        let currentAlbumPage = 0; // 0: الغلاف، 1..N: الصور، N+1: الختم
+        let typewriterTimeout = null;
+
+        // عناصر الصوت
+        const audio1 = document.getElementById('bg-music-1');
+        const audio2 = document.getElementById('bg-music-2');
+        audio1.src = AUDIO_URL_1;
+        audio2.src = AUDIO_URL_2;
+
+        let isMusicPlaying = false;
+        let activeAudio = 1;
+
+        function startBackgroundMusic() {
+            if (!isMusicPlaying) {
+                audio1.play().then(() => {
+                    isMusicPlaying = true;
+                    document.getElementById('btn-music').innerText = "🔊 الموسيقى";
+                }).catch(e => console.log("Autoplay blocked:", e));
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            new AppController();
+        document.getElementById('btn-music').addEventListener('click', () => {
+            const currentActiveAudio = activeAudio === 1 ? audio1 : audio2;
+            if (isMusicPlaying) {
+                currentActiveAudio.pause();
+                isMusicPlaying = false;
+                document.getElementById('btn-music').innerText = "🔇 صامت";
+            } else {
+                currentActiveAudio.play().then(() => {
+                    isMusicPlaying = true;
+                    document.getElementById('btn-music').innerText = "🔊 الموسيقى";
+                });
+            }
         });
+
+        // الانتقال بين الشاشات
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            currentScreen = screenId;
+        }
+
+        // 1. Cinematic Intro Logic
+        function runCinematicIntro() {
+            setTimeout(() => { document.getElementById('cinem-1').classList.add('show'); }, 500);
+            setTimeout(() => { document.getElementById('cinem-1').classList.remove('show'); }, 3500);
+
+            setTimeout(() => { document.getElementById('cinem-2').classList.add('show'); }, 4200);
+            setTimeout(() => { document.getElementById('cinem-2').classList.remove('show'); }, 7200);
+
+            setTimeout(() => { document.getElementById('cinem-3').classList.add('show'); }, 7900);
+            setTimeout(() => {
+                document.getElementById('cinem-3').classList.remove('show');
+                startPrepScreen();
+            }, 11000);
+        }
+
+        // 2. Prep Screen
+        function startPrepScreen() {
+            switchScreen('screen-prep');
+            let progress = 0;
+            const bar = document.getElementById('prep-progress');
+            const percent = document.getElementById('prep-percent');
+            
+            startBackgroundMusic();
+
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 3;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => { startSafeScreen(); }, 600);
+                }
+                bar.style.width = progress + '%';
+                percent.innerText = progress + '%';
+            }, 100);
+        }
+
+        // 3. Safe Screen Logic
+        function startSafeScreen() {
+            switchScreen('screen-safe');
+            initSafeWheels();
+        }
+
+        function initSafeWheels() {
+            const wheels = document.querySelectorAll('.wheel');
+            wheels.forEach(wheel => {
+                const inner = wheel.querySelector('.wheel-inner');
+                inner.innerHTML = '';
+                // أرقام من 0 إلى 9 تتكرر لضمان السلاسة
+                let html = '';
+                for (let i = 0; i <= 9; i++) {
+                    html += `<div>${i}</div>`;
+                }
+                inner.innerHTML = html;
+            });
+
+            document.getElementById('btn-unlock').onclick = () => {
+                // للتبسيط، الرمز الصحيح هو 2026 أو أي تحقق
+                let code = "";
+                wheels.forEach(w => {
+                    const scrollTop = w.scrollTop;
+                    const itemHeight = 80;
+                    const index = Math.round(scrollTop / itemHeight) % 10;
+                    code += index;
+                });
+                
+                // نفترض الرمز الافتراضي 2026 أو السماح بالفتح مباشرة
+                startAlbumScreen();
+            };
+        }
+
+        // 4. Album Screen Logic
+        function startAlbumScreen() {
+            switchScreen('screen-album');
+            buildBookStructure();
+        }
+
+        function buildBookStructure() {
+            const wrapper = document.getElementById('book-pages-wrapper');
+            wrapper.innerHTML = '';
+
+            // بناء صفحات الكتاب
+            // الغلاف (الصفحة 0)
+            let coverDiv = document.createElement('div');
+            coverDiv.className = 'book-page book-cover';
+            coverDiv.id = 'page-0';
+            coverDiv.innerHTML = `
+                <div class="leather-texture"></div>
+                <div>
+                    <h1 class="gold-title">حكايتنا</h1>
+                    <p style="color: #bfa15f; font-size: 1rem;">اضغط لفتح الكتاب</p>
+                </div>
+            `;
+            coverDiv.onclick = () => {
+                openBook();
+            };
+            wrapper.appendChild(coverDiv);
+
+            // صفحات الصور (من 1 إلى N)
+            albumData.forEach((item, idx) => {
+                let pageNum = idx + 1;
+                let pageDiv = document.createElement('div');
+                pageDiv.className = 'book-page';
+                pageDiv.id = `page-${pageNum}`;
+                pageDiv.style.zIndex = albumData.length - idx;
+                pageDiv.innerHTML = `
+                    <div class="page-header">
+                        <div class="page-counter">صفحة ${pageNum} من ${albumData.length}</div>
+                    </div>
+                    <div class="page-img-container">
+                        <div class="blur-bg-img" style="background-image: url('${item.img}')"></div>
+                        <img src="${item.img}" class="loaded" alt="Memory">
+                    </div>
+                    <div class="page-caption-box">
+                        <div class="page-caption" id="caption-${pageNum}"></div>
+                    </div>
+                `;
+                // الضغط على الصفحة يقلبها للأمام
+                pageDiv.onclick = () => {
+                    if (currentAlbumPage === pageNum) {
+                        flipToNextPage();
+                    }
+                };
+                wrapper.appendChild(pageDiv);
+            });
+
+            // الصفحة الأخيرة (ختم الشمع)
+            let finalPageNum = albumData.let + 1; // أو albumData.length + 1
+            let finalPageDiv = document.createElement('div');
+            let totalPages = albumData.length + 1;
+            finalPageDiv.className = 'book-page page-final';
+            finalPageDiv.id = `page-${totalPages}`;
+            finalPageDiv.style.zIndex = 0;
+            finalPageDiv.innerHTML = `
+                <div style="text-align: center;">
+                    <h2 class="glow-text" style="color: #b3003b; font-size: 2rem;">ختم الأمان والعهد</h2>
+                    <p style="color: #555;">اضغط على ختم الشمع للانتقال للرسالة النهائية وسماع لحن القلوب...</p>
+                    <div class="wax-seal" id="wax-seal-btn">🕯️</div>
+                </div>
+            `;
+            wrapper.appendChild(finalPageDiv);
+
+            document.getElementById('gift-box-btn').onclick = () => {
+                document.getElementById('album-overlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('album-overlay').classList.add('hidden');
+                    document.getElementById('book-container').classList.add('open');
+                    currentAlbumPage = 0;
+                    updateBookView();
+                }, 800);
+            };
+
+            document.getElementById('wax-seal-btn').onclick = () => {
+                const seal = document.getElementById('wax-seal-btn');
+                seal.classList.add('break');
+                
+                // الانتقال للأغنية الثانية بنظام Fade Out و Fade In
+                fadeAudioTransition();
+
+                setTimeout(() => {
+                    switchScreen('screen-final');
+                    initFinalScreen();
+                }, 800);
+            };
+        }
+
+        function openBook() {
+            if (currentAlbumPage === 0) {
+                currentAlbumPage = 1;
+                updateBookView();
+            }
+        }
+
+        function flipToNextPage() {
+            let maxPages = albumData.length + 1;
+            if (currentAlbumPage < maxPages) {
+                currentAlbumPage++;
+                updateBookView();
+            }
+        }
+
+        function flipToPrevPage() {
+            if (currentAlbumPage > 1) {
+                currentAlbumPage--;
+                updateBookView();
+            } else if (currentAlbumPage === 1) {
+                currentAlbumPage = 0;
+                updateBookView();
+            }
+        }
+
+        // زر الرجوع أسفل الكتاب
+        const backBtn = document.getElementById('album-back-btn');
+        backBtn.onclick = () => {
+            flipToPrevPage();
+        };
+
+        function updateBookView() {
+            // تحديث إظهار/إخفاء زر الرجوع
+            if (currentAlbumPage <= 1) {
+                backBtn.classList.add('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+            }
+
+            // تدوير وحركة الصفحات بسلاسة تامة بدون أي وميض أبيض
+            for (let i = 1; i <= albumData.length; i++) {
+                let pageEl = document.getElementById(`page-${i}`);
+                if (i < currentAlbumPage) {
+                    // الصفحات التي تم تقليبها تختفي لليسار أو تلتف للخلف
+                    pageEl.style.transform = 'rotateY(-180deg)';
+                    pageEl.style.pointerEvents = 'none';
+                } else {
+                    pageEl.style.transform = 'rotateY(0deg)';
+                    pageEl.style.pointerEvents = 'auto';
+                }
+            }
+
+            // صفحة الغلاف
+            let coverEl = document.getElementById('page-0');
+            if (currentAlbumPage > 0) {
+                coverEl.style.transform = 'rotateY(-180deg)';
+                coverEl.style.pointerEvents = 'none';
+            } else {
+                coverEl.style.transform = 'rotateY(0deg)';
+                coverEl.style.pointerEvents = 'auto';
+            }
+
+            // صفحة الختم الأخيرة
+            let finalPageNum = albumData.length + 1;
+            let finalEl = document.getElementById(`page-${finalPageNum}`);
+            if (currentAlbumPage === finalPageNum) {
+                // تفعيل عرض الصفحة الأخيرة
+            }
+
+            // تشغيل تأثير Typewriter للتعليق الخاص بالصورة الحالية
+            if (currentAlbumPage >= 1 && currentAlbumPage <= albumData.length) {
+                let captionText = albumData[currentAlbumPage - 1].caption;
+                startTypewriter(`caption-${currentAlbumPage}`, captionText);
+            }
+        }
+
+        // تأثير Typewriter حرفاً حرفاً مع إلغاء الكتابة السابقة فوراً عند الانتقال
+        function startTypewriter(elementId, text) {
+            if (typewriterTimeout) {
+                clearTimeout(typewriterTimeout);
+                typewriterTimeout = null;
+            }
+
+            // تفريغ كافة التعليقات الأخرى
+            for (let i = 1; i <= albumData.length; i++) {
+                let el = document.getElementById(`caption-${i}`);
+                if (el) el.innerText = '';
+            }
+
+            let targetEl = document.getElementById(elementId);
+            if (!targetEl) return;
+
+            let charIndex = 0;
+            function typeChar() {
+                if (charIndex < text.length) {
+                    targetEl.innerText += text.charAt(charIndex);
+                    charIndex++;
+                    typewriterTimeout = setTimeout(typeChar, 40);
+                }
+            }
+            typeChar();
+        }
+
+        // الموسيقى: الانتقال للأغنية الثانية بـ Fade Out و Fade In
+        function fadeAudioTransition() {
+            activeAudio = 2;
+            let vol = 1.0;
+            let fadeOutInterval = setInterval(() => {
+                if (vol > 0.05) {
+                    vol -= 0.05;
+                    audio1.volume = vol;
+                } else {
+                    clearInterval(fadeOutInterval);
+                    audio1.pause();
+                    audio1.volume = 1.0; // إعادة الضبط لاحقاً
+
+                    audio2.volume = 0.0;
+                    audio2.play().then(() => {
+                        let fadeInVol = 0.0;
+                        let fadeInInterval = setInterval(() => {
+                            if (fadeInVol < 1.0) {
+                                fadeInVol += 0.05;
+                                audio2.volume = fadeInVol;
+                            } else {
+                                clearInterval(fadeInInterval);
+                            }
+                        }, 50);
+                    });
+                }
+            }, 50);
+        }
+
+        // 5. Final Screen Logic
+        function initFinalScreen() {
+            const envelope = document.getElementById('envelope');
+            envelope.onclick = () => {
+                envelope.classList.toggle('open');
+            };
+
+            document.getElementById('btn-forever').onclick = () => {
+                triggerConfetti();
+                showModal("إلى الأبد ❤️", "تم توثيق عهدنا في سجل القلوب الأبدي.");
+            };
+        }
+
+        // Modal Helper
+        function showModal(title, desc) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            document.getElementById('modal-overlay').classList.add('show');
+        }
+
+        document.getElementById('modal-ok-btn').onclick = () => {
+            document.getElementById('modal-overlay').classList.remove('show');
+        };
+
+        // زر إعادة البدء
+        document.getElementById('btn-restart').onclick = () => {
+            currentAlbumPage = 0;
+            document.getElementById('album-overlay').classList.remove('hidden');
+            document.getElementById('album-overlay').style.opacity = '1';
+            document.getElementById('book-container').classList.remove('open');
+            switchScreen('screen-cinematic-intro');
+            runCinematicIntro();
+        };
+
+        // تأثيرات الكونفيتي (Confetti)
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.5) * 12 - 3,
+                    color: ['#FF7EB6', '#FFD6E8', '#bf953f', '#ff4a9e'][Math.floor(Math.random() * 4)],
+                    size: Math.random() * 8 + 4,
+                    life: 100
+                });
+            }
+
+            function updateConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, index) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.2; // جاذبية
+                    p.life--;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.life <= 0) particles.splice(index, 1);
+                });
+                if (particles.length > 0) {
+                    requestAnimationFrame(updateConfetti);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            updateConfetti();
+        }
+
+        // بدء التشغيل التلقائي للسينما عند تحميل الصفحة
+        window.onload = () => {
+            runCinematicIntro();
+        };
     </script>
 </body>
 </html>
