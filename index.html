@@ -406,7 +406,7 @@
             align-items: center;
             position: relative;
             margin: 8px 0;
-            cursor: pointer; /* تلميح إن النقر على الصورة يقلبها للالتالية */
+            cursor: pointer;
         }
         .page-img-container img {
             width: 100%;
@@ -1250,7 +1250,7 @@
                     pageEl.innerHTML = `
                         <div class="page-header">
                             <div class="page-counter">${idx + 1} / ${totalItems}</div>
-                            <button class="btn-prev-page">⬅ السابق</button>
+                            <button class="btn-prev-page">السابق ➡</button>
                         </div>
                         <div class="progress-bar-container" style="margin:4px 0;">
                             <div class="progress-bar" style="width: ${((idx + 1) / totalItems) * 100}%;"></div>
@@ -1272,22 +1272,38 @@
                     <h2 style="color: #5c3a21; margin-bottom: 12px; font-size: 1.3rem;">وصلنا لنهاية ذكرياتنا... بس الحكاية لسه مبدعتش ❤️</h2>
                     <p style="font-size: 0.95rem; color: #7a553c; margin-bottom: 15px;">اضغط على ختم الشمع لختم الحب والانتقال للخطوة التالية</p>
                     <div class="wax-seal" id="wax-seal-btn">💌</div>
-                    <button class="btn-prev-page" style="margin-top: 20px;">⬅ السابق</button>
+                    <button class="btn-prev-page" style="margin-top: 20px;">السابق ➡</button>
                 `;
                 container.appendChild(finalEl);
                 allPages.push(finalEl);
 
                 let activeIdx = 0;
 
-                const showPage = (index) => {
+                // الترتيب العكسي للصفحات لتبدأ من أقصى اليسار وتتراكم نحو اليمين (شكل تقليب الكتاب الصحيح)
+                allPages.forEach((page, i) => {
+                    page.style.zIndex = allPages.length - i;
+                    page.style.transformOrigin = 'left center';
+                    page.style.transition = 'transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1), opacity 0.6s ease';
+                });
+
+                const updateBookVisuals = () => {
                     allPages.forEach((p, i) => {
-                        if (i === index) {
-                            p.classList.add('active-page');
+                        p.classList.add('active-page');
+                        if (i < activeIdx) {
+                            // الصفحات التي تم تقليبها تختفي لليسار
+                            p.style.transform = 'rotateY(-180deg)';
+                            p.style.opacity = '0';
+                            p.style.pointerEvents = 'none';
                         } else {
-                            p.classList.remove('active-page');
+                            // الصفحات الحالية والمستقبلية في مكانها الطبيعي
+                            p.style.transform = 'rotateY(0deg)';
+                            p.style.opacity = '1';
+                            p.style.pointerEvents = (i === activeIdx) ? 'auto' : 'none';
                         }
                     });
                 };
+
+                updateBookVisuals();
 
                 setTimeout(() => {
                     if (allPages[1] && allPages[1].dataset.caption) {
@@ -1296,7 +1312,7 @@
                     }
                 }, 400);
 
-                // ربط أزرار "السابق" في كل صفحة
+                // ربط أزرار "السابق" للرجوع للصفحة السابقة (تحريك الصفحة الحالية لليمين وإعادتها)
                 allPages.forEach((page, idx) => {
                     if (idx > 0) {
                         const prevBtn = page.querySelector('.btn-prev-page');
@@ -1305,7 +1321,7 @@
                                 e.stopPropagation();
                                 if (activeIdx > 0) {
                                     activeIdx--;
-                                    showPage(activeIdx);
+                                    updateBookVisuals();
                                     this.playSound('page-flip-sound');
 
                                     let currentPage = allPages[activeIdx];
@@ -1344,10 +1360,10 @@
                         return;
                     }
 
-                    // التقليب للأمام عند النقر في أي مكان بالكتاب (عدا زر السابق أو ختم الشمع)
+                    // التقليب للأمام عند النقر في أي مكان بالكتاب
                     if (activeIdx < allPages.length - 1) {
                         activeIdx++;
-                        showPage(activeIdx);
+                        updateBookVisuals();
                         this.playSound('page-flip-sound');
 
                         let currentPage = allPages[activeIdx];
