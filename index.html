@@ -87,6 +87,7 @@
             pointer-events: none;
             transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
+            will-change: opacity;
         }
         .screen.active {
             opacity: 1;
@@ -206,41 +207,65 @@
             margin-top: 10px;
         }
 
-        /* Password Safe Wheels - LTR fix for 0000 */
+        /* Loading Spinner for Preparation Screen */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 126, 182, 0.2);
+            border-top: 4px solid var(--accent-1);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Password Safe Wheels */
         .safe-wheels {
             display: flex;
             justify-content: center;
             gap: 12px;
             margin: 25px 0;
             direction: ltr !important;
+            unicode-bidi: bidi-override;
         }
         .wheel {
-            width: 55px;
-            height: 75px;
-            background: rgba(10, 5, 8, 0.8);
+            width: 60px;
+            height: 80px;
+            background: rgba(10, 5, 8, 0.9);
             border: 2px solid var(--accent-1);
             border-radius: 12px;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             scrollbar-width: none;
-            box-shadow: inset 0 0 15px rgba(255, 126, 182, 0.25);
+            box-shadow: inset 0 0 15px rgba(255, 126, 182, 0.3);
             direction: ltr !important;
         }
         .wheel::-webkit-scrollbar { display: none; }
+        .wheel-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            direction: ltr !important;
+        }
         .wheel-inner div {
-            height: 75px;
+            height: 80px;
+            min-height: 80px;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 2.2rem;
             font-weight: bold;
-            scroll-snap-align: start;
+            scroll-snap-align: center;
             color: var(--accent-2);
             direction: ltr !important;
         }
         .error-shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: #ff4a4a !important; }
 
-        /* --- Album & Smooth Book Styles (Fixed Flicker & Lag) --- */
+        /* --- Album & Smooth Book Styles --- */
         .album-dim-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -313,7 +338,6 @@
             backface-visibility: hidden;
             transform-style: preserve-3d;
             transform-origin: left center;
-            /* Smooth acceleration and stable render to completely eliminate flicker/lag */
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             box-shadow: -5px 0 15px rgba(0,0,0,0.25);
             will-change: transform;
@@ -389,7 +413,7 @@
             height: 100%;
             object-fit: contain;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.5s ease-in-out;
             z-index: 2;
             position: relative;
         }
@@ -478,7 +502,7 @@
         }
 
         .envelope {
-            position: relative; width: 240px; height: 140px; margin: 0 auto;
+            position: relative; width: 260px; height: 150px; margin: 0 auto;
             background: var(--accent-1); border-radius: 10px; cursor: pointer;
             perspective: 1000px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -490,13 +514,17 @@
         }
         .envelope.open .flap { transform: rotateX(180deg); z-index: 1; }
         .paper {
-            position: absolute; top: 10px; left: 10px; width: 220px; height: 120px;
+            position: absolute; top: 5px; left: 10px; width: 240px; height: 130px;
             background: white !important; color: #333; z-index: 2;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), height 1s ease; overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 15px;
         }
-        .envelope.open .paper { transform: translateY(-110px); height: 300px; z-index: 4; }
+        .envelope.open .paper { transform: translateY(-135px); height: 340px; z-index: 4; }
 
         .mt-2 { margin-top: 20px; }
         
@@ -653,6 +681,17 @@
         </div>
     </section>
 
+    <!-- شاشة تجهيز قبل الهدية الجديدة -->
+    <section id="screen-preparing" class="screen hidden">
+        <div class="content glass-panel" style="text-align: center;">
+            <div class="spinner"></div>
+            <h2 id="prep-status-text" class="glow-text" style="font-size: 1.6rem; min-height: 50px;">✨ تجهيز الذكريات...</h2>
+            <div class="progress-bar-container" style="margin-top: 25px;">
+                <div id="prep-progress-bar" class="progress-bar" style="width: 0%;"></div>
+            </div>
+        </div>
+    </section>
+
     <section id="screen-album" class="screen hidden">
         <div id="album-overlay" class="album-dim-overlay">
             <div class="gift-box" id="gift-box-btn">🎁</div>
@@ -674,16 +713,15 @@
         </div>
     </section>
 
-    <!-- Letter Screen: Clear separation between envelope and button -->
     <section id="screen-letter" class="screen hidden">
         <div class="content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; height: 100%;">
             <div class="envelope" id="envelope" style="order: 1;">
                 <div class="flap"></div>
-                <div class="paper glass-panel" style="padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                    <p id="typewriter-text" style="font-size: 1rem; color: #333; text-align: center; margin: 0; line-height: 1.8;"></p>
+                <div class="paper glass-panel">
+                    <p id="typewriter-text" style="font-size: 0.95rem; color: #333; text-align: right; margin: 0; line-height: 1.7;"></p>
+                    <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="margin-top: auto; align-self: center; width: 80%; max-width: 180px; padding: 8px 15px; font-size: 0.95rem;">Continue</button>
                 </div>
             </div>
-            <button class="btn-primary hidden" id="letter-continue" data-next="screen-final-q" style="order: 2; margin-top: 10px;">Continue</button>
         </div>
     </section>
 
@@ -714,6 +752,8 @@
                 this.audio2 = document.getElementById('bg-music-2');
                 this.currentAudioActive = null;
                 this.isMusicPlaying = false;
+                this.imageCache = new Map();
+                this.isFullyLoaded = false;
                 
                 this.photos = [
                     { src: "1.png", caption: "أجمل بداية حكاية بينا ❤️" },
@@ -883,6 +923,7 @@
             triggerScreenSpecificLogic(screenId) {
                 switch(screenId) {
                     case 'screen-questions': this.startQuestions(); break;
+                    case 'screen-preparing': this.startPreparingSequence(); break;
                     case 'screen-album': this.initAlbumBook(); break;
                     case 'screen-heart': this.initHeart(); break;
                     case 'screen-end': this.fireConfetti(); break;
@@ -921,7 +962,10 @@
                 this.photos.forEach(p => {
                     const img = new Image();
                     img.src = p.src;
-                    img.onload = () => { loadedCount++; };
+                    img.onload = () => { 
+                        loadedCount++; 
+                        this.imageCache.set(p.src, img);
+                    };
                     img.onerror = () => { loadedCount++; };
                 });
 
@@ -938,10 +982,6 @@
                         setTimeout(() => {
                             if (this.currentScreen === 'screen-loading') {
                                 this.navigateTo('screen-start');
-                            } else {
-                                const savedScreen = this.currentScreen;
-                                this.currentScreen = 'screen-loading';
-                                this.navigateTo(savedScreen);
                             }
                         }, 400);
                         return;
@@ -949,6 +989,57 @@
                     bar.style.width = `${currentProg}%`;
                     percentageEl.textContent = `${currentProg}%`;
                 }, 80);
+            }
+
+            // تنفيذ شاشة التجهيز قبل الهدية
+            async startPreparingSequence() {
+                const statusText = document.getElementById('prep-status-text');
+                const progressBar = document.getElementById('prep-progress-bar');
+                
+                progressBar.style.width = '10%';
+                statusText.textContent = '✨ تجهيز الذكريات...';
+                await new Promise(r => setTimeout(r, 600));
+
+                progressBar.style.width = '40%';
+                statusText.textContent = '🖼️ تحميل الصور...';
+                
+                // التأكد من تحميل كافة الصور بالكامل بالذاكرة وبصيغة Promise.all / decode
+                await Promise.all(this.photos.map(p => {
+                    return new Promise((resolve) => {
+                        if (this.imageCache.has(p.src)) {
+                            let img = this.imageCache.get(p.src);
+                            if (img.decode) {
+                                img.decode().then(resolve).catch(resolve);
+                            } else {
+                                resolve();
+                            }
+                        } else {
+                            const img = new Image();
+                            img.src = p.src;
+                            img.onload = () => {
+                                this.imageCache.set(p.src, img);
+                                if (img.decode) img.decode().then(resolve).catch(resolve);
+                                else resolve();
+                            };
+                            img.onerror = resolve;
+                        }
+                    });
+                }));
+
+                progressBar.style.width = '70%';
+                statusText.textContent = '🎵 تجهيز الموسيقى...';
+                await new Promise(r => setTimeout(r, 600));
+
+                progressBar.style.width = '90%';
+                statusText.textContent = '💖 تجهيز المفاجأة...';
+                await new Promise(r => setTimeout(r, 600));
+
+                progressBar.style.width = '100%';
+                statusText.textContent = '✅ كل شيء أصبح جاهزاً ❤️';
+                this.isFullyLoaded = true;
+
+                await new Promise(r => setTimeout(r, 1000));
+                this.navigateTo('screen-album');
             }
 
             fadeInAudio(audio, duration = 2000, targetVolume = 1) {
@@ -1019,16 +1110,16 @@
             initSafeBox() {
                 const wheels = document.querySelectorAll('.wheel-inner');
                 wheels.forEach(w => {
-                    let html = `<div></div>`; 
-                    for(let i=0; i<=9; i++) html += `<div>${i}</div>`;
-                    html += `<div></div>`;
+                    let html = '';
+                    for(let i=0; i<=9; i++) {
+                        html += `<div>${i}</div>`;
+                    }
                     w.innerHTML = html;
                 });
                 
-                // Set precise LTR initial 0000 position
                 setTimeout(() => {
-                    wheels.forEach(w => {
-                        w.scrollTop = 75; // Index 1 is '0'
+                    document.querySelectorAll('.wheel').forEach(w => {
+                        w.scrollTop = 0;
                     });
                 }, 50);
 
@@ -1036,14 +1127,12 @@
                     const wheelsDivs = document.querySelectorAll('.wheel');
                     let password = "";
                     wheelsDivs.forEach(w => {
-                        const index = Math.round(w.scrollTop / 75);
-                        let digit = index - 1;
-                        if(digit < 0) digit = 0;
-                        if(digit > 9) digit = 9;
+                        const index = Math.round(w.scrollTop / 80);
+                        let digit = Math.min(Math.max(index, 0), 9);
                         password += digit.toString();
                     });
 
-                    if(password === "0000") {
+                    if(password === "1107") {
                         this.playSound('success-sound');
                         if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
                         this.navigateTo('screen-questions');
@@ -1065,7 +1154,7 @@
 
                 const loadQ = () => {
                     if(currentQ >= this.questions.length) {
-                        this.navigateTo('screen-album');
+                        this.navigateTo('screen-preparing');
                         return;
                     }
                     qProgress.style.width = `${((currentQ) / this.questions.length) * 100}%`;
@@ -1160,7 +1249,7 @@
                             </div>
                         </div>
                         <div class="page-img-container">
-                            <img src="" data-src="${photo.src}" alt="Memory" class="lazy-img">
+                            <img src="${photo.src}" alt="Memory" class="lazy-img loaded">
                         </div>
                         <div class="page-caption-box">
                             <div class="page-caption">${photo.caption}</div>
@@ -1180,25 +1269,6 @@
                 `;
                 container.appendChild(finalEl);
                 allPages.push(finalEl);
-
-                const updatePreloads = (currentIndex) => {
-                    for(let i = currentIndex; i <= Math.min(currentIndex + 2, allPages.length - 1); i++) {
-                        let p = allPages[i];
-                        if(p) {
-                            let img = p.querySelector('.lazy-img');
-                            if(img && !img.getAttribute('src')) {
-                                img.src = img.getAttribute('data-src');
-                                if(img.complete) {
-                                    img.classList.add("loaded");
-                                } else {
-                                    img.onload = () => img.classList.add("loaded");
-                                }
-                            }
-                        }
-                    }
-                };
-
-                updatePreloads(0);
 
                 let activeIdx = 0;
                 let startX = 0;
@@ -1244,7 +1314,6 @@
                         }, 450);
 
                         activeIdx++;
-                        updatePreloads(activeIdx);
                     } else {
                         targetPage.style.transform = 'translateX(0px) rotateY(0deg)';
                     }
@@ -1274,7 +1343,12 @@
                         this.playSound('success-sound');
                         if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
 
-                        this.transitionAudioTrack(this.audio1, this.audio2, 2500, 0.65);
+                        // تشغيل الأغنية الثانية فوراً مع Fade Out للأولى وتغيير المسار بسلاسة
+                        if(this.currentAudioActive) {
+                            this.transitionAudioTrack(this.currentAudioActive, this.audio2, 1000, 1);
+                        } else {
+                            this.fadeInAudio(this.audio2, 1000, 1);
+                        }
 
                         container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
                         container.style.transform = 'scale(0) rotate(10deg)';
@@ -1299,7 +1373,6 @@
                             }, 450);
 
                             activeIdx++;
-                            updatePreloads(activeIdx);
                         }
                     }
                 };
@@ -1433,7 +1506,7 @@
                     let active = false;
                     
                     pieces.forEach(p => {
-                        if(p.y < canvas.height) active, active = true;
+                        if(p.y < canvas.height) active = true;
                         ctx.save();
                         ctx.translate(p.x, p.y);
                         ctx.rotate((p.rotation * Math.PI) / 180);
