@@ -734,8 +734,8 @@
     <section id="screen-end" class="screen hidden">
         <canvas id="confetti-canvas"></canvas>
         <div class="content glass-panel">
-            <h1 class="glow-text">طب مستنيه اي ♥️</h1>
-            <p id="final-forever-text" style="opacity: 0; transition: opacity 1.5s ease; font-size: 1.4rem; color: var(--accent-2);"> تعالي قوليلي ان المفاجاه عجبتك  😂❤️</p>
+            <h1 class="glow-text">طيب مستنيه اي 🌚😂</h1>
+            <p id="final-forever-text" style="opacity: 0; transition: opacity 1.5s ease; font-size: 1.4rem; color: var(--accent-2);"> تعالي قوليلي ان المفاجاه عجبتك بقي 😂❤️</p>
         </div>
     </section>
 
@@ -949,12 +949,14 @@
                 const percentageEl = document.getElementById('loading-percentage');
                 let currentProg = 0;
                 
+                // تحميل الصور في الخلفية بصمت تام بدون توقف الشاشة أو حدوث شاشة سوداء
                 this.photos.forEach(p => {
                     const img = new Image();
                     img.src = p.src;
                     img.onload = () => this.imageCache.set(p.src, img);
                 });
 
+                // عداد سريع وسلس جداً يضمن الانتقال المباشر بدون أي تهنيج
                 const loadInterval = setInterval(() => {
                     currentProg += 4;
                     
@@ -979,48 +981,48 @@
                 const statusText = document.getElementById('prep-status-text');
                 const progressBar = document.getElementById('prep-progress-bar');
                 
-                progressBar.style.width = '15%';
+                progressBar.style.width = '10%';
                 statusText.textContent = '✨ تجهيز الذكريات...';
                 await new Promise(r => setTimeout(r, 400));
 
-                progressBar.style.width = '45%';
+                progressBar.style.width = '40%';
                 statusText.textContent = '🖼️ تحميل الصور...';
                 
-                const safetyTimeout = new Promise((resolve) => {
-                    setTimeout(() => {
-                        resolve();
-                    }, 3500);
-                });
-
-                const loadImagesPromise = Promise.all(this.photos.map(p => {
+                let loadedCount = 0;
+                await Promise.all(this.photos.map(p => {
                     return new Promise((resolve) => {
                         if (this.imageCache.has(p.src)) {
+                            loadedCount++;
                             resolve();
                         } else {
                             const img = new Image();
                             img.src = p.src;
                             img.onload = () => {
                                 this.imageCache.set(p.src, img);
+                                loadedCount++;
                                 resolve();
                             };
                             img.onerror = () => {
+                                loadedCount++;
                                 resolve();
                             };
                         }
                     });
                 }));
 
-                await Promise.race([loadImagesPromise, safetyTimeout]);
+                progressBar.style.width = '70%';
+                statusText.textContent = '🎵 تجهيز الموسيقى...';
+                await new Promise(r => setTimeout(r, 400));
 
-                progressBar.style.width = '80%';
-                statusText.textContent = '🎵 تجهيز الموسيقى والمفاجأة...';
+                progressBar.style.width = '90%';
+                statusText.textContent = '💖 تجهيز المفاجأة...';
                 await new Promise(r => setTimeout(r, 400));
 
                 progressBar.style.width = '100%';
                 statusText.textContent = '✅ كل شيء أصبح جاهزاً ❤️';
                 this.isFullyLoaded = true;
 
-                await new Promise(r => setTimeout(r, 500));
+                await new Promise(r => setTimeout(r, 600));
                 this.navigateTo('screen-album');
             }
 
@@ -1387,7 +1389,7 @@
                         container.appendChild(heartParticle);
                     }
 
-                    const heartMessage = "الموقع دا معمول عشان حاجه واحد بس  وهيا اني اقولك اني بحبك.. حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير اني عايزك معايا.. اضغطي علي القلب ❤️";
+                    const heartMessage = "الموقع دا معمول عشان حاجه بسيطه وهيا اني اقولك بحبك حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير انا عايزك معايا.. اضغطي علي القلب ❤️";
                     
                     let charIdx = 0;
                     const typeHeartText = () => {
