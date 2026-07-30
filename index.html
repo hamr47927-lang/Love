@@ -881,8 +881,29 @@
 
             checkSavedState() {
                 const saved = localStorage.getItem('loveJourneyState');
+                
+                // لو في شاشة محفوظة غير المقدمة والتحميل
                 if (saved && saved !== 'screen-cinematic-intro' && saved !== 'screen-loading') {
-                    this.currentScreen = saved;
+                    
+                    // 1. إخفاء الشاشة السودة (السينمائية) فوراً بشكل قاطع
+                    const introScreen = document.getElementById('screen-cinematic-intro');
+                    if(introScreen) {
+                        introScreen.classList.remove('active');
+                        introScreen.classList.add('hidden');
+                        introScreen.style.opacity = '0';
+                    }
+                    
+                    // 2. إظهار الشاشة اللي وقفت عندها فوراً
+                    const targetScreen = document.getElementById(saved);
+                    if(targetScreen) {
+                        targetScreen.classList.remove('hidden');
+                        targetScreen.classList.add('active');
+                        targetScreen.style.opacity = '1';
+                        
+                        // 3. تحديث مسار الكود وتشغيل الشاشة
+                        this.currentScreen = saved;
+                        this.triggerScreenSpecificLogic(saved);
+                    }
                 }
             }
 
@@ -1068,101 +1089,166 @@
                 }, stepTime);
             }
 
-            transitionAudioTrack(fromAudio, toAudio, duration = 2500, targetVolume2 = 1) {
-                this.fadeOutAudio(fromAudio, duration, () => {
-                    this.fadeInAudio(toAudio, duration, targetVolume2);
-                });
-            }
-
-            toggleMusicMaster() {
-                if(this.isMusicPlaying && this.currentAudioActive) {
+            switchAudio(newAudio) {
+                if (this.currentAudioActive && this.currentAudioActive !== newAudio && !this.currentAudioActive.paused) {
                     this.fadeOutAudio(this.currentAudioActive, 1000, () => {
-                        this.isMusicPlaying = false;
-                        this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
+                        if (this.isMusicPlaying) {
+                            this.fadeInAudio(newAudio, 1500, 1);
+                        }
                     });
-                } else {
-                    let target = this.currentAudioActive || this.audio1;
-                    this.fadeInAudio(target, 1500, 1);
+                } else if (this.isMusicPlaying && newAudio.paused) {
+                    this.fadeInAudio(newAudio, 1500, 1);
                 }
             }
 
-            playSound(id) {
-                const sound = document.getElementById(id);
-                if(sound) { sound.currentTime = 0; sound.play().catch(()=>{}); }
+            toggleMusicMaster() {
+                let targetAudio = this.audio1;
+                
+                const screensForAudio2 = ['screen-heart', 'screen-letter', 'screen-final-q', 'screen-end'];
+                if (screensForAudio2.includes(this.currentScreen)) {
+                    targetAudio = this.audio2;
+                }
+
+                if (this.isMusicPlaying) {
+                    this.fadeOutAudio(targetAudio, 1000);
+                    this.isMusicPlaying = false;
+                    this.musicBtn.textContent = '🎵 تشغيل الموسيقى';
+                } else {
+                    this.fadeInAudio(targetAudio, 1500, 1);
+                }
+            }
+
+            setupBackground() {
+                const canvas = document.getElementById('bg-canvas');
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let width, height;
+
+                const resize = () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * width;
+                        this.y = Math.random() * height;
+                        this.size = Math.random() * 2;
+                        this.speedX = Math.random() * 0.5 - 0.25;
+                        this.speedY = Math.random() * 0.5 - 0.25;
+                    }
+                    update() {
+                        this.x += this.speedX;
+                        this.y += this.speedY;
+                        if (this.y < 0) this.y = height;
+                        if (this.x < 0) this.x = width;
+                        if (this.x > width) this.x = 0;
+                        if (this.y > height) this.y = 0;
+                    }
+                    draw() {
+                        ctx.fillStyle = 'rgba(255,126,182,0.4)';
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+                
+                for(let i=0; i<80; i++) particles.push(new Particle());
+                
+                const animate = () => {
+                    ctx.clearRect(0, 0, width, height);
+                    particles.forEach(p => { p.update(); p.draw(); });
+                    requestAnimationFrame(animate);
+                }
+                animate();
             }
 
             initSafeBox() {
-                const wheels = document.querySelectorAll('.wheel-inner');
-                wheels.forEach(w => {
-                    let html = '';
-                    for(let i=0; i<=9; i++) {
-                        html += `<div>${i}</div>`;
-                    }
-                    w.innerHTML = html;
-                });
+                const wheels = document.querySelectorAll('.wheel');
                 
-                setTimeout(() => {
-                    document.querySelectorAll('.wheel').forEach(w => {
-                        w.scrollTop = 0;
+                wheels.forEach(wheel => {
+                    const inner = wheel.querySelector('.wheel-inner');
+                    let content = '';
+                    for (let i = 0; i <= 9; i++) {
+                        content += `<div>${i}</div>`;
+                    }
+                    inner.innerHTML = content;
+
+                    let isScrolling;
+                    wheel.addEventListener('scroll', () => {
+                        clearTimeout(isScrolling);
+                        isScrolling = setTimeout(() => {
+                            this.playTypeSound();
+                        }, 50);
                     });
-                }, 50);
+                });
 
                 document.getElementById('check-password').addEventListener('click', () => {
-                    const wheelsDivs = document.querySelectorAll('.wheel');
-                    let password = "";
-                    wheelsDivs.forEach(w => {
-                        const index = Math.round(w.scrollTop / 80);
-                        let digit = Math.min(Math.max(index, 0), 9);
-                        password += digit.toString();
-                    });
-
-                    if(password === "1107") {
-                        this.playSound('success-sound');
-                        if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    const pass = Array.from(wheels).map(w => {
+                        const itemHeight = 80;
+                        const index = Math.round(w.scrollTop / itemHeight);
+                        const items = w.querySelectorAll('div');
+                        if(index >= 0 && index < items.length) {
+                            return items[index].innerText;
+                        }
+                        return '0';
+                    }).join('');
+                    
+                    if (pass === "1801") {
+                        document.getElementById('success-sound').play().catch(()=>{});
                         this.navigateTo('screen-questions');
+                        
+                        if (this.isMusicPlaying && this.currentAudioActive !== this.audio1) {
+                             this.switchAudio(this.audio1);
+                        } else if (!this.isMusicPlaying && this.currentAudioActive === null) {
+                            // لو الموسيقى مش شغالة أصلا، ممكن نشغلها بناء على طلب المستخدم
+                        }
                     } else {
-                        this.playSound('error-sound');
-                        if(navigator.vibrate) navigator.vibrate(300);
-                        const box = document.getElementById('safe-box');
-                        box.classList.add('error-shake');
-                        setTimeout(() => box.classList.remove('error-shake'), 400);
+                        document.getElementById('error-sound').play().catch(()=>{});
+                        wheels.forEach(w => {
+                            w.classList.add('error-shake');
+                            setTimeout(() => w.classList.remove('error-shake'), 400);
+                        });
                     }
                 });
+            }
+
+            playTypeSound() {
+                const s = document.getElementById('type-sound');
+                s.currentTime = 0;
+                s.volume = 0.2;
+                s.play().catch(()=>{});
             }
 
             startQuestions() {
                 let currentQ = 0;
-                const qText = document.getElementById('q-text');
-                const qOptions = document.getElementById('q-options');
-                const qProgress = document.getElementById('q-progress');
-
+                let qProgress = document.getElementById('q-progress');
+                
                 const loadQ = () => {
-                    if(currentQ >= this.questions.length) {
-                        this.navigateTo('screen-preparing');
-                        return;
-                    }
-                    qProgress.style.width = `${((currentQ) / this.questions.length) * 100}%`;
+                    const qData = this.questions[currentQ];
+                    document.getElementById('q-text').innerText = qData.q;
+                    const opts = document.getElementById('q-options');
+                    opts.innerHTML = '';
                     
-                    const q = this.questions[currentQ];
-                    qText.textContent = q.q;
-                    qOptions.innerHTML = '';
-                    
-                    q.options.forEach(opt => {
+                    qData.options.forEach((opt, i) => {
                         const btn = document.createElement('button');
                         btn.className = 'btn-secondary mt-2';
-                        btn.style.display = 'block';
                         btn.style.width = '100%';
-                        btn.textContent = opt;
-                        btn.addEventListener('click', (e) => {
-                            this.createRipple(e);
-                            currentQ++;
-                            qOptions.style.opacity = 0;
+                        btn.style.textAlign = 'center';
+                        btn.innerText = opt;
+                        btn.onclick = () => {
+                            btn.style.background = 'var(--accent-1)';
+                            btn.style.color = 'white';
                             setTimeout(() => {
-                                loadQ();
-                                qOptions.style.opacity = 1;
-                            }, 250);
-                        });
-                        qOptions.appendChild(btn);
+                                currentQ++;
+                                qProgress.style.width = `${(currentQ / this.questions.length) * 100}%`;
+                                if (currentQ < this.questions.length) loadQ();
+                                else this.navigateTo('screen-preparing');
+                            }, 500);
+                        };
+                        opts.appendChild(btn);
                     });
                 };
                 loadQ();
@@ -1170,373 +1256,220 @@
 
             initAlbumBook() {
                 const overlay = document.getElementById('album-overlay');
-                const giftBox = document.getElementById('gift-box-btn');
+                const giftBtn = document.getElementById('gift-box-btn');
                 const bookContainer = document.getElementById('book-container');
+                let currentPage = 0;
 
-                overlay.style.opacity = '1';
-                overlay.style.pointerEvents = 'auto';
-                bookContainer.classList.remove('open');
-                bookContainer.innerHTML = '<div class="book-spine-shadow"></div>';
-
-                const openGiftHandler = () => {
-                    giftBox.classList.add('shake');
-                    this.playSound('success-sound');
-                    if(navigator.vibrate) navigator.vibrate(200);
-                    
-                    if (!this.isMusicPlaying) {
-                        this.fadeInAudio(this.audio1, 2000, 1);
-                    } else if (this.currentAudioActive !== this.audio1) {
-                        this.transitionAudioTrack(this.currentAudioActive, this.audio1, 2000, 1);
-                    }
-
+                giftBtn.onclick = () => {
+                    document.getElementById('success-sound').play().catch(()=>{});
+                    giftBtn.classList.add('shake');
                     setTimeout(() => {
                         overlay.style.opacity = '0';
-                        overlay.style.pointerEvents = 'none';
-                        bookContainer.classList.add('open');
-                        this.buildBookStack();
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                            bookContainer.classList.add('open');
+                            setTimeout(() => {
+                                renderPages();
+                            }, 800);
+                        }, 800);
                     }, 500);
                 };
 
-                giftBox.onclick = null;
-                giftBox.addEventListener('click', openGiftHandler, { once: true });
-            }
-
-            typeWriterCaption(captionEl, fullText) {
-                captionEl.innerHTML = '';
-                let charIdx = 0;
-                
-                if (captionEl.typingTimer) {
-                    clearTimeout(captionEl.typingTimer);
-                }
-
-                const type = () => {
-                    if (charIdx < fullText.length) {
-                        captionEl.innerHTML += fullText.charAt(charIdx);
-                        if(charIdx % 2 === 0) this.playSound('type-sound');
-                        charIdx++;
-                        captionEl.typingTimer = setTimeout(type, 50);
-                    }
-                };
-                type();
-            }
-
-            buildBookStack() {
-                const container = document.getElementById('book-container');
-                container.innerHTML = '';
-
-                let allPages = [];
-                let totalItems = this.photos.length;
-
-                let coverEl = document.createElement('div');
-                coverEl.className = 'book-page book-cover active-page';
-                coverEl.innerHTML = `
-                    <div class="leather-texture"></div>
-                    <h1 class="gold-title">♥️ Memories </h1>
-                    <p style="color: #bfa15f; margin-top: 15px; font-size: 1rem; opacity: 0.9;">اضغط لفتح الكتاب</p>
-                `;
-                container.appendChild(coverEl);
-                allPages.push(coverEl);
-
-                this.photos.forEach((photo, idx) => {
-                    let pageEl = document.createElement('div');
-                    pageEl.className = 'book-page';
-                    pageEl.dataset.caption = photo.caption;
+                const renderPages = () => {
+                    bookContainer.innerHTML = '';
                     
-                    let cachedImgSrc = this.imageCache.has(photo.src) ? this.imageCache.get(photo.src).src : photo.src;
-
-                    pageEl.innerHTML = `
-                        <div class="page-header">
-                            <div class="page-counter">${idx + 1} / ${totalItems}</div>
-                            <button class="btn-prev-page">السابق ➡</button>
-                        </div>
-                        <div class="progress-bar-container" style="margin:4px 0;">
-                            <div class="progress-bar" style="width: ${((idx + 1) / totalItems) * 100}%;"></div>
-                        </div>
-                        <div class="page-img-container">
-                            <img src="${cachedImgSrc}" alt="Memory" loading="lazy">
-                        </div>
-                        <div class="page-caption-box">
-                            <div class="page-caption"></div>
+                    const cover = document.createElement('div');
+                    cover.className = 'book-page book-cover active-page';
+                    cover.innerHTML = `
+                        <div class="leather-texture"></div>
+                        <div>
+                            <div class="gold-title">ألبوم الذكريات</div>
+                            <div style="color: #bf953f; font-size: 1.2rem; letter-spacing: 2px;">Aml & Amr</div>
+                            <p style="color: #a6843c; margin-top: 30px; font-size: 1rem;">اضغطي للفتح</p>
                         </div>
                     `;
-                    container.appendChild(pageEl);
-                    allPages.push(pageEl);
-                });
+                    cover.onclick = () => nextPage();
+                    bookContainer.appendChild(cover);
 
-                let finalEl = document.createElement('div');
-                finalEl.className = 'book-page page-final';
-                finalEl.innerHTML = `
-                    <h2 style="color: #5c3a21; margin-bottom: 12px; font-size: 1.3rem;">وصلنا لنهاية وطبعا دا جزء بسيط جدا ... لسه القصه مبداتش  ❤️</h2>
-                    <p style="font-size: 0.95rem; color: #7a553c; margin-bottom: 15px;">اضغطي واقفلي الكتاب  </p>
-                    <div class="wax-seal" id="wax-seal-btn">💌</div>
-                    <button class="btn-prev-page" style="margin-top: 20px;">السابق ➡</button>
-                `;
-                container.appendChild(finalEl);
-                allPages.push(finalEl);
-
-                let activeIdx = 0;
-
-                allPages.forEach((page, i) => {
-                    page.style.zIndex = allPages.length - i;
-                    page.style.transformOrigin = 'left center';
-                    page.style.transition = 'transform 0.6s cubic-bezier(0.645, 0.045, 0.355, 1), opacity 0.6s ease';
-                });
-
-                const updateBookVisuals = () => {
-                    allPages.forEach((p, i) => {
-                        p.classList.add('active-page');
-                        if (i < activeIdx) {
-                            p.style.transform = 'rotateY(-180deg)';
-                            p.style.opacity = '0';
-                            p.style.pointerEvents = 'none';
-                        } else {
-                            p.style.transform = 'rotateY(0deg)';
-                            p.style.opacity = '1';
-                            p.style.pointerEvents = (i === activeIdx) ? 'auto' : 'none';
-                        }
+                    this.photos.forEach((photo, index) => {
+                        const page = document.createElement('div');
+                        page.className = 'book-page';
+                        
+                        page.innerHTML = `
+                            <div class="page-header">
+                                <span class="page-counter">صفحة ${index + 1}</span>
+                                <button class="btn-prev-page" onclick="event.stopPropagation(); window.app.prevPage()">السابق</button>
+                            </div>
+                            <div class="page-img-container" onclick="window.app.nextPage()">
+                                <img src="${photo.src}" alt="Memory" loading="lazy">
+                            </div>
+                            <div class="page-caption-box">
+                                <p class="page-caption">${photo.caption}</p>
+                            </div>
+                        `;
+                        bookContainer.appendChild(page);
                     });
+
+                    const lastPage = document.createElement('div');
+                    lastPage.className = 'book-page page-final';
+                    lastPage.innerHTML = `
+                        <h2 style="color: #660022; margin-bottom: 20px;">الذكريات دي جزء من حكايتنا</h2>
+                        <p style="color: #5c3a21;"> ولسه في كتير</p>
+                        <div class="wax-seal" id="wax-seal" title="اضغط لفتح الرسالة">💌</div>
+                    `;
+                    bookContainer.appendChild(lastPage);
+
+                    const waxSeal = lastPage.querySelector('#wax-seal');
+                    if (waxSeal) {
+                        waxSeal.onclick = () => {
+                            waxSeal.classList.add('break');
+                            document.getElementById('success-sound').play().catch(()=>{});
+                            setTimeout(() => {
+                                this.navigateTo('screen-heart');
+                            }, 600);
+                        };
+                    }
                 };
 
-                updateBookVisuals();
-
-                setTimeout(() => {
-                    if (allPages[1] && allPages[1].dataset.caption) {
-                        let firstCaptionEl = allPages[1].querySelector('.page-caption');
-                        this.typeWriterCaption(firstCaptionEl, allPages[1].dataset.caption);
+                this.nextPage = () => {
+                    const pages = bookContainer.querySelectorAll('.book-page');
+                    if (currentPage < pages.length - 1) {
+                        document.getElementById('page-flip-sound').play().catch(()=>{});
+                        pages[currentPage].classList.remove('active-page');
+                        currentPage++;
+                        pages[currentPage].classList.add('active-page');
                     }
-                }, 400);
+                };
 
-                allPages.forEach((page, idx) => {
-                    if (idx > 0) {
-                        const prevBtn = page.querySelector('.btn-prev-page');
-                        if (prevBtn) {
-                            prevBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                if (activeIdx > 0) {
-                                    activeIdx--;
-                                    updateBookVisuals();
-                                    this.playSound('page-flip-sound');
-
-                                    let currentPage = allPages[activeIdx];
-                                    if (currentPage && currentPage.dataset.caption) {
-                                        let capEl = currentPage.querySelector('.page-caption');
-                                        if (capEl) {
-                                            this.typeWriterCaption(capEl, currentPage.dataset.caption);
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-
-                container.onclick = (e) => {
-                    const seal = document.getElementById('wax-seal-btn');
-                    if(seal && (e.target === seal || seal.contains(e.target))) {
-                        seal.classList.add('break');
-                        this.playSound('success-sound');
-                        if(navigator.vibrate) navigator.vibrate([150, 100, 150]);
-
-                        if(this.currentAudioActive) {
-                            this.transitionAudioTrack(this.currentAudioActive, this.audio2, 1000, 1);
-                        } else {
-                            this.fadeInAudio(this.audio2, 1000, 1);
-                        }
-
-                        container.style.transition = 'transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease';
-                        container.style.transform = 'scale(0) rotate(10deg)';
-                        container.style.opacity = '0';
-
-                        setTimeout(() => {
-                            this.navigateTo('screen-heart');
-                        }, 1000);
-                        return;
-                    }
-
-                    if (activeIdx < allPages.length - 1) {
-                        activeIdx++;
-                        updateBookVisuals();
-                        this.playSound('page-flip-sound');
-
-                        let currentPage = allPages[activeIdx];
-                        if (currentPage && currentPage.dataset.caption) {
-                            let capEl = currentPage.querySelector('.page-caption');
-                            if (capEl) {
-                                this.typeWriterCaption(capEl, currentPage.dataset.caption);
-                            }
-                        }
+                this.prevPage = () => {
+                    const pages = bookContainer.querySelectorAll('.book-page');
+                    if (currentPage > 0) {
+                        document.getElementById('page-flip-sound').play().catch(()=>{});
+                        pages[currentPage].classList.remove('active-page');
+                        currentPage--;
+                        pages[currentPage].classList.add('active-page');
                     }
                 };
             }
 
             initHeart() {
+                this.switchAudio(this.audio2);
+
                 const svg = document.querySelector('.heart-svg');
+                const textContainer = document.getElementById('heart-typewriter-text');
                 const container = document.querySelector('.heart-svg-container');
-                const typewriterEl = document.getElementById('heart-typewriter-text');
-                
-                svg.classList.add('draw');
-                
-                setTimeout(() => {
-                    svg.classList.add('pulse');
+                let clicked = false;
 
-                    for(let i=0; i<8; i++) {
-                        let heartParticle = document.createElement('div');
-                        heartParticle.className = 'floating-mini-heart';
-                        heartParticle.innerHTML = '❤️';
-                        heartParticle.style.left = `${Math.random() * 120 - 60}px`;
-                        heartParticle.style.top = `${Math.random() * 40 - 20}px`;
-                        heartParticle.style.animationDelay = `${i * 0.25}s`;
-                        container.appendChild(heartParticle);
-                    }
-
-                    const heartMessage = "الموقع دا معمول عشان حاجه واحد بس  وهيا اني اقولك اني بحبك.. حسيت اني مينفعش اقولها كدا وخلاص كان لازم حاجه حلوه ليكي. انا فكرت كتير الصراحه لان الكلمة دي بيترتب عليها حاجات كتير تانيه ولسه الطريق قدمنا طويل بس موصلتش لاي حاجه غير اني عايزك معايا.. اضغطي علي القلب ❤️";
-                    
-                    let charIdx = 0;
-                    const typeHeartText = () => {
-                        if (charIdx < heartMessage.length) {
-                            typewriterEl.innerHTML += heartMessage.charAt(charIdx);
-                            if(charIdx % 2 === 0) this.playSound('type-sound');
-                            charIdx++;
-                            setTimeout(typeHeartText, 45);
-                        }
-                    };
-                    typeHeartText();
-
-                }, 2500);
+                const message = "انا ممكن اكون مقولتهاش صريحه غير مره واحده بس حبيت اقولك اني بحبك وعارف انك بتحبيني ودي حاجه احنا الاتنين عارفينها كويس انا عايزك جمبي ديما ❤️";
 
                 svg.addEventListener('click', () => {
-                    this.navigateTo('screen-letter');
-                    setTimeout(() => this.openEnvelope(), 1000);
+                    if(clicked) return;
+                    clicked = true;
+                    svg.classList.add('draw');
+                    
+                    for(let i=0; i<8; i++) {
+                        setTimeout(() => {
+                            const mh = document.createElement('div');
+                            mh.innerHTML = '❤️';
+                            mh.className = 'floating-mini-heart';
+                            mh.style.left = `${Math.random()*80 + 10}%`;
+                            mh.style.bottom = '20px';
+                            container.appendChild(mh);
+                            setTimeout(() => mh.remove(), 2000);
+                        }, i * 150);
+                    }
+
+                    setTimeout(() => {
+                        svg.classList.add('pulse');
+                        this.typeText(message, textContainer, 60, () => {
+                            setTimeout(() => this.navigateTo('screen-letter'), 4000);
+                        });
+                    }, 2500);
                 });
             }
 
-            openEnvelope() {
+            initLetter() {
                 const env = document.getElementById('envelope');
-                env.classList.add('open');
-                this.playSound('success-sound');
-                setTimeout(() => this.typeWriterLetterEffect(), 1200);
+                const txt = document.getElementById('typewriter-text');
+                const btn = document.getElementById('letter-continue');
+                let opened = false;
+                const msg = "امل انتي دخلتي حياتي من فتره مش كبيره اوي بس قدرتي تغيري فيها حاجات كتير او تخليها احسن وجودك لوحده مخليني مبسوط انا عملت كل دا عشان مش عايز يوم زي دا يعدي عادي لاني بجد بحبك ❤️ ";
+
+                env.addEventListener('click', () => {
+                    if(opened) return;
+                    opened = true;
+                    env.classList.add('open');
+                    setTimeout(() => {
+                        this.typeText(msg, txt, 50, () => {
+                            btn.classList.remove('hidden');
+                        });
+                    }, 1200);
+                });
             }
 
-            typeWriterLetterEffect() {
-                const lines = [
-                    "انا ممكن اكون ...",
-                    "متلغبط شويه ...",
-                    "بس المتاكد منو ...",
-                    "اني عايزك ف حياتي ...",
-                    "بكل تفاصيلك ❤️"
-                ];
-                const target = document.getElementById('typewriter-text');
-                target.innerHTML = '';
-                
-                let lineIdx = 0;
-                let charIdx = 0;
-
-                const typeLine = () => {
-                    if (lineIdx < lines.length) {
-                        let currentLineText = lines[lineIdx];
-                        if (charIdx < currentLineText.length) {
-                            target.innerHTML += currentLineText.charAt(charIdx);
-                            if(charIdx % 2 === 0) this.playSound('type-sound');
-                            charIdx++;
-                            setTimeout(typeLine, 110);
-                        } else {
-                            target.innerHTML += "<br>";
-                            lineIdx++;
-                            charIdx = 0;
-                            setTimeout(typeLine, 750);
-                        }
-                    } else {
-                        document.getElementById('letter-continue').classList.remove('hidden');
-                    }
+            typeText(text, element, speed = 50, callback) {
+                element.innerHTML = '';
+                let i = 0;
+                const type = () => {
+                    if (i < text.length) {
+                        element.innerHTML += text.charAt(i);
+                        i++;
+                        if (i % 3 === 0) this.playTypeSound();
+                        setTimeout(type, speed);
+                    } else if (callback) callback();
                 };
-                typeLine();
-            }
-
-            setupBackground() {
-                const canvas = document.getElementById('bg-canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-
-                const particles = [];
-                for(let i=0; i<50; i++) {
-                    particles.push({
-                        x: Math.random() * canvas.width,
-                        y: Math.random() * canvas.height,
-                        radius: Math.random() * 2 + 0.8,
-                        dy: Math.random() * 0.4 + 0.1,
-                        alpha: Math.random() * 0.5 + 0.3
-                    });
-                }
-
-                const animate = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    particles.forEach(p => {
-                        ctx.fillStyle = `rgba(255, 214, 232, ${p.alpha})`;
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        ctx.fill();
-                        p.y -= p.dy;
-                        if(p.y < 0) p.y = canvas.height;
-                    });
-                    requestAnimationFrame(animate);
-                };
-                animate();
+                type();
             }
 
             fireConfetti() {
+                const txt = document.getElementById('final-forever-text');
+                setTimeout(() => txt.style.opacity = '1', 500);
+
                 const canvas = document.getElementById('confetti-canvas');
                 const ctx = canvas.getContext('2d');
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
 
                 const pieces = [];
-                const colors = ['#FF7EB6', '#FFD6E8', '#F8BBD0', '#ffffff', '#ff4a9e'];
+                const colors = ['#FF7EB6', '#ff4a9e', '#FFD6E8', '#fff'];
 
-                for(let i=0; i<120; i++) {
+                for(let i=0; i<150; i++) {
                     pieces.push({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height - canvas.height,
-                        size: Math.random() * 12 + 6,
+                        w: Math.random() * 10 + 5,
+                        h: Math.random() * 10 + 5,
                         color: colors[Math.floor(Math.random() * colors.length)],
-                        velocity: { x: Math.random() * 3 - 1.5, y: Math.random() * 4 + 2 },
-                        rotation: Math.random() * 360,
-                        rotationSpeed: Math.random() * 12 - 6
+                        speed: Math.random() * 3 + 2,
+                        angle: Math.random() * 360,
+                        spin: Math.random() * 5 - 2.5
                     });
                 }
 
                 const render = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    let active = false;
-                    
+                    ctx.clearRect(0,0,canvas.width,canvas.height);
                     pieces.forEach(p => {
-                        if(p.y < canvas.height) active = true;
+                        p.y += p.speed;
+                        p.angle += p.spin;
+                        if(p.y > canvas.height) p.y = -10;
+                        
                         ctx.save();
                         ctx.translate(p.x, p.y);
-                        ctx.rotate((p.rotation * Math.PI) / 180);
+                        ctx.rotate(p.angle * Math.PI / 180);
                         ctx.fillStyle = p.color;
-                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
                         ctx.restore();
-
-                        p.x += p.velocity.x;
-                        p.y += p.velocity.y;
-                        p.rotation += p.rotationSpeed;
                     });
-
-                    if(active) requestAnimationFrame(render);
+                    requestAnimationFrame(render);
                 };
                 render();
-
-                setTimeout(() => {
-                    const foreverText = document.getElementById('final-forever-text');
-                    if(foreverText) foreverText.style.opacity = '1';
-                }, 1000);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            new AppController();
-        });
+        window.onload = () => {
+            window.app = new AppController();
+            setTimeout(() => { window.app.initLetter(); }, 1000);
+        };
     </script>
 </body>
 </html>
