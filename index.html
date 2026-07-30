@@ -949,14 +949,12 @@
                 const percentageEl = document.getElementById('loading-percentage');
                 let currentProg = 0;
                 
-                // تحميل الصور في الخلفية بصمت تام بدون توقف الشاشة أو حدوث شاشة سوداء
                 this.photos.forEach(p => {
                     const img = new Image();
                     img.src = p.src;
                     img.onload = () => this.imageCache.set(p.src, img);
                 });
 
-                // عداد سريع وسلس جداً يضمن الانتقال المباشر بدون أي تهنيج
                 const loadInterval = setInterval(() => {
                     currentProg += 4;
                     
@@ -981,48 +979,48 @@
                 const statusText = document.getElementById('prep-status-text');
                 const progressBar = document.getElementById('prep-progress-bar');
                 
-                progressBar.style.width = '10%';
+                progressBar.style.width = '15%';
                 statusText.textContent = '✨ تجهيز الذكريات...';
                 await new Promise(r => setTimeout(r, 400));
 
-                progressBar.style.width = '40%';
+                progressBar.style.width = '45%';
                 statusText.textContent = '🖼️ تحميل الصور...';
                 
-                let loadedCount = 0;
-                await Promise.all(this.photos.map(p => {
+                const safetyTimeout = new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve();
+                    }, 3500);
+                });
+
+                const loadImagesPromise = Promise.all(this.photos.map(p => {
                     return new Promise((resolve) => {
                         if (this.imageCache.has(p.src)) {
-                            loadedCount++;
                             resolve();
                         } else {
                             const img = new Image();
                             img.src = p.src;
                             img.onload = () => {
                                 this.imageCache.set(p.src, img);
-                                loadedCount++;
                                 resolve();
                             };
                             img.onerror = () => {
-                                loadedCount++;
                                 resolve();
                             };
                         }
                     });
                 }));
 
-                progressBar.style.width = '70%';
-                statusText.textContent = '🎵 تجهيز الموسيقى...';
-                await new Promise(r => setTimeout(r, 400));
+                await Promise.race([loadImagesPromise, safetyTimeout]);
 
-                progressBar.style.width = '90%';
-                statusText.textContent = '💖 تجهيز المفاجأة...';
+                progressBar.style.width = '80%';
+                statusText.textContent = '🎵 تجهيز الموسيقى والمفاجأة...';
                 await new Promise(r => setTimeout(r, 400));
 
                 progressBar.style.width = '100%';
                 statusText.textContent = '✅ كل شيء أصبح جاهزاً ❤️';
                 this.isFullyLoaded = true;
 
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(r => setTimeout(r, 500));
                 this.navigateTo('screen-album');
             }
 
